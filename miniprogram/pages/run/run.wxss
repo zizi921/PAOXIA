@@ -1,0 +1,8 @@
+.run { padding-top: max(128px, 18vh, var(--safe-top, 96px)); padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); }
+.headline { font-size: 78rpx; line-height: 1.15; }
+.timer { margin-top: 44rpx; font-size: 156rpx; line-height: 1.05; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.run-art { flex: 1; width: 100%; min-height: 280rpx; display: flex; align-items: center; justify-content: center; padding: 22rpx 0 28rpx; }
+.run-runner { width: 360rpx; height: 375rpx; max-height: 29vh; }
+.return-link { position: relative; display: table; min-height: 52px; margin: 16rpx auto 0; padding: 0 20rpx 8rpx; background: transparent; border: none; border-radius: 0; font-size: 68rpx; line-height: 1.35; color: #262622; }
+.return-link::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: 9rpx; height: 2px; background: #75927b; transform: rotate(-3deg); border-radius: 50%; }
+@media (max-height: 600px) { .run { padding-top: max(100px, var(--safe-top, 96px)); padding-bottom: 12px; } .timer { margin-top: 24rpx; } .run-art { min-height: 240rpx; padding: 8rpx 0 20rpx; } }

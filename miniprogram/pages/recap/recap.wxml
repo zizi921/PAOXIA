@@ -1,0 +1,79 @@
+<view class="recap" style="--safe-top: {{safeTop}}px;">
+  <view class="recap-inner">
+    <view class="recap-heading-row">
+      <view>
+        <text class="handwritten recap-title">Back.</text>
+        <text class="handwritten recap-duration">23 min</text>
+      </view>
+      <view class="sun" aria-hidden="true">
+        <view class="sun-core"></view>
+        <view class="sun-ray sun-ray-1"></view><view class="sun-ray sun-ray-2"></view>
+        <view class="sun-ray sun-ray-3"></view><view class="sun-ray sun-ray-4"></view>
+        <view class="sun-ray sun-ray-5"></view><view class="sun-ray sun-ray-6"></view>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="handwritten section-title">How was it?</text>
+      <view class="mood-grid">
+        <button class="choice mood-choice {{mood === 'good' ? 'selected mood-green' : ''}}" data-value="good" bindtap="chooseMood" hover-class="choice-pressed" aria-label="心情不错">
+          <view class="face face-good"><view class="eyes"></view><view class="mouth"></view></view>
+          <text class="choice-label handwritten">Good</text>
+        </button>
+        <button class="choice mood-choice {{mood === 'calm' ? 'selected mood-green' : ''}}" data-value="calm" bindtap="chooseMood" hover-class="choice-pressed" aria-label="心情平静">
+          <view class="face face-calm"><view class="eyes"></view><view class="mouth"></view></view>
+          <text class="choice-label handwritten">Calm</text>
+        </button>
+        <button class="choice mood-choice {{mood === 'tired' ? 'selected mood-green' : ''}}" data-value="tired" bindtap="chooseMood" hover-class="choice-pressed" aria-label="感觉疲惫">
+          <view class="face face-tired"><view class="eyes"></view><view class="mouth"></view></view>
+          <text class="choice-label handwritten">Tired</text>
+        </button>
+        <button class="choice mood-choice {{mood === 'unsure' ? 'selected mood-green' : ''}}" data-value="unsure" bindtap="chooseMood" hover-class="choice-pressed" aria-label="不太确定">
+          <text class="question-mark handwritten">?</text>
+          <view class="face face-unsure"><view class="eyes"></view><view class="mouth"></view></view>
+          <text class="choice-label handwritten">Not sure</text>
+        </button>
+      </view>
+    </view>
+
+    <view class="section notice-section">
+      <text class="handwritten section-title">What did you notice?</text>
+      <view class="notice-grid">
+        <button class="choice notice-choice {{notice === 'tree' ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见树">
+          <view class="pictogram tree-icon"><view class="tree-crown crown-a"></view><view class="tree-crown crown-b"></view><view class="tree-crown crown-c"></view><view class="tree-trunk"></view><view class="tree-branch"></view></view>
+          <text class="choice-label handwritten">Tree</text>
+        </button>
+        <button class="choice notice-choice {{notice === 'wind' ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="感到风">
+          <view class="pictogram wind-icon"><view class="wind-line wind-a"></view><view class="wind-line wind-b"></view><view class="wind-line wind-c"></view></view>
+          <text class="choice-label handwritten">Wind</text>
+        </button>
+        <button class="choice notice-choice {{notice === 'cloud' ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见云">
+          <view class="pictogram cloud-icon"><view class="cloud-puff puff-a"></view><view class="cloud-puff puff-b"></view><view class="cloud-puff puff-c"></view><view class="cloud-base"></view></view>
+          <text class="choice-label handwritten">Cloud</text>
+        </button>
+        <button class="choice notice-choice {{notice === 'cat' ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见猫">
+          <view class="pictogram cat-icon"><view class="cat-head"><view class="cat-ear cat-ear-a"></view><view class="cat-ear cat-ear-b"></view><view class="cat-face"></view></view><view class="cat-body"></view><view class="cat-leg cat-leg-a"></view><view class="cat-leg cat-leg-b"></view><view class="cat-tail"></view></view>
+          <text class="choice-label handwritten">Cat</text>
+        </button>
+        <button class="choice notice-choice {{notice === 'streetlight' ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见路灯">
+          <view class="pictogram lamp-icon"><view class="lamp-pole"></view><view class="lamp-arm"></view><view class="lamp-shade"></view><view class="lamp-light"></view><view class="lamp-ground"></view></view>
+          <text class="choice-label handwritten">Streetlight</text>
+        </button>
+        <button class="choice notice-choice {{notice === 'nothing' ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="没有特别留意">
+          <view class="pictogram nothing-icon"><view class="dot dot-a"></view><view class="dot dot-b"></view><view class="dot dot-c"></view><view class="dot dot-d"></view><view class="dot dot-e"></view></view>
+          <view class="choice-label two-line handwritten"><text>Didn’t</text><text>notice</text></view>
+        </button>
+      </view>
+    </view>
+
+    <view class="form-row distance-row">
+      <text class="handwritten field-label">Distance <text class="optional">(optional)</text></text>
+      <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="跑步距离，可选" />
+      <text class="handwritten unit">km</text>
+    </view>
+    <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="A little note, if you like" placeholder-class="note-placeholder" aria-label="跑步备注，可选" />
+
+    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="保存演示记录并返回首页">Save →</button>
+    <text class="handwritten helper">You can leave it all blank.</text>
+  </view>
+</view>

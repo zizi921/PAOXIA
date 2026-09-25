@@ -1,0 +1,11 @@
+{
+  "pages": ["pages/home/home", "pages/run/run", "pages/recap/recap"],
+  "window": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fdfcf9",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

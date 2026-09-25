@@ -1,0 +1,13 @@
+.DS_Store
+
+# Local agent and review tooling
+.agents/
+.codex/
+.impeccable/
+
+# WeChat DevTools machine-specific settings
+project.private.config.json
+
+# Generated previews and discarded concept iterations
+output/ui-preview/
+output/imagegen/

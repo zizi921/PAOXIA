@@ -1,0 +1,33 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const pages = JSON.parse(fs.readFileSync('miniprogram/app.json')).pages;
+for (const route of pages) for (const ext of ['js','json','wxml','wxss']) assert(fs.existsSync(`miniprogram/${route}.${ext}`));
+function load(route, wx) {
+  let page;
+  vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), { Page: x => page=x, wx, require: () => ({ safeTop: () => 108 }) });
+  page.setData = update => Object.assign(page.data, update);
+  return page;
+}
+let layout;
+vm.runInNewContext(fs.readFileSync('miniprogram/utils/layout.js', 'utf8'), { module: layout = { exports: {} }, wx: { getMenuButtonBoundingClientRect: () => ({ bottom: 88 }) } });
+assert.equal(layout.exports.safeTop(), 108);
+let navigation, completed;
+const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}});
+home.onLoad(); assert.equal(home.data.safeTop, 108);
+home.go(); assert.equal(navigation, '/pages/run/run');
+navigation=null;home.go();assert.equal(navigation,null);completed();home.go();assert.equal(navigation,'/pages/run/run');
+const run=load('run',{navigateTo:x=>{navigation=x.url;x.complete();}});
+assert.equal(run.data.paused,false);run.togglePause();assert.equal(run.data.paused,true);run.togglePause();assert.equal(run.data.paused,false);
+run.finish();assert.equal(navigation,'/pages/recap/recap');
+const recap=load('recap',{reLaunch:x=>{navigation=x.url;x.complete();}});
+recap.onLoad();assert.equal(recap.data.safeTop,108);
+recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'good');
+recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'');
+recap.chooseNotice({currentTarget:{dataset:{value:'tree'}}});assert.equal(recap.data.notice,'tree');
+recap.updateDistance({detail:{value:'5.2'}});assert.equal(recap.data.distance,'5.2');
+recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,'Quiet streets');
+recap.save();assert.equal(navigation,'/pages/home/home');
+assert(!/setInterval|wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
+assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
+console.log('PASS: routes, navigation, double-tap guards, pause/resume, recap selections and inputs, UI-only scope.');

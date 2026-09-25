@@ -1,0 +1,6 @@
+.home { justify-content: flex-end; padding-bottom: calc(80rpx + env(safe-area-inset-bottom)); }
+.home-art { width: 100%; flex: 1; min-height: 360rpx; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 36rpx; }
+.home-runner { width: 620rpx; height: 660rpx; max-height: 56vh; }
+.home-actions { margin-bottom: 52rpx; }
+.screen .go { background-color: #e5ecdf; }
+@media (max-height: 600px) { .home { padding-top: max(96px, var(--safe-top, 96px)); padding-bottom: 24px; } .home-actions { margin-bottom: 12rpx; } .home-runner { max-height: 51vh; } }
