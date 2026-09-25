@@ -1,5 +1,5 @@
 {
-  "pages": ["pages/home/home", "pages/run/run", "pages/recap/recap"],
+  "pages": ["pages/home/home", "pages/run/run", "pages/recap/recap", "pages/history/history"],
   "window": {
     "navigationStyle": "custom",
     "navigationBarTextStyle": "black",

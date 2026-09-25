@@ -3,7 +3,7 @@
     <view class="recap-heading-row">
       <view>
         <text class="handwritten recap-title">Back.</text>
-        <text class="handwritten recap-duration">23 min</text>
+        <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
       <view class="sun" aria-hidden="true">
         <view class="sun-core"></view>

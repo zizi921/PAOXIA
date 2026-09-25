@@ -1,17 +1,23 @@
 const { safeTop } = require('../../utils/layout');
+const { formatDuration } = require('../../utils/time');
 
 // UI-only form state. Nothing is persisted or sent over the network.
 Page({
   data: {
     safeTop: 96,
+    durationText: '0 sec',
     mood: 'calm',
     notice: 'cat',
     distance: '',
     note: ''
   },
 
-  onLoad() {
-    this.setData({ safeTop: safeTop() });
+  onLoad(options) {
+    const durationSeconds = Number(options && options.durationSeconds) || 0;
+    this.setData({
+      safeTop: safeTop(),
+      durationText: formatDuration(durationSeconds)
+    });
   },
 
   chooseMood(event) {
@@ -35,8 +41,8 @@ Page({
   save() {
     if (this.navigating) return;
     this.navigating = true;
-    wx.reLaunch({
-      url: '/pages/home/home',
+    wx.redirectTo({
+      url: '/pages/history/history',
       complete: () => { this.navigating = false; }
     });
   }

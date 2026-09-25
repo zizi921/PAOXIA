@@ -5,6 +5,10 @@ Page({
   go() {
     if (this.navigating) return;
     this.navigating = true;
-    wx.navigateTo({ url: '/pages/run/run', complete: () => { this.navigating = false; } });
+    const startedAt = Date.now();
+    wx.navigateTo({
+      url: `/pages/run/run?startedAt=${startedAt}`,
+      complete: () => { this.navigating = false; }
+    });
   }
 });
