@@ -3,6 +3,7 @@
 .home-runner { width: 620rpx; height: 660rpx; max-height: 56vh; }
 .home-actions { margin-bottom: 52rpx; }
 .screen .go { background-color: #e5ecdf; }
+.home .resume { font-size: 48rpx; }
 .home .history-link { background: transparent; margin-top: 16rpx; min-height: 44px; line-height: 44px; font-size: 40rpx; text-decoration: underline; text-underline-offset: 6rpx; }
 .home .history-link::after { border: 0; }
 @media (max-height: 600px) { .home { padding-top: max(96px, var(--safe-top, 96px)); padding-bottom: 24px; } .home-actions { margin-bottom: 12rpx; } .home-runner { max-height: 51vh; } }

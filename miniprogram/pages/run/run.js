@@ -1,5 +1,6 @@
 const { safeTop } = require('../../utils/layout');
 const { formatElapsed } = require('../../utils/time');
+const { readActiveRun, saveActiveRun, clearActiveRun } = require('../../utils/active-run');
 
 Page({
   data: {
@@ -10,11 +11,22 @@ Page({
   },
 
   onLoad(options) {
-    this.startedAt = Number(options && options.startedAt) || Date.now();
-    this.totalPausedMs = 0;
-    this.pausedAt = 0;
-    this.ended = false;
     this.setData({ safeTop: safeTop() });
+    this.ended = true;
+    try {
+      const run = readActiveRun() || {
+        startedAt: Number(options && options.startedAt) || Date.now(),
+        totalPausedMs: 0,
+        pausedAt: 0
+      };
+      saveActiveRun(run);
+      Object.assign(this, run);
+      this.ended = false;
+      this.setData({ paused: !!this.pausedAt });
+      this.updateClock();
+    } catch (error) {
+      wx.showToast({ title: '未能保存或恢复跑步', icon: 'none' });
+    }
   },
 
   onShow() {
@@ -53,28 +65,49 @@ Page({
   },
 
   togglePause() {
-    if (this.data.paused) {
-      this.totalPausedMs += Date.now() - this.pausedAt;
-      this.pausedAt = 0;
-      this.setData({ paused: false });
-      this.beginTicker();
+    if (this.ended) return;
+    const now = Date.now();
+    const run = {
+      startedAt: this.startedAt,
+      totalPausedMs: this.totalPausedMs + (this.pausedAt ? now - this.pausedAt : 0),
+      pausedAt: this.pausedAt ? 0 : now
+    };
+    try {
+      saveActiveRun(run);
+    } catch (error) {
+      wx.showToast({ title: '未能保存跑步状态', icon: 'none' });
       return;
     }
-
+    Object.assign(this, run);
+    this.setData({ paused: !!this.pausedAt });
     this.updateClock();
-    this.pausedAt = Date.now();
-    this.clearTicker();
-    this.setData({ paused: true });
+    if (this.data.paused) this.clearTicker();
+    else this.beginTicker();
   },
 
   finish() {
-    if (this.navigating) return;
+    if (this.navigating || this.ended) return;
+    try {
+      clearActiveRun();
+    } catch (error) {
+      wx.showToast({ title: '未能结束本次跑步', icon: 'none' });
+      return;
+    }
     this.navigating = true;
     const elapsedSeconds = this.updateClock();
     this.ended = true;
     this.clearTicker();
     wx.redirectTo({
       url: `/pages/recap/recap?durationSeconds=${elapsedSeconds}`,
+      fail: () => {
+        try {
+          saveActiveRun(this);
+        } catch (error) {
+          wx.showToast({ title: '未能保存跑步状态', icon: 'none' });
+        }
+        this.ended = false;
+        if (!this.data.paused) this.beginTicker();
+      },
       complete: () => { this.navigating = false; }
     });
   }

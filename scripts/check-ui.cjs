@@ -9,7 +9,8 @@ class TestDate extends Date {
 const storage = new Map();
 const storageWx = {
   getStorageSync: key => storage.has(key) ? JSON.parse(storage.get(key)) : '',
-  setStorageSync: (key, value) => storage.set(key, JSON.stringify(value))
+  setStorageSync: (key, value) => storage.set(key, JSON.stringify(value)),
+  removeStorageSync: key => storage.delete(key)
 };
 function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns') || []; }
 const pages = JSON.parse(fs.readFileSync('miniprogram/app.json')).pages;
@@ -19,11 +20,13 @@ function load(route, wx, globals = {}) {
   const runtimeWx = { ...storageWx, ...wx };
   const recordsModule = { exports: {} };
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/records.js', 'utf8'), { module: recordsModule, wx: runtimeWx });
+  const activeRunModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/active-run.js', 'utf8'), { module: activeRunModule, wx: runtimeWx });
   const context = {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -69,6 +72,8 @@ now=9500;run.updateClock();assert.equal(run.data.elapsedText,'00:00:05');
 run.togglePause();assert.equal(run.data.paused,false);
 now=12500;tick();assert.equal(run.data.elapsedText,'00:00:08');
 run.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=8');
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+home.onShow();assert.equal(home.data.hasActiveRun,false);
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
 assert.equal(recap.data.weather,'');assert.equal(recap.data.mood,'');assert.equal(Object.keys(recap.data.selectedNotices).length,0);recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
@@ -175,6 +180,60 @@ assert.equal(newSession.data.selectedRecord.noticeItems.length,0);
 // Successful saves stay single even if navigation fails or Save is tapped again.
 blankRecap.save();
 assert.equal(savedRecords().length,3);
+// Simulate process loss with fresh page/module contexts and the same storage.
+const runRuntime = { Date: clock, setInterval: fn => { tick = fn; return 1; }, clearInterval: () => {} };
+now=20000;
+const firstRun=load('run',{},runRuntime);
+firstRun.onLoad({startedAt:'20000'});firstRun.onShow();
+now=25000;firstRun.onHide();firstRun.onUnload();
+now=35000;
+const restoredHome=load('home',{navigateTo:x=>{navigation=x.url;x.complete();}}, {Date:clock});
+restoredHome.onLoad();restoredHome.onShow();
+assert.equal(restoredHome.data.hasActiveRun,true);
+restoredHome.go();assert.equal(navigation,'/pages/run/run?startedAt=20000');
+const restoredRun=load('run',{},runRuntime);
+// Even a stale new-GO URL must restore the existing run.
+restoredRun.onLoad({startedAt:'35000'});restoredRun.onShow();
+assert.equal(restoredRun.data.elapsedSeconds,15);
+assert.equal(restoredRun.startedAt,20000);
+restoredRun.togglePause();
+assert.equal(storageWx.getStorageSync('paoxia.activeRun').pausedAt,35000);
+restoredRun.onUnload();now=65000;
+const pausedRun=load('run',{redirectTo:x=>{navigation=x.url;x.complete();}},runRuntime);
+pausedRun.onLoad({});pausedRun.onShow();
+assert.equal(pausedRun.data.paused,true);
+assert.equal(pausedRun.data.elapsedSeconds,15);
+assert.equal(pausedRun.timer,undefined);
+pausedRun.togglePause();
+assert.equal(pausedRun.totalPausedMs,30000);
+now=70000;tick();assert.equal(pausedRun.data.elapsedSeconds,20);
+pausedRun.togglePause();pausedRun.onUnload();now=90000;
+const twicePaused=load('run',{redirectTo:x=>{navigation=x.url;x.complete();}},runRuntime);
+twicePaused.onLoad({});twicePaused.onShow();
+assert.equal(twicePaused.data.elapsedSeconds,20);
+twicePaused.togglePause();assert.equal(twicePaused.totalPausedMs,50000);
+now=93000;tick();assert.equal(twicePaused.data.elapsedSeconds,23);
+twicePaused.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=23');
+restoredHome.onShow();assert.equal(restoredHome.data.hasActiveRun,false);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'),'');
+// Failed state writes must not silently change the pause state.
+now=100000;
+let activeRunToast;
+const writeFailure=load('run',{showToast:x=>{activeRunToast=x.title;},setStorageSync:(key,value)=>{
+  if(value.pausedAt) throw new Error('storage full');
+  storageWx.setStorageSync(key,value);
+}},runRuntime);
+writeFailure.onLoad({});writeFailure.onShow();now=105000;writeFailure.togglePause();
+assert.equal(writeFailure.data.paused,false);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun').pausedAt,0);
+assert.equal(activeRunToast,'未能保存跑步状态');
+writeFailure.onUnload();
+// A failed end-navigation restores the recoverable run.
+const navigationFailure=load('run',{redirectTo:x=>{x.fail();x.complete();}},runRuntime);
+navigationFailure.onLoad({});navigationFailure.finish();
+assert.equal(navigationFailure.ended,false);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun').startedAt,100000);
+navigationFailure.onUnload();storageWx.removeStorageSync('paoxia.activeRun');
 // A failed write must keep the form and previous records intact.
 let toast, failedNavigation = false;
 const failedRecap = load('recap', {
@@ -206,6 +265,7 @@ assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprog
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));
 assert(historyWxml.includes('No days out yet.'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('bindtap="openHistory"'));
+assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes("hasActiveRun ? '继续这次' : 'GO'"));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
 assert(historyWxml.includes('>DAY<'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));
@@ -214,4 +274,4 @@ assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
-console.log('PASS: routes, timer, recap, persistent multi-run history, same-day details, real aggregates, optional fields, and storage failure handling.');
+console.log('PASS: routes, timer, active-run restart/pause recovery, GO overwrite protection, end cleanup, recap, persistent multi-run history, same-day details, real aggregates, optional fields, and storage failure handling.');
