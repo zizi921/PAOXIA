@@ -1,15 +1,15 @@
-<view class="recap" style="--safe-top: {{safeTop}}px;">
+<view class="recap lang-{{language}}" style="--safe-top: {{safeTop}}px;">
   <view class="recap-inner">
     <view class="recap-heading-row">
       <view>
-        <text class="handwritten recap-title">{{editing ? 'Edit' : 'So?'}}</text>
+        <text class="handwritten recap-title">{{editing ? copy.edit : copy.so}}</text>
         <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
-      <button class="weather-trigger weather-{{weather || 'none'}} {{weatherOpen ? 'open' : ''}}" disabled="{{editing}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="{{editing ? '原记录天气：' : '选择天气，当前为'}}{{weatherLabel}}">
+      <button class="weather-trigger weather-{{weather || 'none'}} {{weatherOpen ? 'open' : ''}}" disabled="{{editing}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="{{copy.weather}}：{{weatherLabel}}">
         <text class="weather-glyph" aria-hidden="true">{{weatherGlyph}}</text>
-        <text class="handwritten weather-caption">Weather</text>
+        <text class="handwritten weather-caption">{{copy.weather}}</text>
       </button>
-      <view wx:if="{{weatherOpen}}" class="weather-menu" aria-label="天气选项">
+      <view wx:if="{{weatherOpen}}" class="weather-menu" aria-label="{{copy.weatherMenuAria}}">
         <button class="weather-option {{weather === item.value ? 'selected' : ''}}" wx:for="{{weatherOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="chooseWeather" hover-class="choice-pressed" aria-label="{{item.label}}">
           <text class="weather-option-glyph {{item.value}}" aria-hidden="true">{{item.glyph}}</text>
           <text class="handwritten weather-option-label">{{item.label}}</text>
@@ -18,78 +18,78 @@
     </view>
 
     <view class="section mood-section">
-      <text class="handwritten section-title">How was it?</text>
+      <text class="handwritten section-title">{{copy.howWasIt}}</text>
       <view class="mood-grid">
-        <button class="choice mood-choice {{mood === 'good' ? 'selected mood-green' : ''}}" data-value="good" bindtap="chooseMood" hover-class="choice-pressed" aria-label="心情不错">
+        <button class="choice mood-choice {{mood === 'good' ? 'selected mood-green' : ''}}" data-value="good" bindtap="chooseMood" hover-class="choice-pressed" aria-label="{{copy.good}}">
           <view class="face face-good"><view class="eyes"></view><view class="mouth"></view></view>
-          <text class="choice-label handwritten">Good</text>
+          <text class="choice-label handwritten">{{copy.good}}</text>
         </button>
-        <button class="choice mood-choice {{mood === 'calm' ? 'selected mood-green' : ''}}" data-value="calm" bindtap="chooseMood" hover-class="choice-pressed" aria-label="心情平静">
+        <button class="choice mood-choice {{mood === 'calm' ? 'selected mood-green' : ''}}" data-value="calm" bindtap="chooseMood" hover-class="choice-pressed" aria-label="{{copy.calm}}">
           <view class="face face-calm"><view class="eyes"></view><view class="mouth"></view></view>
-          <text class="choice-label handwritten">Calm</text>
+          <text class="choice-label handwritten">{{copy.calm}}</text>
         </button>
-        <button class="choice mood-choice {{mood === 'tired' ? 'selected mood-green' : ''}}" data-value="tired" bindtap="chooseMood" hover-class="choice-pressed" aria-label="感觉疲惫">
+        <button class="choice mood-choice {{mood === 'tired' ? 'selected mood-green' : ''}}" data-value="tired" bindtap="chooseMood" hover-class="choice-pressed" aria-label="{{copy.tired}}">
           <view class="face face-tired"><view class="eyes"></view><view class="mouth"></view></view>
-          <text class="choice-label handwritten">Tired</text>
+          <text class="choice-label handwritten">{{copy.tired}}</text>
         </button>
-        <button class="choice mood-choice {{mood === 'unsure' ? 'selected mood-green' : ''}}" data-value="unsure" bindtap="chooseMood" hover-class="choice-pressed" aria-label="不太确定">
+        <button class="choice mood-choice {{mood === 'unsure' ? 'selected mood-green' : ''}}" data-value="unsure" bindtap="chooseMood" hover-class="choice-pressed" aria-label="{{copy.unsure}}">
           <text class="question-mark handwritten">?</text>
           <view class="face face-unsure"><view class="eyes"></view><view class="mouth"></view></view>
-          <text class="choice-label handwritten">Not sure</text>
+          <text class="choice-label handwritten">{{copy.unsure}}</text>
         </button>
       </view>
     </view>
 
     <view class="section notice-section">
-      <text class="handwritten section-title">What did you notice?</text>
+      <text class="handwritten section-title">{{copy.whatNotice}}</text>
       <view class="notice-grid">
-        <button class="choice notice-choice {{selectedNotices.tree ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见树">
+        <button class="choice notice-choice {{selectedNotices.tree ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.tree}}">
           <view class="pictogram tree-icon"><view class="tree-crown crown-a"></view><view class="tree-crown crown-b"></view><view class="tree-crown crown-c"></view><view class="tree-trunk"></view><view class="tree-branch"></view></view>
-          <text class="choice-label handwritten">Tree</text>
+          <text class="choice-label handwritten">{{copy.tree}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.wind ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="感到风">
+        <button class="choice notice-choice {{selectedNotices.wind ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.wind}}">
           <view class="pictogram wind-icon"><view class="wind-line wind-a"></view><view class="wind-line wind-b"></view><view class="wind-line wind-c"></view></view>
-          <text class="choice-label handwritten">Wind</text>
+          <text class="choice-label handwritten">{{copy.wind}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.cloud ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见云">
+        <button class="choice notice-choice {{selectedNotices.cloud ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.cloud}}">
           <view class="pictogram cloud-icon"><view class="cloud-puff puff-a"></view><view class="cloud-puff puff-b"></view><view class="cloud-puff puff-c"></view><view class="cloud-base"></view></view>
-          <text class="choice-label handwritten">Cloud</text>
+          <text class="choice-label handwritten">{{copy.cloud}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.cat ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见猫">
+        <button class="choice notice-choice {{selectedNotices.cat ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.cat}}">
           <view class="pictogram cat-icon"><view class="cat-head"><view class="cat-ear cat-ear-a"></view><view class="cat-ear cat-ear-b"></view><view class="cat-face"></view></view><view class="cat-body"></view><view class="cat-leg cat-leg-a"></view><view class="cat-leg cat-leg-b"></view><view class="cat-tail"></view></view>
-          <text class="choice-label handwritten">Cat</text>
+          <text class="choice-label handwritten">{{copy.cat}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.streetlight ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见路灯">
+        <button class="choice notice-choice {{selectedNotices.streetlight ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.streetlight}}">
           <view class="pictogram lamp-icon"><view class="lamp-pole"></view><view class="lamp-arm"></view><view class="lamp-shade"></view><view class="lamp-light"></view><view class="lamp-ground"></view></view>
-          <text class="choice-label handwritten">Streetlight</text>
+          <text class="choice-label handwritten">{{copy.streetlight}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.dog ? 'selected notice-red' : ''}}" data-value="dog" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="Saw a dog">
+        <button class="choice notice-choice {{selectedNotices.dog ? 'selected notice-red' : ''}}" data-value="dog" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.dog}}">
           <image class="pictogram" src="/assets/notice-dog.svg" mode="aspectFit" aria-hidden="true" />
-          <text class="choice-label handwritten">Dog</text>
+          <text class="choice-label handwritten">{{copy.dog}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.flower ? 'selected notice-red' : ''}}" data-value="flower" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="Saw a flower">
+        <button class="choice notice-choice {{selectedNotices.flower ? 'selected notice-red' : ''}}" data-value="flower" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.flower}}">
           <image class="pictogram" src="/assets/notice-flower.svg" mode="aspectFit" aria-hidden="true" />
-          <text class="choice-label handwritten">Flower</text>
+          <text class="choice-label handwritten">{{copy.flower}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="没有特别留意">
+        <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.didnt}} {{copy.notice}}">
           <view class="pictogram nothing-icon"><view class="dot dot-a"></view><view class="dot dot-b"></view><view class="dot dot-c"></view><view class="dot dot-d"></view><view class="dot dot-e"></view></view>
-          <view class="choice-label two-line handwritten"><text>Didn’t</text><text>notice</text></view>
+          <view class="choice-label two-line handwritten"><text>{{copy.didnt}}</text><text>{{copy.notice}}</text></view>
         </button>
       </view>
     </view>
 
     <view class="form-row distance-row">
-      <text class="handwritten field-label">Distance <text wx:if="{{editing}}" class="optional">(edit)</text></text>
-      <input wx:if="{{editing}}" class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="修改跑步距离" />
+      <text class="handwritten field-label">{{copy.distance}} <text wx:if="{{editing}}" class="optional">{{copy.editHint}}</text></text>
+      <input wx:if="{{editing}}" class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="{{copy.distance}}" />
       <text wx:else class="handwritten distance-value" aria-label="自动记录的跑步距离 {{distance || '0.00'}} 公里">{{distance || '0.00'}}</text>
       <text class="handwritten unit">km</text>
     </view>
-    <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="A little note, if you like" placeholder-class="note-placeholder" aria-label="跑步备注，可选" />
+    <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="{{copy.notePlaceholder}}" placeholder-class="note-placeholder" aria-label="{{copy.notePlaceholder}}" />
 
-    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="{{editing ? '保存修改并返回详情' : '保存本次记录并查看历史记录'}}">{{editing ? 'Save changes →' : 'Save →'}}</button>
-    <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun" aria-label="继续本次跑步，返回计时页面">Continue this run</button>
-    <button wx:if="{{editing}}" class="discard-button handwritten" hover-class="pressed" bindtap="cancelEdit" aria-label="取消编辑">Cancel</button>
-    <button wx:else class="discard-button handwritten" hover-class="pressed" bindtap="discard" aria-label="Discard draft">Discard draft</button>
-    <button wx:if="{{editing}}" class="delete-button handwritten" hover-class="pressed" bindtap="deleteRun" aria-label="永久删除这条跑步记录">Delete this run</button>
+    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save">{{editing ? copy.saveChanges : copy.save}}</button>
+    <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun">{{copy.continueRun}}</button>
+    <button wx:if="{{editing}}" class="discard-button handwritten" hover-class="pressed" bindtap="cancelEdit">{{copy.cancel}}</button>
+    <button wx:else class="discard-button handwritten" hover-class="pressed" bindtap="discard">{{copy.discardDraft}}</button>
+    <button wx:if="{{editing}}" class="delete-button handwritten" hover-class="pressed" bindtap="deleteRun">{{copy.deleteRun}}</button>
   </view>
 </view>

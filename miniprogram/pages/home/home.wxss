@@ -1,4 +1,9 @@
 .home { justify-content: flex-end; padding-bottom: calc(80rpx + env(safe-area-inset-bottom)); }
+.language-switch { position: absolute; top: max(calc(var(--safe-top, 96px) + 16rpx), 112px); left: 44rpx; z-index: 2; display: flex; align-items: center; color: #a2a29a; font-family: sans-serif; font-size: 28rpx; }
+.language-option { min-width: 72rpx; min-height: 44px; margin: 0; padding: 0 8rpx; border: 0; background: transparent; color: #aaa9a1; font-family: sans-serif; font-size: 28rpx; font-weight: 500; line-height: 44px; }
+.language-option::after { border: 0; }
+.language-option.active { color: #666760; font-weight: 700; }
+.language-divider { color: #bab9b2; }
 .home-art { width: 100%; flex: 1; min-height: 360rpx; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 36rpx; }
 .home-runner { width: 620rpx; height: 660rpx; max-height: 56vh; }
 .home-actions { margin-bottom: 52rpx; }

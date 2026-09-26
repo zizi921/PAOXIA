@@ -3,6 +3,7 @@ const { safeTop } = require('../../utils/layout');
 const { formatElapsed } = require('../../utils/time');
 const { distanceBetween, formatDistanceMeters } = require('../../utils/distance');
 const { readActiveRun, saveActiveRun, clearActiveRun } = require('../../utils/active-run');
+const { readLanguage, copyFor } = require('../../utils/i18n');
 
 Page({
   data: {
@@ -11,11 +12,14 @@ Page({
     elapsedSeconds: 0,
     elapsedText: '00:00:00',
     distanceText: '0.00 km',
-    locationStatus: 'Finding GPS…'
+    locationStatus: 'Finding GPS…',
+    language: 'en',
+    copy: copyFor('en', 'run')
   },
 
   onLoad(options) {
-    this.setData({ safeTop: safeTop() });
+    const language = readLanguage();
+    this.setData({ safeTop: safeTop(), language, copy: copyFor(language, 'run') });
     this.ended = true;
     try {
       let run = readActiveRun();
@@ -39,11 +43,11 @@ Page({
       Object.assign(this, run);
       this.ended = false;
       this.setData({ paused: !!this.pausedAt,
-        distanceText: `${formatDistanceMeters(this.distanceMeters)} km`,
-        locationStatus: this.pausedAt ? 'Distance paused' : 'Finding GPS…' });
+        distanceText: `${formatDistanceMeters(this.distanceMeters)} km` });
+      this.setLocationStatus(this.pausedAt ? 'distancePaused' : 'findingGps');
       this.updateClock();
     } catch (error) {
-      wx.showToast({ title: '未能保存或恢复跑步', icon: 'none' });
+      wx.showToast({ title: this.data.copy.restoreError, icon: 'none' });
     }
   },
 
@@ -97,10 +101,15 @@ Page({
     }
   },
 
+  setLocationStatus(key) {
+    this.locationStatusKey = key;
+    this.setData({ locationStatus: this.data.copy[key] || '' });
+  },
+
   startLocationTracking() {
     if (this.locationStarting || this.locationActive || this.data.paused || this.ended) return;
     if (typeof wx.onLocationChange !== 'function') {
-      this.setData({ locationStatus: 'Distance needs phone GPS' });
+      this.setLocationStatus('gpsNeeded');
       return;
     }
     this.locationStarting = true;
@@ -112,7 +121,7 @@ Page({
     const succeeded = () => {
       this.locationStarting = false;
       this.locationActive = true;
-      this.setData({ locationStatus: 'GPS on · distance updates automatically' });
+      this.setLocationStatus('gpsOn');
     };
     const failed = () => {
       if (typeof wx.startLocationUpdate === 'function' && !this.foregroundLocationAttempted) {
@@ -136,7 +145,7 @@ Page({
     this.locationStarting = false;
     this.locationActive = false;
     this.foregroundLocationAttempted = false;
-    this.setData({ locationStatus: 'Allow location to calculate distance' });
+    this.setLocationStatus('allowLocation');
   },
 
   stopLocationTracking() {
@@ -171,8 +180,8 @@ Page({
     if (segmentMeters / seconds > 12) return;
     this.distanceMeters += segmentMeters;
     this.lastLocation = point;
-    this.setData({ distanceText: `${formatDistanceMeters(this.distanceMeters)} km`,
-      locationStatus: 'GPS on · distance updates automatically' });
+    this.setData({ distanceText: `${formatDistanceMeters(this.distanceMeters)} km` });
+    this.setLocationStatus('gpsOn');
     this.persistRun();
   },
 
@@ -189,7 +198,7 @@ Page({
     try {
       saveActiveRun(run);
     } catch (error) {
-      wx.showToast({ title: '未能保存跑步状态', icon: 'none' });
+      wx.showToast({ title: this.data.copy.stateError, icon: 'none' });
       return;
     }
     Object.assign(this, run);
@@ -198,7 +207,7 @@ Page({
     if (this.data.paused) {
       this.clearTicker();
       this.stopLocationTracking();
-      this.setData({ locationStatus: 'Distance paused' });
+      this.setLocationStatus('distancePaused');
     } else {
       this.beginTicker();
       this.startLocationTracking();
@@ -224,7 +233,7 @@ Page({
           distanceMeters: this.distanceMeters, lastLocation: this.lastLocation } });
       clearActiveRun();
     } catch (error) {
-      wx.showToast({ title: '未能结束本次跑步', icon: 'none' });
+      wx.showToast({ title: this.data.copy.finishError, icon: 'none' });
       return;
     }
     this.navigating = true;
@@ -238,7 +247,7 @@ Page({
         try {
           saveActiveRun(this);
         } catch (error) {
-          wx.showToast({ title: '未能保存跑步状态', icon: 'none' });
+          wx.showToast({ title: this.data.copy.stateError, icon: 'none' });
         }
         this.ended = false;
         if (!this.data.paused) {

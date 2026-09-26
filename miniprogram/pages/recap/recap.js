@@ -1,11 +1,14 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
 const { readRecords, saveRecord, updateRecord, deleteRecord } = require('../../utils/records');
+const { readLanguage, copyFor } = require('../../utils/i18n');
 
 const { readDraft, saveDraft, clearDraft } = require('../../utils/recap-draft');
 Page({
   data: {
     safeTop: 96,
+    language: 'en',
+    copy: copyFor('en', 'recap'),
     editing: false,
     canContinue: false,
     durationSeconds: 0,
@@ -34,7 +37,10 @@ Page({
     this.run = null;
     this.editId = options && options.recordId || null;
     this.editRecord = null;
-    this.setData({ editing: !!this.editId });
+    const language = readLanguage();
+    const copy = copyFor(language, 'recap');
+    this.setData({ editing: !!this.editId, language, copy,
+      weatherOptions: this.data.weatherOptions.map(option => ({ ...option, label: copy.weatherOptions[option.value] })) });
     this.setData({ canContinue: false });
     this.setData({ safeTop: safeTop() });
     if (this.editId) {
@@ -46,15 +52,15 @@ Page({
         const selectedNotices = {};
         (record.notices || []).forEach(value => { selectedNotices[value] = true; });
         this.setData({ durationSeconds: record.durationSeconds,
-          durationText: formatDuration(record.durationSeconds),
+          durationText: formatDuration(record.durationSeconds, language),
           weather: record.weather || '', weatherOpen: false,
-          weatherLabel: selected ? selected.label : 'Not selected',
+          weatherLabel: selected ? selected.label : copy.notSelected,
           weatherGlyph: selected ? selected.glyph : '＋',
           mood: record.mood && record.mood !== 'Not set' ? record.moodType : '',
           selectedNotices, distance: record.distance && record.distance !== '— km' ? String(record.distance).replace(/\s*km$/, '') : '',
           note: record.note || '' });
       } catch (error) {
-        wx.showToast({ title: 'Could not load this run. Reopen it.', icon: 'none' });
+        wx.showToast({ title: copy.loadRecordError, icon: 'none' });
       }
       return;
     }
@@ -62,23 +68,23 @@ Page({
     try {
       draft = readDraft();
     } catch (error) {
-      wx.showToast({ title: 'Could not load draft. Reopen this page.', icon: 'none' });
+      wx.showToast({ title: copy.loadDraftError, icon: 'none' });
       return;
     }
     this.run = draft && draft.run || null;
     this.setData({ canContinue: !!this.run });
     this.draftId = draft ? draft.id : `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const durationSeconds = draft ? draft.durationSeconds : Number(options && options.durationSeconds) || 0;
-    this.setData({ weather: '', weatherLabel: 'Not selected', weatherGlyph: '＋',
+    this.setData({ weather: '', weatherLabel: copy.notSelected, weatherGlyph: '＋',
       weatherOpen: false, mood: '', selectedNotices: {}, distance: '', note: '' });
     if (draft) {
       const { weather, mood, selectedNotices, distance, note } = draft;
       const selected = this.data.weatherOptions.find(option => option.value === weather);
       this.setData({ weather, mood, selectedNotices, distance, note,
-        weatherLabel: selected ? selected.label : 'Not selected',
+        weatherLabel: selected ? selected.label : copy.notSelected,
         weatherGlyph: selected ? selected.glyph : '＋' });
     }
-    this.setData({ durationSeconds, durationText: formatDuration(durationSeconds) });
+    this.setData({ durationSeconds, durationText: formatDuration(durationSeconds, language) });
     this.persistDraft();
   },
 
@@ -90,7 +96,7 @@ Page({
       saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, run: this.run });
       return true;
     } catch (error) {
-      wx.showToast({ title: 'Could not save draft. Try again.', icon: 'none' });
+      wx.showToast({ title: this.data.copy.draftError, icon: 'none' });
       return false;
     }
   },
@@ -120,7 +126,7 @@ Page({
     const selected = this.data.weatherOptions.find(option => option.value === weather);
     if (!selected) return;
     if (this.data.weather === weather) {
-      this.updateForm({ weather: '', weatherLabel: 'Not selected', weatherGlyph: '＋', weatherOpen: false });
+      this.updateForm({ weather: '', weatherLabel: this.data.copy.notSelected, weatherGlyph: '＋', weatherOpen: false });
       return;
     }
     this.updateForm({
@@ -161,7 +167,7 @@ Page({
     wx.redirectTo({
       url: '/pages/run/run?continue=1',
       fail: () => {
-        wx.showToast({ title: 'Could not open run. Try again.', icon: 'none' });
+        wx.showToast({ title: this.data.copy.continueError, icon: 'none' });
       },
       complete: () => { this.navigating = false; }
     });
@@ -172,29 +178,29 @@ Page({
     if (this.navigating || this.saved) return;
     this.navigating = true;
     wx.showModal({
-      title: 'Discard draft?',
-      content: 'Your time and notes will be deleted. This run will not be saved.',
-      confirmText: 'Discard',
-      cancelText: 'Keep',
+      title: this.data.copy.discardTitle,
+      content: this.data.copy.discardContent,
+      confirmText: this.data.copy.discardConfirm,
+      cancelText: this.data.copy.keep,
       success: result => {
         if (!result.confirm) return;
         try {
           clearDraft();
         } catch (error) {
-          wx.showToast({ title: 'Could not discard draft. Try again.', icon: 'none' });
+          wx.showToast({ title: this.data.copy.discardError, icon: 'none' });
           return;
         }
         this.discarded = true;
         this.setData({ canContinue: false });
         this.setData({ durationSeconds: 0, durationText: '0 sec', weather: '',
-          weatherLabel: 'Not selected', weatherGlyph: '＋', weatherOpen: false,
+          weatherLabel: this.data.copy.notSelected, weatherGlyph: '＋', weatherOpen: false,
           mood: '', selectedNotices: {}, distance: '', note: '' });
         wx.reLaunch({
           url: '/pages/home/home',
           fail: () => {
             // Discard succeeded; keep a usable blank form if navigation fails.
             this.onLoad({});
-            wx.showToast({ title: 'Draft discarded. Could not open home.', icon: 'none' });
+            wx.showToast({ title: this.data.copy.discardNavError, icon: 'none' });
           }
         });
       },
@@ -209,7 +215,7 @@ Page({
       fail: () => {
         wx.redirectTo({
           url: `/pages/history/history?recordId=${encodeURIComponent(this.editId)}`,
-          fail: () => { wx.showToast({ title: 'Could not open history. Try again.', icon: 'none' }); },
+          fail: () => { wx.showToast({ title: this.data.copy.historyError, icon: 'none' }); },
           complete: () => { this.navigating = false; }
         });
       },
@@ -226,17 +232,17 @@ Page({
     if (!this.editId || !this.editRecord || this.navigating) return;
     this.navigating = true;
     wx.showModal({
-      title: 'Delete this run?',
-      content: 'This saved run and its details will be permanently deleted.',
-      confirmText: 'Delete',
+      title: this.data.copy.deleteTitle,
+      content: this.data.copy.deleteContent,
+      confirmText: this.data.copy.deleteConfirm,
       confirmColor: '#a65445',
-      cancelText: 'Cancel',
+      cancelText: this.data.copy.cancel,
       success: result => {
         if (!result.confirm) return;
         try {
           deleteRecord(this.editId);
         } catch (error) {
-          wx.showToast({ title: 'Could not delete this run. Try again.', icon: 'none' });
+          wx.showToast({ title: this.data.copy.deleteError, icon: 'none' });
           return;
         }
         this.discarded = true;
@@ -246,7 +252,7 @@ Page({
           fail: () => {
             wx.redirectTo({
               url: '/pages/history/history',
-              fail: () => { wx.showToast({ title: 'Run deleted. Could not open history.', icon: 'none' }); },
+              fail: () => { wx.showToast({ title: this.data.copy.deleteNavError, icon: 'none' }); },
               complete: () => { this.navigating = false; }
             });
           },
@@ -273,7 +279,7 @@ Page({
         this.saved = true;
       }
     } catch (error) {
-      wx.showToast({ title: 'Could not save changes. Try again.', icon: 'none' });
+      wx.showToast({ title: this.data.copy.saveChangesError, icon: 'none' });
       return;
     }
     this.returnToDetail();
@@ -308,17 +314,17 @@ Page({
       }
     } catch (error) {
       this.navigating = false;
-      wx.showToast({ title: 'Could not save this run. Try again.', icon: 'none' });
+      wx.showToast({ title: this.data.copy.saveError, icon: 'none' });
       return;
     }
     try {
       clearDraft();
     } catch (error) {
-      wx.showToast({ title: 'Run saved. Draft cleanup failed.', icon: 'none' });
+      wx.showToast({ title: this.data.copy.cleanupError, icon: 'none' });
     }
     wx.redirectTo({
       url: '/pages/history/history',
-      fail: () => { wx.showToast({ title: 'Run saved. Tap Save to open history.', icon: 'none' }); },
+      fail: () => { wx.showToast({ title: this.data.copy.savedNavError, icon: 'none' }); },
       complete: () => { this.navigating = false; }
     });
   }

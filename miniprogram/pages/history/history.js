@@ -1,21 +1,24 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
 const { readRecords } = require('../../utils/records');
+const { readLanguage, copyFor } = require('../../utils/i18n');
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const WEEKDAY_NAMES_ZH = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+const WEEKDAY_SHORT_ZH = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 const NOTICE_META = {
-  tree: { label: 'Tree', glyph: '♧', className: 'tree' },
-  wind: { label: 'Wind', glyph: '≋', className: 'wind' },
-  cloud: { label: 'Cloud', glyph: '☁', className: 'cloud' },
-  cat: { label: 'Cat', glyph: '⌁', className: 'cat' },
-  dog: { label: 'Dog', image: '/assets/notice-dog.svg', className: 'dog' },
-  flower: { label: 'Flower', image: '/assets/notice-flower.svg', className: 'flower' },
-  sun: { label: 'Sun', glyph: '☀', className: 'sun' },
-  moon: { label: 'Moon', glyph: '☾', className: 'moon' },
-  streetlight: { label: 'Streetlight', glyph: '⌑', className: 'streetlight' },
-  nothing: { label: 'Didn’t notice', glyph: '···', className: 'nothing' }
+  tree: { labelKey: 'tree', glyph: '♧', className: 'tree' },
+  wind: { labelKey: 'wind', glyph: '≋', className: 'wind' },
+  cloud: { labelKey: 'cloud', glyph: '☁', className: 'cloud' },
+  cat: { labelKey: 'cat', glyph: '⌁', className: 'cat' },
+  dog: { labelKey: 'dog', image: '/assets/notice-dog.svg', className: 'dog' },
+  flower: { labelKey: 'flower', image: '/assets/notice-flower.svg', className: 'flower' },
+  sun: { labelKey: 'sun', glyph: '☀', className: 'sun' },
+  moon: { labelKey: 'moon', glyph: '☾', className: 'moon' },
+  streetlight: { labelKey: 'streetlight', glyph: '⌑', className: 'streetlight' },
+  nothing: { labelKey: 'didntNotice', glyph: '···', className: 'nothing' }
 };
 const WEATHER_META = {
   sunny: { glyph: '☀', className: 'sunny' },
@@ -33,8 +36,9 @@ function dateParts(value) {
   };
 }
 
-function monthPresentation(value) {
+function monthPresentation(value, language) {
   const { year, monthIndex } = dateParts(`${value}-01`);
+  if (language === 'zh') return { label: `${year}年${monthIndex + 1}月`, abbr: `${monthIndex + 1}月` };
   return { label: `${MONTH_NAMES[monthIndex]} ${year}`, abbr: MONTH_ABBR[monthIndex] };
 }
 
@@ -44,9 +48,10 @@ function shiftMonth(value, direction) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function dayPresentation(value) {
+function dayPresentation(value, language) {
   const { year, monthIndex, day } = dateParts(value);
   const date = new Date(year, monthIndex, day);
+  if (language === 'zh') return { label: `${year}年${monthIndex + 1}月${day}日`, weekday: WEEKDAY_NAMES_ZH[date.getDay()] };
   return { label: `${MONTH_NAMES[monthIndex]} ${day}, ${year}`, weekday: WEEKDAY_NAMES[date.getDay()] };
 }
 
@@ -56,37 +61,44 @@ function shiftDay(value, direction) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-function totalText(totalSeconds) {
+function totalText(totalSeconds, language) {
   const safeSeconds = Math.max(0, Number(totalSeconds) || 0);
   const hours = Math.floor(safeSeconds / 3600);
   const minutes = Math.floor((safeSeconds % 3600) / 60);
+  if (language === 'zh') {
+    if (hours) return `${hours}小时 ${minutes}分钟`;
+    return minutes ? `${minutes}分钟` : `${Math.floor(safeSeconds)}秒`;
+  }
   if (hours) return `${hours} h ${String(minutes).padStart(2, '0')} min`;
   return minutes ? `${minutes} min` : `${Math.floor(safeSeconds)} sec`;
 }
 
-function decorateRecord(record) {
+function decorateRecord(record, language, copy) {
   if (!record) return null;
   const { monthIndex, day } = dateParts(record.date);
   const date = new Date(`${record.date}T12:00:00`);
   const weather = WEATHER_META[record.weather] || { glyph: '☁', className: 'decorative' };
   return {
     ...record,
-    day: `${MONTH_ABBR[monthIndex]} ${day}`,
-    weekday: WEEKDAY_NAMES[date.getDay()].slice(0, 3),
-    weekdayLong: WEEKDAY_NAMES[date.getDay()],
-    duration: formatDuration(record.durationSeconds),
+    day: language === 'zh' ? `${monthIndex + 1}月${day}日` : `${MONTH_ABBR[monthIndex]} ${day}`,
+    weekday: language === 'zh' ? WEEKDAY_SHORT_ZH[date.getDay()] : WEEKDAY_NAMES[date.getDay()].slice(0, 3),
+    weekdayLong: language === 'zh' ? WEEKDAY_NAMES_ZH[date.getDay()] : WEEKDAY_NAMES[date.getDay()],
+    duration: formatDuration(record.durationSeconds, language),
     distance: record.distance || '— km',
-    mood: record.mood || 'Not set',
+    mood: record.mood === 'Not set' || !record.mood ? copy.notSet : copy[record.moodType] || record.mood,
     moodType: record.moodType || 'unsure',
     marks: record.notices || [],
-    noticeItems: (record.notices || []).map(value => NOTICE_META[value]).filter(Boolean),
+    noticeItems: (record.notices || []).map(value => {
+      const meta = NOTICE_META[value];
+      return meta ? { ...meta, label: copy[meta.labelKey] } : null;
+    }).filter(Boolean),
     weatherGlyph: weather.glyph,
     weatherClass: weather.className,
     note: record.note || ''
   };
 }
 
-function yearRowsFor(records, year) {
+function yearRowsFor(records, year, language) {
   const byMonth = {};
   records.filter(record => record.date.startsWith(`${year}-`)).forEach(record => {
     const value = record.date.slice(0, 7);
@@ -97,21 +109,23 @@ function yearRowsFor(records, year) {
   return Object.keys(byMonth).sort().reverse().map(value => {
     const monthIndex = Number(value.slice(5, 7)) - 1;
     const aggregate = byMonth[value];
-    return { month: MONTH_ABBR[monthIndex], value, times: aggregate.times, totalSeconds: aggregate.totalSeconds, level: Math.min(5, aggregate.times) };
+    return { month: language === 'zh' ? `${monthIndex + 1}月` : MONTH_ABBR[monthIndex], value, times: aggregate.times, totalSeconds: aggregate.totalSeconds, level: Math.min(5, aggregate.times) };
   });
 }
 
-function presentYearRows(rows) {
+function presentYearRows(rows, language) {
   return rows.map(row => ({
     ...row,
-    timesText: `${row.times} ${row.times === 1 ? 'time' : 'times'}`,
-    total: totalText(row.totalSeconds)
+    timesText: language === 'zh' ? `${row.times}次` : `${row.times} ${row.times === 1 ? 'time' : 'times'}`,
+    total: totalText(row.totalSeconds, language)
   }));
 }
 
 Page({
   data: {
     safeTop: 96,
+    language: 'en',
+    copy: copyFor('en', 'history'),
     mode: 'year',
     periodLabels: { year: '', month: '', day: '' },
     monthValue: '',
@@ -126,18 +140,20 @@ Page({
   },
 
   onLoad(options) {
+    const language = readLanguage();
+    const copy = copyFor(language, 'history');
     let records = [];
     try {
       records = readRecords();
     } catch (error) {
-      wx.showToast({ title: '未能读取本机记录', icon: 'none' });
+      wx.showToast({ title: copy.readError, icon: 'none' });
     }
     const latestRun = records.find(record => record.id === (options && options.recordId)) || records[0];
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const dayValue = latestRun ? latestRun.date : today;
     const monthValue = dayValue.slice(0, 7);
-    this.setData({ safeTop: safeTop(), records, dayValue, monthValue, mode: latestRun ? 'day' : 'year' });
+    this.setData({ safeTop: safeTop(), language, copy, records, dayValue, monthValue, mode: latestRun ? 'day' : 'year' });
     this.applyYear(dayValue.slice(0, 4));
     this.applyMonth(monthValue);
     this.applyDay(dayValue, latestRun && latestRun.id);
@@ -147,7 +163,7 @@ Page({
     try {
       this.setData({ records: readRecords() });
     } catch (error) {
-      wx.showToast({ title: '未能读取本机记录', icon: 'none' });
+      wx.showToast({ title: this.data.copy.readError, icon: 'none' });
       return;
     }
     this.applyYear(this.data.periodLabels.year);
@@ -160,7 +176,7 @@ Page({
     this.editNavigating = true;
     wx.navigateTo({
       url: `/pages/recap/recap?recordId=${encodeURIComponent(this.data.selectedRecord.id)}`,
-      fail: () => { wx.showToast({ title: 'Could not open edit. Try again.', icon: 'none' }); },
+      fail: () => { wx.showToast({ title: this.data.copy.editError, icon: 'none' }); },
       complete: () => { this.editNavigating = false; }
     });
   },
@@ -195,21 +211,23 @@ Page({
 
   applyYear(yearValue) {
     const year = String(yearValue || 2026);
-    const rawRows = yearRowsFor(this.data.records, year);
+    const rawRows = yearRowsFor(this.data.records, year, this.data.language);
     const times = rawRows.reduce((sum, row) => sum + row.times, 0);
     const seconds = rawRows.reduce((sum, row) => sum + row.totalSeconds, 0);
     const periodLabels = { ...this.data.periodLabels, year };
     this.setData({
       periodLabels,
-      yearRows: presentYearRows(rawRows),
-      yearSummary: { times: times ? `${times} times out.` : 'No days out yet.', total: times ? `${totalText(seconds)}.` : 'Try another year.' }
+      yearRows: presentYearRows(rawRows, this.data.language),
+      yearSummary: this.data.language === 'zh'
+        ? { times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyYearHint }
+        : { times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyYearHint }
     });
   },
 
   applyMonth(value) {
-    const { label } = monthPresentation(value);
-    const records = this.data.records.filter(record => record.date.startsWith(`${value}-`)).map(decorateRecord);
-    const aggregate = yearRowsFor(this.data.records, value.slice(0, 4)).find(row => row.value === value);
+    const { label } = monthPresentation(value, this.data.language);
+    const records = this.data.records.filter(record => record.date.startsWith(`${value}-`)).map(record => decorateRecord(record, this.data.language, this.data.copy));
+    const aggregate = yearRowsFor(this.data.records, value.slice(0, 4), this.data.language).find(row => row.value === value);
     const times = aggregate ? aggregate.times : records.length;
     const seconds = aggregate ? aggregate.totalSeconds : records.reduce((sum, record) => sum + record.durationSeconds, 0);
     const periodLabels = { ...this.data.periodLabels, month: label };
@@ -217,15 +235,17 @@ Page({
       monthValue: value,
       periodLabels,
       monthRows: records,
-      monthSummary: { times: times ? `${times} times out.` : 'No days out yet.', total: times ? `${totalText(seconds)}.` : 'Pick another month.' }
+      monthSummary: this.data.language === 'zh'
+        ? { times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyMonthHint }
+        : { times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyMonthHint }
     });
   },
 
   applyDay(value, recordId) {
-    const { label, weekday } = dayPresentation(value);
+    const { label, weekday } = dayPresentation(value, this.data.language);
     const periodLabels = { ...this.data.periodLabels, day: label };
     const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
-    const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)));
+    const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)), this.data.language, this.data.copy);
     this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels });
   },
 

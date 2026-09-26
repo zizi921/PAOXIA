@@ -1,4 +1,9 @@
-<view class="screen home" style="--safe-top: {{safeTop}}px;">
+<view class="screen home lang-{{language}}" style="--safe-top: {{safeTop}}px;">
+  <view class="language-switch" aria-label="Language / 语言">
+    <button class="language-option {{language === 'en' ? 'active' : ''}}" data-language="en" bindtap="chooseLanguage" aria-label="English">EN</button>
+    <text class="language-divider">/</text>
+    <button class="language-option {{language === 'zh' ? 'active' : ''}}" data-language="zh" bindtap="chooseLanguage" aria-label="中文">中文</button>
+  </view>
   <view class="home-art"><image class="runner home-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
-  <view class="actions home-actions"><button class="pill handwritten go {{hasActiveRun || hasDraft ? 'resume' : ''}}" hover-class="pressed" bindtap="go" aria-label="{{hasActiveRun ? '继续这次跑步' : (hasDraft ? 'Continue your draft' : '开始跑步计时')}}">{{hasActiveRun ? '继续这次' : (hasDraft ? 'Continue draft' : 'GO')}}</button><button class="history-link handwritten" hover-class="pressed" bindtap="openHistory" aria-label="查看跑步记录">Days Out.</button></view>
+  <view class="actions home-actions"><button class="pill handwritten go {{hasActiveRun || hasDraft ? 'resume' : ''}}" hover-class="pressed" bindtap="go" aria-label="{{hasActiveRun ? copy.continueRunAria : (hasDraft ? copy.continueDraftAria : copy.goAria)}}">{{hasActiveRun ? copy.continueRun : (hasDraft ? copy.continueDraft : copy.go)}}</button><button class="history-link handwritten" hover-class="pressed" bindtap="openHistory" aria-label="{{copy.historyAria}}">{{copy.history}}</button></view>
 </view>

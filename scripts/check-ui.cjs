@@ -30,11 +30,13 @@ function load(route, wx, globals = {}) {
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/active-run.js', 'utf8'), { module: activeRunModule, wx: runtimeWx });
   const draftModule = { exports: {} };
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/recap-draft.js', 'utf8'), { module: draftModule, wx: runtimeWx, require: () => recordsModule.exports });
+  const i18nModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/i18n.js', 'utf8'), { module: i18nModule, wx: runtimeWx });
   const context = {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/time') ? time : request.endsWith('/distance') ? distance : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/distance') ? distance : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -49,6 +51,10 @@ let now = 1000;
 const clock = { now: () => now };
 const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, { Date: clock });
 home.onLoad(); assert.equal(home.data.safeTop, 108);
+home.chooseLanguage({ currentTarget: { dataset: { language: 'zh' } } });
+assert.equal(storageWx.getStorageSync('paoxia.language'), 'zh');assert.equal(home.data.copy.go, '出发');
+home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
+assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'GO');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
 navigation=null;home.openHistory();assert.equal(navigation,null);completed();
 home.go(); assert.equal(navigation, '/pages/run/run?startedAt=1000');
@@ -270,7 +276,7 @@ const writeFailure=load('run',{showToast:x=>{activeRunToast=x.title;},setStorage
 writeFailure.onLoad({});writeFailure.onShow();now=105000;writeFailure.togglePause();
 assert.equal(writeFailure.data.paused,false);
 assert.equal(storageWx.getStorageSync('paoxia.activeRun').pausedAt,0);
-assert.equal(activeRunToast,'未能保存跑步状态');
+assert.equal(activeRunToast,'Could not save run state.');
 writeFailure.onUnload();
 // A failed end-navigation restores the recoverable run.
 const navigationFailure=load('run',{redirectTo:x=>{x.fail();x.complete();}},runRuntime);
@@ -307,15 +313,16 @@ assert(historyWxml.includes('data-id="{{item.id}}"'));
 assert(historyWxml.includes('wx:for="{{selectedRecord.noticeItems}}"'));
 assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprogram/pages/history/history.wxss','utf8')));
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));
-assert(historyWxml.includes('No days out yet.'));
+assert(historyWxml.includes('{{copy.noRuns}}'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('bindtap="openHistory"'));
-assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes("hasDraft ? 'Continue draft' : 'GO'"));
+assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('hasDraft ? copy.continueDraft : copy.go'));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
-assert(historyWxml.includes('>DAY<'));assert(historyWxml.includes('day-feeling'));
+assert(historyWxml.includes('{{copy.dayKicker}}'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));
 history.goAgain();assert.equal(navigation,'/pages/home/home');
 assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
+assert.equal(time.formatDuration(3661,'zh'),'1小时 1分钟');
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
 // Slice 5: fresh page/module contexts simulate closing and reopening the app.
@@ -621,3 +628,21 @@ assert.equal(toast, 'Could not delete this run. Try again.');
 assert.equal(storage.get('paoxia.recapDraft'), untouchedDraft);assert.equal(storage.get('paoxia.activeRun'), untouchedRun);
 assert(historyWxml.includes('bindtap="editRecord"'));assert(recapWxml.includes('bindtap="cancelEdit"'));assert(recapWxml.includes('bindtap="deleteRun"'));
 console.log('PASS: Slice 7 — original values, targeted update, deletion confirmation, immediate detail refresh, clearing, cancellation, no duplicates, timing preservation, draft isolation and failure handling.');
+
+// Language choice persists and localizes all four pages without changing saved record values.
+storage.clear();storageWx.setStorageSync('paoxia.language', 'zh');
+storageWx.setStorageSync('paoxia.completedRuns', [{ id: 'zh-run', date: '2026-09-26', durationSeconds: 125,
+  distance: '2.4 km', mood: 'Calm', moodType: 'calm', notices: ['tree'], note: '', weather: 'rainy' }]);
+const zhHome = load('home', {});zhHome.onLoad();zhHome.onShow();
+assert.equal(zhHome.data.language, 'zh');assert.equal(zhHome.data.copy.go, '出发');assert.equal(zhHome.data.copy.history, '跑步记录');
+const zhRun = load('run', {}, { Date: clock, setInterval: () => 1, clearInterval: () => {} });zhRun.onLoad({ startedAt: String(now) });
+assert.equal(zhRun.data.copy.moving, '跑起来');assert.equal(zhRun.data.copy.pause, '暂停');
+const zhRecap = load('recap', {});zhRecap.onLoad({ recordId: 'zh-run' });
+assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.howWasIt, '感觉怎么样？');assert.equal(zhRecap.data.weatherLabel, '下雨');
+const zhHistory = load('history', {});zhHistory.onLoad({ recordId: 'zh-run' });
+assert.equal(zhHistory.data.periodLabels.month, '2026年9月');assert.equal(zhHistory.data.periodLabels.day, '2026年9月26日');
+assert.equal(zhHistory.data.selectedRecord.duration, '2分钟');assert.equal(zhHistory.data.selectedRecord.mood, '平静');assert.equal(zhHistory.data.selectedRecord.noticeItems[0].label, '树');
+assert.equal(zhHistory.data.yearSummary.times, '1次跑步');assert.equal(zhHistory.data.monthSummary.total, '2分钟');
+const homeWxml = fs.readFileSync('miniprogram/pages/home/home.wxml','utf8');
+assert(homeWxml.includes('data-language="en"'));assert(homeWxml.includes('data-language="zh"'));
+console.log('PASS: persistent EN / 中文 selection and localized home, run, recap, dates, summaries and saved-record presentation.');
