@@ -1,5 +1,21 @@
 const { safeTop } = require('../../utils/layout');
 
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+function monthPresentation(value) {
+  const [yearText, monthText] = String(value).split('-');
+  const monthIndex = Math.min(11, Math.max(0, Number(monthText) - 1));
+  const year = Number(yearText) || 2026;
+  return { label: `${MONTH_NAMES[monthIndex]} ${year}`, abbr: MONTH_ABBR[monthIndex] };
+}
+
+function shiftMonth(value, direction) {
+  const [yearText, monthText] = String(value).split('-');
+  const date = new Date(Number(yearText) || 2026, (Number(monthText) || 1) - 1 + direction, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 Page({
   data: {
     safeTop: 96,
@@ -9,6 +25,7 @@ Page({
       month: 'September 2026',
       day: 'September 21, 2026'
     },
+    monthValue: '2026-09',
     monthRows: [
       { day: 'SEP 25', weekday: 'Thu', duration: '37 min', distance: '1.8 km', mood: 'Calm', moodType: 'calm', marks: ['cat', 'wind'] },
       { day: 'SEP 21', weekday: 'Sun', duration: '52 min', distance: '5.2 km', mood: 'Good', moodType: 'good', marks: ['tree', 'cloud'] },
@@ -46,6 +63,20 @@ Page({
     this.setData({ mode: 'month' });
   },
 
+  chooseMonth(event) {
+    this.applyMonth(event.detail.value);
+  },
+
+  applyMonth(value) {
+    const { label, abbr } = monthPresentation(value);
+    const periodLabels = { ...this.data.periodLabels, month: label };
+    const monthRows = this.data.monthRows.map(item => ({
+      ...item,
+      day: item.day.replace(/^[A-Z]{3}/, abbr)
+    }));
+    this.setData({ monthValue: value, periodLabels, monthRows });
+  },
+
   stepPeriod(event) {
     const direction = Number(event.currentTarget.dataset.direction);
     const periodLabels = { ...this.data.periodLabels };
@@ -53,7 +84,8 @@ Page({
       const currentYear = Number(periodLabels.year) || 2026;
       periodLabels.year = String(currentYear + direction);
     } else if (this.data.mode === 'month') {
-      periodLabels.month = direction < 0 ? 'August 2026' : 'October 2026';
+      this.applyMonth(shiftMonth(this.data.monthValue, direction));
+      return;
     } else {
       periodLabels.day = direction < 0 ? 'September 20, 2026' : 'September 22, 2026';
     }

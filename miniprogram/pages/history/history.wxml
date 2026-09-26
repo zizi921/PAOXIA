@@ -13,7 +13,10 @@
     </view>
     <view class="period-nav">
       <button class="period-arrow handwritten" data-direction="-1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="上一时间段">‹</button>
-      <view class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text><text wx:if="{{mode === 'day'}}" class="handwritten weekday-label">Sunday</text></view>
+      <picker wx:if="{{mode === 'month'}}" class="month-picker" mode="date" fields="month" value="{{monthValue}}" start="2020-01" end="2035-12" bindchange="chooseMonth" aria-label="筛选月份">
+        <view class="period-copy month-period-copy"><text class="handwritten period-label">{{periodLabels.month}}</text><text class="handwritten month-filter-caret" aria-hidden="true">⌄</text></view>
+      </picker>
+      <view wx:else class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text><text wx:if="{{mode === 'day'}}" class="handwritten weekday-label">Sunday</text></view>
       <button class="period-arrow handwritten" data-direction="1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="下一时间段">›</button>
     </view>
   </view>
@@ -22,14 +25,14 @@
     <block wx:if="{{mode === 'month'}}">
       <view class="summary month-summary">
         <view><text class="handwritten summary-line">6 times out.</text><text class="handwritten summary-line">2 h 47 min.</text></view>
-        <image class="summary-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" />
+        <image class="summary-runner month-rest-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" />
       </view>
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
-        <button class="record-row" wx:for="{{monthRows}}" wx:key="day" bindtap="openDay" hover-class="row-pressed">
-          <view class="record-date"><view><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
+        <view class="record-row" role="button" aria-label="查看 {{item.day}} 跑步记录" wx:for="{{monthRows}}" wx:key="day" bindtap="openDay" hover-class="row-pressed">
+          <view class="record-date"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
           <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark}}" wx:for="{{item.marks}}" wx:for-item="mark" wx:key="*this">{{mark === 'tree' ? '♧' : mark === 'cloud' ? '☁' : mark === 'moon' ? '☾' : mark === 'sun' ? '☀' : mark === 'cat' ? '⌁' : '≋'}}</text></view></view>
           <text class="handwritten row-chevron">›</text>
-        </button>
+        </view>
       </scroll-view>
     </block>
 

@@ -56,7 +56,10 @@ history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(histor
 history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2026');
 history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2027');
 history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(history.data.periodLabels.year,'2026');
-history.openMonth();assert.equal(history.data.mode,'month');history.openDay();assert.equal(history.data.mode,'day');
+history.openMonth();assert.equal(history.data.mode,'month');
+history.chooseMonth({detail:{value:'2026-08'}});assert.equal(history.data.monthValue,'2026-08');assert.equal(history.data.periodLabels.month,'August 2026');assert.equal(history.data.monthRows[0].day,'AUG 25');
+history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.monthValue,'2026-09');assert.equal(history.data.periodLabels.month,'September 2026');assert.equal(history.data.monthRows[0].day,'SEP 25');
+history.openDay();assert.equal(history.data.mode,'day');
 history.goAgain();assert.equal(navigation,'/pages/home/home');
 assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');

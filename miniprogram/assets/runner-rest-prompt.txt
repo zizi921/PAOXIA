@@ -1,0 +1,8 @@
+Use case: precise-object-edit
+Asset type: transparent WeChat mini program summary illustration
+Primary request: Change the character's pose into a clearly different post-run resting pose: seated on the ground in a relaxed three-quarter side view, one knee bent, one leg extended, one hand supporting the body on the ground and the other hand wiping the forehead. The pose must read immediately as resting after a run, not running.
+Input image: runner.png is the exact character and style reference.
+Style/medium: preserve the rough hand-drawn black wax-crayon linework, white shirt, bright blue scribbled pants, black-and-white shoes with orange sole accents, simple round faceless head with three black hair strokes and round ears.
+Composition/framing: centered full-body character, compact horizontal silhouette suitable for a small Month summary panel; include only two or three subtle hand-drawn exertion marks near the head.
+Background: genuinely transparent alpha background.
+Constraints: preserve the same mascot identity, palette, imperfect handmade texture, line weight, and childlike sketch character. No text, no scenery, no border, no shadow, no second character, no cropped limbs, no watermark.
