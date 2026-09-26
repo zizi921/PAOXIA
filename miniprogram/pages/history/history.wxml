@@ -26,14 +26,14 @@
   </view>
 
   <view class="history-content">
-    <view wx:if="{{!records.length}}" class="day-empty"><image class="empty-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">No days out yet.</text><text class="handwritten empty-copy">Go again, then save your first run.</text><text class="handwritten empty-copy">Only your latest run in this session appears here.</text></view>
+    <view wx:if="{{!records.length}}" class="day-empty"><image class="empty-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">No days out yet.</text><text class="handwritten empty-copy">Go again, then save your first run.</text><text class="handwritten empty-copy">Your saved runs stay on this device.</text></view>
     <block wx:elif="{{mode === 'month'}}">
       <view class="summary month-summary">
         <view><text class="handwritten summary-line">{{monthSummary.times}}</text><text class="handwritten summary-line">{{monthSummary.total}}</text></view>
         <image class="summary-runner month-rest-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" />
       </view>
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
-        <view class="record-row" role="button" aria-label="查看 {{item.day}} 跑步记录" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" bindtap="openDay" hover-class="row-pressed">
+        <view class="record-row" role="button" aria-label="查看 {{item.day}} 跑步记录" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" data-id="{{item.id}}" bindtap="openDay" hover-class="row-pressed">
           <view class="record-date"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
           <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark.className}}" wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label">{{mark.glyph}}</text></view></view>
           <text class="handwritten row-chevron">›</text>

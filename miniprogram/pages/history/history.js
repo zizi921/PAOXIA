@@ -1,5 +1,6 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
+const { readRecords } = require('../../utils/records');
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -123,9 +124,13 @@ Page({
   },
 
   onLoad() {
-    const app = getApp();
-    const latestRun = app && app.globalData ? app.globalData.latestRun : null;
-    const records = latestRun ? [latestRun] : [];
+    let records = [];
+    try {
+      records = readRecords();
+    } catch (error) {
+      wx.showToast({ title: '未能读取本机记录', icon: 'none' });
+    }
+    const latestRun = records[0];
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const dayValue = latestRun ? latestRun.date : today;
@@ -137,7 +142,7 @@ Page({
   },
 
   onShow() {
-    if (this.data.mode === 'day') this.applyDay(this.data.dayValue);
+    if (this.data.mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
   },
 
   switchMode(event) {
@@ -145,13 +150,13 @@ Page({
     this.setData({ mode });
     if (mode === 'year') this.applyYear(this.data.periodLabels.year);
     if (mode === 'month') this.applyMonth(this.data.monthValue);
-    if (mode === 'day') this.applyDay(this.data.dayValue);
+    if (mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
   },
 
   openDay(event) {
     const date = event.currentTarget.dataset.date || this.data.dayValue;
     this.setData({ mode: 'day' });
-    this.applyDay(date);
+    this.applyDay(date, event.currentTarget.dataset.id);
   },
 
   openMonth(event) {
@@ -196,10 +201,10 @@ Page({
     });
   },
 
-  applyDay(value) {
+  applyDay(value, recordId) {
     const { label, weekday } = dayPresentation(value);
     const periodLabels = { ...this.data.periodLabels, day: label };
-    const selectedRecord = decorateRecord(this.data.records.find(record => record.date === value));
+    const selectedRecord = decorateRecord(this.data.records.find(record => record.date === value && (!recordId || record.id === recordId)));
     this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels });
   },
 

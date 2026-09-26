@@ -6,17 +6,24 @@ class TestDate extends Date {
   constructor(...args) { super(...(args.length ? args : [2028, 8, 26, 12])); }
   static now() { return new TestDate().getTime(); }
 }
-const appState = { globalData: { latestRun: null } };
+const storage = new Map();
+const storageWx = {
+  getStorageSync: key => storage.has(key) ? JSON.parse(storage.get(key)) : '',
+  setStorageSync: (key, value) => storage.set(key, JSON.stringify(value))
+};
+function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns') || []; }
 const pages = JSON.parse(fs.readFileSync('miniprogram/app.json')).pages;
 for (const route of pages) for (const ext of ['js','json','wxml','wxss']) assert(fs.existsSync(`miniprogram/${route}.${ext}`));
 function load(route, wx, globals = {}) {
   let page;
+  const runtimeWx = { ...storageWx, ...wx };
+  const recordsModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/records.js', 'utf8'), { module: recordsModule, wx: runtimeWx });
   const context = {
     Page: x => page=x,
-    wx,
-    getApp: () => appState,
+    wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/time') ? time : { safeTop: () => 108 },
+    require: request => request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -89,7 +96,7 @@ assert.equal(recap.data.weather,'rainy');
 assert.equal(recap.data.mood,'good');
 recap.updateDistance({detail:{value:'5.2'}});assert.equal(recap.data.distance,'5.2');
 recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,'Quiet streets');
-recap.save();assert.equal(navigation,'/pages/history/history');assert.equal(appState.globalData.latestRun.durationSeconds,8);assert.equal(appState.globalData.latestRun.distance,'5.2 km');assert.equal(appState.globalData.latestRun.mood,'Good');assert.equal(appState.globalData.latestRun.notices.join(','),'tree,wind,cloud,cat,streetlight');
+recap.save();assert.equal(navigation,'/pages/history/history');assert.equal(savedRecords()[0].durationSeconds,8);assert.equal(savedRecords()[0].distance,'5.2 km');assert.equal(savedRecords()[0].mood,'Good');assert.equal(savedRecords()[0].notices.join(','),'tree,wind,cloud,cat,streetlight');
 const history=load('history',{reLaunch:x=>{navigation=x.url;}});
 history.onLoad();history.onShow();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'day');assert.equal(history.data.selectedRecord.duration,'8 sec');assert.equal(history.data.selectedRecord.note,'Quiet streets');assert.equal(history.data.selectedRecord.weatherClass,'rainy');
 assert.equal(history.data.records.length,1);
@@ -120,7 +127,7 @@ assert.equal(history.data.selectedRecord.duration,'8 sec');
 const reopenedHistory = load('history', {});
 reopenedHistory.onLoad();assert.equal(reopenedHistory.data.selectedRecord.note,'Quiet streets');
 // The formerly hard-coded demo year must also contain only the real run.
-appState.globalData.latestRun = {...appState.globalData.latestRun, date:'2026-09-26'};
+storageWx.setStorageSync('paoxia.completedRuns', [{...savedRecords()[0], date:'2026-09-26'}]);
 const history2026 = load('history', {});history2026.onLoad();
 assert.equal(history2026.data.yearRows.length,1);
 assert.equal(history2026.data.yearRows[0].times,1);
@@ -133,9 +140,10 @@ optionalRecap.save();
 const nothingHistory = load('history',{});nothingHistory.onLoad();
 assert.equal(nothingHistory.data.selectedRecord.noticeItems.length,1);
 assert.equal(nothingHistory.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
-optionalRecap.chooseNotice({currentTarget:{dataset:{value:'nothing'}}});
-optionalRecap.save();
-assert.equal(appState.globalData.latestRun.notices.length,0);
+const blankRecap = load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
+blankRecap.onLoad({durationSeconds:'8'});
+blankRecap.save();
+assert.equal(savedRecords()[0].notices.length,0);
 const blankHistory = load('history',{});blankHistory.onLoad();
 assert.equal(blankHistory.data.selectedRecord.noticeItems.length,0);
 assert.equal(blankHistory.data.selectedRecord.duration,'8 sec');
@@ -146,11 +154,53 @@ const recapWxml = fs.readFileSync('miniprogram/pages/recap/recap.wxml','utf8');
 for (const value of ['tree','wind','cloud','cat','streetlight','nothing']) {
   assert(recapWxml.includes("selectedNotices." + value + " ? 'selected notice-red'"));
 }
-appState.globalData.latestRun = null;
+// A new page/module context reads persistent storage without app globals.
 const newSession = load('history', {});newSession.onLoad();
-assert.equal(newSession.data.records.length,0);
+assert.equal(newSession.data.records.length,3);
+assert.equal(newSession.data.yearSummary.times,'2 times out.');
+assert.equal(newSession.data.monthSummary.total,'16 sec.');
+assert.equal(newSession.data.selectedRecord.distance,'— km');
+assert.equal(new Set(newSession.data.records.map(record=>record.id)).size,3);
+newSession.openDay({currentTarget:{dataset:{date:'2028-09-26',id:savedRecords()[1].id}}});
+newSession.onShow();
+assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
+// Re-selecting Day or returning from another tab must keep the chosen run.
+for (const mode of ['day','month','day','year','day']) {
+  newSession.switchMode({currentTarget:{dataset:{mode}}});
+  assert.equal(newSession.data.selectedRecord.id,savedRecords()[1].id);
+  assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
+}
+newSession.openDay({currentTarget:{dataset:{date:'2028-09-26',id:savedRecords()[0].id}}});
+assert.equal(newSession.data.selectedRecord.noticeItems.length,0);
+// Successful saves stay single even if navigation fails or Save is tapped again.
+blankRecap.save();
+assert.equal(savedRecords().length,3);
+// A failed write must keep the form and previous records intact.
+let toast, failedNavigation = false;
+const failedRecap = load('recap', {
+  setStorageSync: () => { throw new Error('storage full'); },
+  showToast: value => { toast = value.title; },
+  redirectTo: () => { failedNavigation = true; }
+});
+failedRecap.onLoad({durationSeconds:'5'});
+failedRecap.updateNote({detail:{value:'Still here'}});
+failedRecap.save();
+assert.equal(failedNavigation,false);
+assert.equal(toast,'未能保存到本机');
+assert.equal(failedRecap.data.note,'Still here');
+assert.equal(failedRecap.navigating,false);
+assert.equal(savedRecords().length,3);
+// Different years and months aggregate independently, without demo records.
+newSession.applyYear('2026');
+assert.equal(newSession.data.yearRows.length,1);
+assert.equal(newSession.data.yearRows[0].totalSeconds,8);
+newSession.applyMonth('2026-09');
+assert.equal(newSession.data.monthRows.length,1);
+newSession.applyMonth('2026-08');
+assert.equal(newSession.data.monthRows.length,0);
 const historyWxml=fs.readFileSync('miniprogram/pages/history/history.wxml','utf8');assert(!historyWxml.includes('day-run-row'));assert(historyWxml.includes('class="day-detail"'));
 assert(!historyWxml.includes('day-share'));
+assert(historyWxml.includes('data-id="{{item.id}}"'));
 assert(historyWxml.includes('wx:for="{{selectedRecord.noticeItems}}"'));
 assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprogram/pages/history/history.wxss','utf8')));
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));
@@ -164,4 +214,4 @@ assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
-console.log('PASS: routes, live timer, pause exclusion, recap handoff, truthful history filters, navigation, and no database persistence.');
+console.log('PASS: routes, timer, recap, persistent multi-run history, same-day details, real aggregates, optional fields, and storage failure handling.');

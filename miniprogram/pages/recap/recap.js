@@ -1,7 +1,8 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
+const { saveRecord } = require('../../utils/records');
 
-// UI-only form state. Nothing is persisted or sent over the network.
+// Form state stays in memory until Save writes a completed record locally.
 Page({
   data: {
     safeTop: 96,
@@ -86,8 +87,7 @@ Page({
     const now = new Date();
     const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const moodLabels = { good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure' };
-    const app = getApp();
-    app.globalData.latestRun = {
+    const record = {
       id: `run-${Date.now()}`,
       date,
       durationSeconds: this.data.durationSeconds,
@@ -98,6 +98,16 @@ Page({
       note: this.data.note,
       weather: this.data.weather
     };
+    try {
+      if (!this.saved) {
+        saveRecord(record);
+        this.saved = true;
+      }
+    } catch (error) {
+      this.navigating = false;
+      wx.showToast({ title: '未能保存到本机', icon: 'none' });
+      return;
+    }
     wx.redirectTo({
       url: '/pages/history/history',
       complete: () => { this.navigating = false; }
