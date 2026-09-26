@@ -24,29 +24,29 @@
         <view><text class="handwritten summary-line">6 times out.</text><text class="handwritten summary-line">2 h 47 min.</text></view>
         <image class="summary-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" />
       </view>
-      <view class="record-list">
+      <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <button class="record-row" wx:for="{{monthRows}}" wx:key="day" bindtap="openDay" hover-class="row-pressed">
           <view class="record-date"><view><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
           <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark}}" wx:for="{{item.marks}}" wx:for-item="mark" wx:key="*this">{{mark === 'tree' ? '♧' : mark === 'cloud' ? '☁' : mark === 'moon' ? '☾' : mark === 'sun' ? '☀' : mark === 'cat' ? '⌁' : '≋'}}</text></view></view>
           <text class="handwritten row-chevron">›</text>
         </button>
-      </view>
+      </scroll-view>
     </block>
 
     <block wx:elif="{{mode === 'year'}}">
       <view class="summary year-summary"><image class="year-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /><view><text class="handwritten summary-line">48 times out.</text><text class="handwritten summary-line">18 h 26 min.</text></view></view>
-      <view class="year-list">
-        <button class="year-row" wx:for="{{yearRows}}" wx:key="month" bindtap="openMonth" hover-class="row-pressed"><text class="handwritten year-month">{{item.month}}</text><view class="year-copy"><text class="handwritten">{{item.times}}</text><text class="handwritten year-total">{{item.total}}</text></view><view class="bar-chart level-{{item.level}}"><view></view><view></view><view></view><view></view><view></view></view><text class="handwritten row-chevron">›</text></button>
-      </view>
+      <scroll-view class="year-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="year-row" role="button" aria-label="查看 {{item.month}} 跑步记录" wx:for="{{yearRows}}" wx:key="month" bindtap="openMonth" hover-class="row-pressed"><text class="handwritten year-month">{{item.month}}</text><view class="year-copy"><text class="handwritten">{{item.times}}</text><text class="handwritten year-total">{{item.total}}</text></view><view class="bar-chart level-{{item.level}}"><view></view><view></view><view></view><view></view><view></view></view><text class="handwritten row-chevron">›</text></view>
+      </scroll-view>
     </block>
 
-    <block wx:else>
+    <scroll-view wx:else class="day-scroll scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
       <view class="day-scene"><view class="day-sun"><view></view></view><text class="day-cloud">☁</text><text class="day-tree tree-a">♧</text><text class="day-tree tree-b">♧</text><image class="day-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
       <view class="day-feature"><view><text class="handwritten day-duration">52 min</text><text class="handwritten day-distance">5.2 km</text></view><view class="day-mood"><view class="mini-face good"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Good</text></view></view>
       <view class="day-notices"><view><text class="big-mark tree">♧</text><text class="handwritten">Tree</text></view><view><text class="big-mark cloud">☁</text><text class="handwritten">Cloud</text></view></view>
       <text class="handwritten day-note">Such a beautiful sunset!</text>
       <view class="day-runs"><view class="day-run-row"><view><text class="handwritten run-time">12:05</text><text class="handwritten record-duration">23 min</text><text class="handwritten record-distance">2.1 km</text></view><view class="record-story"><view class="mood-inline"><view class="mini-face calm"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Calm</text></view><text class="mark cat">⌁</text></view><text class="handwritten row-chevron">›</text></view><view class="day-run-row"><view><text class="handwritten run-time">07:40</text><text class="handwritten record-duration">18 min</text><text class="handwritten record-distance">— km</text></view><view class="record-story"><view class="mood-inline"><view class="mini-face tired"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Tired</text></view><text class="mark wind">≋</text></view><text class="handwritten row-chevron">›</text></view></view>
-    </block>
+    </scroll-view>
   </view>
 
   <button class="history-action handwritten" bindtap="goAgain" hover-class="pressed" aria-label="再次开始跑步"><text class="plus">＋</text><text>Go again</text><text class="action-arrow">→</text></button>

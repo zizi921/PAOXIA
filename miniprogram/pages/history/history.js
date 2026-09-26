@@ -3,7 +3,7 @@ const { safeTop } = require('../../utils/layout');
 Page({
   data: {
     safeTop: 96,
-    mode: 'month',
+    mode: 'year',
     periodLabels: {
       year: '2026',
       month: 'September 2026',
@@ -49,10 +49,11 @@ Page({
   stepPeriod(event) {
     const direction = Number(event.currentTarget.dataset.direction);
     const periodLabels = { ...this.data.periodLabels };
-    if (this.data.mode === 'month') {
+    if (this.data.mode === 'year') {
+      const currentYear = Number(periodLabels.year) || 2026;
+      periodLabels.year = String(currentYear + direction);
+    } else if (this.data.mode === 'month') {
       periodLabels.month = direction < 0 ? 'August 2026' : 'October 2026';
-    } else if (this.data.mode === 'year') {
-      periodLabels.year = direction < 0 ? '2025' : '2027';
     } else {
       periodLabels.day = direction < 0 ? 'September 20, 2026' : 'September 22, 2026';
     }

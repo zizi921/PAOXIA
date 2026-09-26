@@ -51,9 +51,11 @@ recap.updateDistance({detail:{value:'5.2'}});assert.equal(recap.data.distance,'5
 recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,'Quiet streets');
 recap.save();assert.equal(navigation,'/pages/history/history');
 const history=load('history',{reLaunch:x=>{navigation=x.url;}});
-history.onLoad();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'month');
-history.switchMode({currentTarget:{dataset:{mode:'year'}}});assert.equal(history.data.mode,'year');
+history.onLoad();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'year');assert.equal(history.data.periodLabels.year,'2026');
 history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(history.data.periodLabels.year,'2025');
+history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2026');
+history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2027');
+history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(history.data.periodLabels.year,'2026');
 history.openMonth();assert.equal(history.data.mode,'month');history.openDay();assert.equal(history.data.mode,'day');
 history.goAgain();assert.equal(navigation,'/pages/home/home');
 assert.equal(time.formatElapsed(3661),'01:01:01');
