@@ -22,11 +22,13 @@ function load(route, wx, globals = {}) {
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/records.js', 'utf8'), { module: recordsModule, wx: runtimeWx });
   const activeRunModule = { exports: {} };
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/active-run.js', 'utf8'), { module: activeRunModule, wx: runtimeWx });
+  const draftModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/recap-draft.js', 'utf8'), { module: draftModule, wx: runtimeWx, require: () => recordsModule.exports });
   const context = {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -245,7 +247,7 @@ failedRecap.onLoad({durationSeconds:'5'});
 failedRecap.updateNote({detail:{value:'Still here'}});
 failedRecap.save();
 assert.equal(failedNavigation,false);
-assert.equal(toast,'未能保存到本机');
+assert.equal(toast,'Could not save this run. Try again.');
 assert.equal(failedRecap.data.note,'Still here');
 assert.equal(failedRecap.navigating,false);
 assert.equal(savedRecords().length,3);
@@ -265,7 +267,7 @@ assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprog
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));
 assert(historyWxml.includes('No days out yet.'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('bindtap="openHistory"'));
-assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes("hasActiveRun ? '继续这次' : 'GO'"));
+assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes("hasDraft ? 'Continue draft' : 'GO'"));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
 assert(historyWxml.includes('>DAY<'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));
@@ -274,4 +276,116 @@ assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
-console.log('PASS: routes, timer, active-run restart/pause recovery, GO overwrite protection, end cleanup, recap, persistent multi-run history, same-day details, real aggregates, optional fields, and storage failure handling.');
+// Slice 5: fresh page/module contexts simulate closing and reopening the app.
+storage.clear();
+const draftRuntime = {
+  redirectTo: x => { navigation = x.url; x.complete(); },
+  reLaunch: x => { navigation = x.url; },
+  showToast: x => { toast = x.title; }
+};
+const pick = value => ({ currentTarget: { dataset: { value } } });
+const input = value => ({ detail: { value } });
+const draftPage = load('recap', draftRuntime);
+draftPage.onLoad({ durationSeconds: '125' });
+draftPage.chooseWeather(pick('cloudy'));
+draftPage.chooseMood(pick('calm'));
+draftPage.chooseNotice(pick('tree'));
+draftPage.chooseNotice(pick('wind'));
+// Fields are persisted during input, without depending on exit callbacks.
+let recovered = load('recap', draftRuntime);
+recovered.onLoad({});
+assert.equal(recovered.data.durationSeconds, 125);
+assert.equal(recovered.data.weather, 'cloudy');
+assert.equal(recovered.data.weatherLabel, 'Cloudy');
+assert.equal(recovered.data.weatherGlyph, '☁︎');
+assert.equal(recovered.data.mood, 'calm');
+assert.equal(Object.keys(recovered.data.selectedNotices).join(','), 'tree,wind');
+assert.equal(recovered.data.distance, '');
+assert.equal(recovered.data.note, '');
+const draftHome = load('home', { navigateTo: x => { navigation = x.url; x.complete(); } });
+draftHome.onShow();assert.equal(draftHome.data.hasDraft, true);
+draftHome.go();assert.equal(navigation, '/pages/recap/recap');
+const draftHistory = load('history', {});draftHistory.onLoad();
+assert.equal(draftHistory.data.records.length, 0);
+recovered.updateDistance(input('3.25'));
+recovered.updateNote(input('沿途有风 🌿'));
+recovered.onHide();recovered.onUnload();
+recovered = load('recap', draftRuntime);recovered.onLoad({ durationSeconds: '999' });
+assert.equal(recovered.data.distance, '3.25');
+assert.equal(recovered.data.note, '沿途有风 🌿');
+assert.equal(recovered.data.durationSeconds, 125);
+recovered.save();recovered.onHide();recovered.onUnload();
+assert.equal(savedRecords().length, 1);
+assert.equal(savedRecords()[0].note, '沿途有风 🌿');
+assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');
+draftHome.onShow();assert.equal(draftHome.data.hasDraft, false);
+const fresh = load('recap', draftRuntime);fresh.onLoad({ durationSeconds: '10' });
+for (const field of ['weather', 'mood', 'distance', 'note']) assert.equal(fresh.data[field], '');
+assert.equal(Object.keys(fresh.data.selectedNotices).length, 0);
+fresh.chooseWeather(pick('rainy'));fresh.chooseWeather(pick('rainy'));
+fresh.chooseMood(pick('good'));fresh.chooseMood(pick('good'));
+fresh.chooseNotice(pick('nothing'));fresh.chooseNotice(pick('nothing'));
+fresh.updateDistance(input('2'));fresh.updateDistance(input(''));
+fresh.updateNote(input('erase me'));fresh.updateNote(input(''));
+const cleared = load('recap', draftRuntime);cleared.onLoad({});
+for (const field of ['weather', 'mood', 'distance', 'note']) assert.equal(cleared.data[field], '');
+assert.equal(Object.keys(cleared.data.selectedNotices).length, 0);
+let confirmDiscard = false;
+const discardPage = load('recap', { ...draftRuntime,
+  showModal: x => { x.success({ confirm: confirmDiscard }); x.complete(); }
+});
+discardPage.onLoad({});discardPage.updateNote(input('keep until confirmed'));
+discardPage.discard();
+assert.equal(storageWx.getStorageSync('paoxia.recapDraft').note, 'keep until confirmed');
+confirmDiscard = true;discardPage.discard();discardPage.onHide();discardPage.onUnload();
+assert.equal(navigation, '/pages/home/home');
+assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');
+assert.equal(discardPage.data.note, '');
+assert.equal(savedRecords().length, 1);
+const afterDiscard = load('recap', draftRuntime);afterDiscard.onLoad({ durationSeconds: '9' });
+assert.equal(afterDiscard.data.note, '');
+afterDiscard.updateNote(input('retain on failure'));
+const saveFailure = load('recap', { ...draftRuntime, setStorageSync: (key, value) => {
+  if (key === 'paoxia.completedRuns') throw new Error('full');
+  storageWx.setStorageSync(key, value);
+}});
+saveFailure.onLoad({});saveFailure.save();
+assert.equal(storageWx.getStorageSync('paoxia.recapDraft').note, 'retain on failure');
+assert.equal(savedRecords().length, 1);
+const removeFailure = load('recap', { ...draftRuntime,
+  removeStorageSync: () => { throw new Error('unavailable'); },
+  showModal: x => { x.success({ confirm: true }); x.complete(); }
+});
+removeFailure.onLoad({});removeFailure.discard();
+assert.equal(removeFailure.discarded, false);
+assert.equal(storageWx.getStorageSync('paoxia.recapDraft').note, 'retain on failure');
+removeFailure.save();removeFailure.save();
+assert.equal(savedRecords().length, 2);
+// Completed drafts never reappear, even when removal failed after the record write.
+draftHome.onShow();assert.equal(draftHome.data.hasDraft, false);
+const afterRemovalFailure = load('recap', draftRuntime);afterRemovalFailure.onLoad({ durationSeconds: '3' });
+assert.equal(afterRemovalFailure.data.note, '');
+assert.equal(afterRemovalFailure.data.durationSeconds, 3);
+assert(recapWxml.includes('bindtap="discard"'));
+// Hot reload / failed discard navigation must not leave Save silently disabled.
+storage.clear();
+const stalePage = load('recap', draftRuntime);
+stalePage.discarded = true;
+stalePage.save();
+assert.equal(navigation, '/pages/history/history');
+assert.equal(savedRecords().length, 1);
+const failedDiscardNavigation = load('recap', { ...draftRuntime,
+  showModal: x => { x.success({ confirm: true }); x.complete(); },
+  reLaunch: x => x.fail()
+});
+failedDiscardNavigation.onLoad({durationSeconds:'20'});
+failedDiscardNavigation.updateNote(input('discard this'));
+failedDiscardNavigation.discard();
+assert.equal(failedDiscardNavigation.discarded, false);
+assert.equal(failedDiscardNavigation.data.note, '');
+assert.equal(failedDiscardNavigation.data.durationSeconds, 0);
+failedDiscardNavigation.save();
+assert.equal(navigation, '/pages/history/history');
+assert.equal(savedRecords().length, 2);
+assert.equal(savedRecords()[0].note, '');
+console.log('PASS: routes, timer, active-run recovery, persistent history, recap draft restart/blank-field recovery, home entry, save/discard cleanup, draft/history separation, and storage failure handling.');

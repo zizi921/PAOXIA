@@ -79,5 +79,6 @@
 
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="保存本次记录并查看历史记录">Save →</button>
     <text class="handwritten helper">You can leave it all blank.</text>
+    <button class="discard-button handwritten" hover-class="pressed" bindtap="discard" aria-label="Discard draft">Discard draft</button>
   </view>
 </view>

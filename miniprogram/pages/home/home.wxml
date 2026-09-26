@@ -1,4 +1,4 @@
 <view class="screen home" style="--safe-top: {{safeTop}}px;">
   <view class="home-art"><image class="runner home-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
-  <view class="actions home-actions"><button class="pill handwritten go {{hasActiveRun ? 'resume' : ''}}" hover-class="pressed" bindtap="go" aria-label="{{hasActiveRun ? '继续这次跑步' : '开始跑步计时'}}">{{hasActiveRun ? '继续这次' : 'GO'}}</button><button class="history-link handwritten" hover-class="pressed" bindtap="openHistory" aria-label="查看跑步记录">Days Out.</button></view>
+  <view class="actions home-actions"><button class="pill handwritten go {{hasActiveRun || hasDraft ? 'resume' : ''}}" hover-class="pressed" bindtap="go" aria-label="{{hasActiveRun ? '继续这次跑步' : (hasDraft ? 'Continue your draft' : '开始跑步计时')}}">{{hasActiveRun ? '继续这次' : (hasDraft ? 'Continue draft' : 'GO')}}</button><button class="history-link handwritten" hover-class="pressed" bindtap="openHistory" aria-label="查看跑步记录">Days Out.</button></view>
 </view>
