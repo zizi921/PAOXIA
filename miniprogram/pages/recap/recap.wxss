@@ -84,8 +84,8 @@
   .helper { margin-top: 14rpx; margin-bottom: 20rpx; }
 }
 
-.recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 20rpx; font-size: 36rpx; text-decoration: underline; text-underline-offset: 6rpx; }
-.recap .discard-button::after { border: 0; }
+.recap .continue-button, .recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 20rpx; font-size: 36rpx; text-decoration: underline; text-underline-offset: 6rpx; }
+.recap .continue-button::after, .recap .discard-button::after { border: 0; }
 
 @media (max-height: 740px) {
   .recap { padding-bottom: env(safe-area-inset-bottom); }

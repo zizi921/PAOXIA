@@ -11,6 +11,12 @@ function readDraft() {
       typeof draft.selectedNotices !== 'object' || Array.isArray(draft.selectedNotices)) {
     throw new Error('Invalid recap draft');
   }
+  if (draft.run && (!Number.isFinite(draft.run.startedAt) || draft.run.startedAt <= 0 ||
+      !Number.isFinite(draft.run.pausedAt) || draft.run.pausedAt < 0 ||
+      !Number.isFinite(draft.run.totalPausedMs) || draft.run.totalPausedMs < 0 ||
+      !Number.isFinite(draft.run.finishedAt) || draft.run.finishedAt < draft.run.startedAt)) {
+    throw new Error('Invalid draft run');
+  }
   // A completed record remains authoritative if draft removal failed.
   return readRecords().some(record => record.id === draft.id) ? null : draft;
 }

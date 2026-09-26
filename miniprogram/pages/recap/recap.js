@@ -1,11 +1,13 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
-const { saveRecord } = require('../../utils/records');
+const { readRecords, saveRecord, updateRecord } = require('../../utils/records');
 
 const { readDraft, saveDraft, clearDraft } = require('../../utils/recap-draft');
 Page({
   data: {
     safeTop: 96,
+    editing: false,
+    canContinue: false,
     durationSeconds: 0,
     durationText: '0 sec',
     weather: '',
@@ -29,7 +31,33 @@ Page({
     this.discarded = false;
     this.navigating = false;
     this.draftId = null;
+    this.run = null;
+    this.editId = options && options.recordId || null;
+    this.editRecord = null;
+    this.setData({ editing: !!this.editId });
+    this.setData({ canContinue: false });
     this.setData({ safeTop: safeTop() });
+    if (this.editId) {
+      try {
+        const record = readRecords().find(item => item.id === this.editId);
+        if (!record) throw new Error('Record not found');
+        this.editRecord = record;
+        const selected = this.data.weatherOptions.find(option => option.value === record.weather);
+        const selectedNotices = {};
+        (record.notices || []).forEach(value => { selectedNotices[value] = true; });
+        this.setData({ durationSeconds: record.durationSeconds,
+          durationText: formatDuration(record.durationSeconds),
+          weather: record.weather || '', weatherOpen: false,
+          weatherLabel: selected ? selected.label : 'Not selected',
+          weatherGlyph: selected ? selected.glyph : '＋',
+          mood: record.mood && record.mood !== 'Not set' ? record.moodType : '',
+          selectedNotices, distance: record.distance && record.distance !== '— km' ? String(record.distance).replace(/\s*km$/, '') : '',
+          note: record.note || '' });
+      } catch (error) {
+        wx.showToast({ title: 'Could not load this run. Reopen it.', icon: 'none' });
+      }
+      return;
+    }
     let draft;
     try {
       draft = readDraft();
@@ -37,6 +65,8 @@ Page({
       wx.showToast({ title: 'Could not load draft. Reopen this page.', icon: 'none' });
       return;
     }
+    this.run = draft && draft.run || null;
+    this.setData({ canContinue: !!this.run });
     this.draftId = draft ? draft.id : `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const durationSeconds = draft ? draft.durationSeconds : Number(options && options.durationSeconds) || 0;
     this.setData({ weather: '', weatherLabel: 'Not selected', weatherGlyph: '＋',
@@ -53,12 +83,15 @@ Page({
   },
 
   persistDraft() {
-    if (!this.draftId || this.saved || this.discarded) return;
+    if (this.editId) return false;
+    if (!this.draftId || this.saved || this.discarded) return false;
     const { durationSeconds, weather, mood, selectedNotices, distance, note } = this.data;
     try {
-      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note });
+      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, run: this.run });
+      return true;
     } catch (error) {
       wx.showToast({ title: 'Could not save draft. Try again.', icon: 'none' });
+      return false;
     }
   },
 
@@ -66,7 +99,7 @@ Page({
   onUnload() { this.persistDraft(); },
 
   updateForm(update) {
-    if (!this.draftId || this.saved || this.discarded) return;
+    if ((!this.draftId && !this.editRecord) || this.saved || this.discarded) return;
     this.setData(update);
     this.persistDraft();
   },
@@ -77,10 +110,12 @@ Page({
   },
 
   toggleWeather() {
+    if (this.editId) return;
     this.setData({ weatherOpen: !this.data.weatherOpen });
   },
 
   chooseWeather(event) {
+    if (this.editId) return;
     const weather = event.currentTarget.dataset.value;
     const selected = this.data.weatherOptions.find(option => option.value === weather);
     if (!selected) return;
@@ -119,7 +154,21 @@ Page({
     this.updateForm({ note: event.detail.value });
   },
 
+  continueRun() {
+    if (this.navigating || this.saved || this.discarded || !this.run) return;
+    if (!this.persistDraft()) return;
+    this.navigating = true;
+    wx.redirectTo({
+      url: '/pages/run/run?continue=1',
+      fail: () => {
+        wx.showToast({ title: 'Could not open run. Try again.', icon: 'none' });
+      },
+      complete: () => { this.navigating = false; }
+    });
+  },
+
   discard() {
+    if (this.editId) return;
     if (this.navigating || this.saved) return;
     this.navigating = true;
     wx.showModal({
@@ -136,6 +185,7 @@ Page({
           return;
         }
         this.discarded = true;
+        this.setData({ canContinue: false });
         this.setData({ durationSeconds: 0, durationText: '0 sec', weather: '',
           weatherLabel: 'Not selected', weatherGlyph: '＋', weatherOpen: false,
           mood: '', selectedNotices: {}, distance: '', note: '' });
@@ -152,8 +202,49 @@ Page({
     });
   },
 
+  returnToDetail() {
+    this.navigating = true;
+    wx.navigateBack({
+      delta: 1,
+      fail: () => {
+        wx.redirectTo({
+          url: `/pages/history/history?recordId=${encodeURIComponent(this.editId)}`,
+          fail: () => { wx.showToast({ title: 'Could not open history. Try again.', icon: 'none' }); },
+          complete: () => { this.navigating = false; }
+        });
+      },
+      complete: () => { this.navigating = false; }
+    });
+  },
+
+  cancelEdit() {
+    if (!this.editId || this.navigating) return;
+    this.returnToDetail();
+  },
+
+  saveEdit() {
+    if (!this.editRecord) return;
+    const moodLabels = { good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure' };
+    try {
+      if (!this.saved) {
+        updateRecord(this.editId, {
+          distance: this.data.distance ? `${this.data.distance} km` : '— km',
+          mood: moodLabels[this.data.mood] || 'Not set',
+          moodType: this.data.mood || 'unsure',
+          notices: Object.keys(this.data.selectedNotices), note: this.data.note
+        });
+        this.saved = true;
+      }
+    } catch (error) {
+      wx.showToast({ title: 'Could not save changes. Try again.', icon: 'none' });
+      return;
+    }
+    this.returnToDetail();
+  },
+
   save() {
     if (this.navigating) return;
+    if (this.editId) { this.saveEdit(); return; }
     // DevTools hot reload can retain the page without running the new onLoad.
     if (!this.draftId || this.discarded) this.onLoad({ durationSeconds: this.data.durationSeconds });
     if (!this.draftId) return;
@@ -176,6 +267,7 @@ Page({
       if (!this.saved) {
         saveRecord(record);
         this.saved = true;
+        this.setData({ canContinue: false });
       }
     } catch (error) {
       this.navigating = false;

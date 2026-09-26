@@ -2,6 +2,7 @@
   <view class="history-header">
     <view class="title-row">
       <text class="handwritten history-title">Days Out.</text>
+      <button wx:if="{{mode === 'day' && selectedRecord}}" class="edit-button handwritten" bindtap="editRecord" hover-class="choice-pressed" aria-label="编辑当前跑步记录">Edit</button>
     </view>
     <view class="mode-tabs" role="tablist">
       <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'year'}}" aria-label="按年份查看" data-mode="year" bindtap="switchMode" hover-class="choice-pressed">Year</button>

@@ -125,14 +125,14 @@ Page({
     selectedRecord: null
   },
 
-  onLoad() {
+  onLoad(options) {
     let records = [];
     try {
       records = readRecords();
     } catch (error) {
       wx.showToast({ title: '未能读取本机记录', icon: 'none' });
     }
-    const latestRun = records[0];
+    const latestRun = records.find(record => record.id === (options && options.recordId)) || records[0];
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const dayValue = latestRun ? latestRun.date : today;
@@ -140,11 +140,29 @@ Page({
     this.setData({ safeTop: safeTop(), records, dayValue, monthValue, mode: latestRun ? 'day' : 'year' });
     this.applyYear(dayValue.slice(0, 4));
     this.applyMonth(monthValue);
-    this.applyDay(dayValue);
+    this.applyDay(dayValue, latestRun && latestRun.id);
   },
 
   onShow() {
+    try {
+      this.setData({ records: readRecords() });
+    } catch (error) {
+      wx.showToast({ title: '未能读取本机记录', icon: 'none' });
+      return;
+    }
+    this.applyYear(this.data.periodLabels.year);
+    this.applyMonth(this.data.monthValue);
     if (this.data.mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
+  },
+
+  editRecord() {
+    if (this.editNavigating || this.data.mode !== 'day' || !this.data.selectedRecord) return;
+    this.editNavigating = true;
+    wx.navigateTo({
+      url: `/pages/recap/recap?recordId=${encodeURIComponent(this.data.selectedRecord.id)}`,
+      fail: () => { wx.showToast({ title: 'Could not open edit. Try again.', icon: 'none' }); },
+      complete: () => { this.editNavigating = false; }
+    });
   },
 
   switchMode(event) {

@@ -404,4 +404,162 @@ failedDiscardNavigation.save();
 assert.equal(navigation, '/pages/history/history');
 assert.equal(savedRecords().length, 2);
 assert.equal(savedRecords()[0].note, '');
-console.log('PASS: routes, timer, active-run recovery, persistent history, recap draft restart/blank-field recovery, home entry, save/discard cleanup, draft/history separation, and storage failure handling.');
+// Slice 6: Done -> recap -> continue preserves the run, optional fields and pause state.
+for (const pausedBeforeDone of [false, true]) {
+  storage.clear();
+  now = 100000;
+  const original = load('run', draftRuntime, runRuntime);
+  original.onLoad({});original.onShow();
+  now = 105500;
+  if (pausedBeforeDone) original.togglePause();
+  now = 108500;original.finish();original.onUnload();
+  const firstDuration = pausedBeforeDone ? 5 : 8;
+  assert.equal(storageWx.getStorageSync('paoxia.recapDraft').durationSeconds, firstDuration);
+  assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+  const form = load('recap', draftRuntime, { Date: clock });form.onLoad({});
+  assert.equal(form.data.canContinue, true);
+  form.chooseWeather(pick('rainy'));form.chooseMood(pick('calm'));
+  form.chooseNotice(pick('tree'));form.chooseNotice(pick('wind'));
+  form.updateDistance(input('2.4'));form.updateNote(input('Keep this note'));
+  const draftId = form.draftId;
+  form.onHide();form.onUnload();
+  now = 168500;
+  const reopened = load('recap', draftRuntime, { Date: clock });reopened.onLoad({});
+  reopened.continueRun();reopened.onHide();reopened.onUnload();
+  assert.equal(navigation, '/pages/run/run?continue=1');
+  const continued = load('run', draftRuntime, runRuntime);continued.onLoad({ continue: '1' });continued.onShow();
+  draftHome.onShow();draftHome.go();
+  assert.equal(navigation, '/pages/run/run?startedAt=100000');
+  assert.equal(continued.startedAt, 100000);
+  assert.equal(continued.data.elapsedSeconds, firstDuration);
+  assert.equal(continued.data.paused, pausedBeforeDone);
+  now = 178500;continued.updateClock();
+  assert.equal(continued.data.elapsedSeconds, firstDuration + (pausedBeforeDone ? 0 : 10));
+  if (pausedBeforeDone) continued.togglePause();
+  now = 183500;continued.togglePause();
+  const beforePause = continued.data.elapsedSeconds;
+  now = 193500;continued.updateClock();assert.equal(continued.data.elapsedSeconds, beforePause);
+  continued.togglePause();now = 195500;continued.finish();continued.onUnload();
+  const again = load('recap', draftRuntime, { Date: clock });again.onLoad({});
+  assert.equal(again.draftId, draftId);
+  assert.equal(again.data.durationSeconds, beforePause + 2);
+  assert.equal(again.data.weather, 'rainy');assert.equal(again.data.mood, 'calm');
+  assert.equal(Object.keys(again.data.selectedNotices).join(','), 'tree,wind');
+  assert.equal(again.data.distance, '2.4');assert.equal(again.data.note, 'Keep this note');
+  // Repeat the round trip to catch double-counted form time.
+  now = 225500;again.continueRun();again.onUnload();
+  const lastRun = load('run', draftRuntime, runRuntime);lastRun.onLoad({ continue: '1' });lastRun.onShow();
+  assert.equal(lastRun.data.elapsedSeconds, beforePause + 2);
+  now = 228500;lastRun.finish();lastRun.onUnload();
+  const lastForm = load('recap', draftRuntime);lastForm.onLoad({});lastForm.save();
+  assert.equal(savedRecords().length, 1);
+  assert.equal(savedRecords()[0].id, draftId);
+  assert.equal(savedRecords()[0].durationSeconds, beforePause + 5);
+  assert.equal(savedRecords()[0].note, 'Keep this note');
+  assert.equal(lastForm.data.canContinue, false);
+  navigation = null;lastForm.continueRun();assert.equal(navigation, null);
+  assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+  assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');
+  const afterSave = load('recap', draftRuntime);afterSave.onLoad({});
+  assert.equal(afterSave.data.canContinue, false);
+}
+// Failed Done persistence keeps the original timer recoverable.
+storage.clear();now = 300000;
+const failedDone = load('run', { ...draftRuntime, setStorageSync: (key, value) => {
+  if (key === 'paoxia.recapDraft') throw new Error('full');
+  storageWx.setStorageSync(key, value);
+}}, runRuntime);
+failedDone.onLoad({});failedDone.onShow();now = 305000;
+navigation = null;failedDone.finish();
+assert.equal(navigation, null);assert.equal(failedDone.ended, false);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun').startedAt, 300000);
+failedDone.onUnload();
+const finishRetry = load('run', draftRuntime, runRuntime);finishRetry.onLoad({});finishRetry.finish();
+// Failed continue navigation leaves the draft available and excludes all form time on retry.
+const failedContinue = load('recap', { ...draftRuntime,
+  redirectTo: x => { x.fail();x.complete(); }
+}, { Date: clock });failedContinue.onLoad({});
+now = 365000;failedContinue.continueRun();
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+assert.equal(failedContinue.navigating, false);
+assert.equal(failedContinue.data.canContinue, true);
+now = 395000;
+const retryContinue = load('recap', draftRuntime, { Date: clock });retryContinue.onLoad({});retryContinue.continueRun();
+const afterRetry = load('run', draftRuntime, runRuntime);afterRetry.onLoad({ continue: '1' });
+assert.equal(afterRetry.data.elapsedSeconds, 5);
+afterRetry.finish();
+// A saved record is authoritative even if draft cleanup and navigation both fail.
+const savedWithFailure = load('recap', { ...draftRuntime,
+  removeStorageSync: () => { throw new Error('unavailable'); },
+  redirectTo: x => { x.fail();x.complete(); }
+});savedWithFailure.onLoad({});savedWithFailure.save();
+navigation = null;savedWithFailure.continueRun();assert.equal(navigation, null);
+assert.equal(savedWithFailure.data.canContinue, false);
+const reopenSaved = load('recap', draftRuntime);reopenSaved.onLoad({});
+assert.equal(reopenSaved.data.canContinue, false);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+const staleContinue = load('run', draftRuntime, runRuntime);
+staleContinue.onLoad({ continue: '1' });
+assert.equal(staleContinue.ended, true);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+assert(recapWxml.includes('wx:if="{{canContinue}}"'));
+assert(recapWxml.includes('bindtap="continueRun"'));
+console.log('PASS: routes, timer, active-run recovery, persistent history, recap drafts, Done/continue round trips, paused state, updated duration, save lockout and storage/navigation failures.');
+// Slice 7: edit an older run on a day with multiple records, without touching drafts.
+storage.clear();
+const originalRecords = [
+  { id: 'newer', date: '2026-09-26', durationSeconds: 30, distance: '— km', mood: 'Not set', moodType: 'unsure', notices: [], note: 'Keep newer', weather: '' },
+  { id: 'older', date: '2026-09-26', durationSeconds: 125, distance: '2.4 km', mood: 'Calm', moodType: 'calm', notices: ['tree', 'wind'], note: 'Original note', weather: 'rainy', startedAt: 12345 }
+];
+storageWx.setStorageSync('paoxia.completedRuns', originalRecords);
+const separateDraft = load('recap', draftRuntime);separateDraft.onLoad({ durationSeconds: '9' });
+separateDraft.updateNote(input('Unrelated draft'));
+storageWx.setStorageSync('paoxia.activeRun', { startedAt: 999, pausedAt: 0, totalPausedMs: 0 });
+const untouchedDraft = storage.get('paoxia.recapDraft');
+const untouchedRun = storage.get('paoxia.activeRun');
+const editHistory = load('history', { navigateTo: x => { navigation = x.url;x.complete(); } });
+editHistory.onLoad();editHistory.openDay({ currentTarget: { dataset: { date: '2026-09-26', id: 'older' } } });
+editHistory.editRecord();assert.equal(navigation, '/pages/recap/recap?recordId=older');
+let backCount = 0;
+const editRuntime = { ...draftRuntime, navigateBack: x => { backCount++;editHistory.onShow();x.complete(); } };
+const editor = load('recap', editRuntime);editor.onLoad({ recordId: 'older' });
+assert.equal(editor.data.editing, true);assert.equal(editor.data.canContinue, false);
+assert.equal(editor.data.durationSeconds, 125);assert.equal(editor.data.weather, 'rainy');
+assert.equal(editor.data.mood, 'calm');assert.equal(editor.data.distance, '2.4');
+assert.equal(editor.data.note, 'Original note');assert.equal(Object.keys(editor.data.selectedNotices).join(','), 'tree,wind');
+editor.chooseWeather(pick('sunny'));assert.equal(editor.data.weather, 'rainy');
+editor.updateDistance(input('3.5'));editor.chooseMood(pick('good'));editor.chooseNotice(pick('flower'));
+editor.updateNote(input('Updated note'));editor.onHide();editor.onUnload();
+assert.equal(savedRecords()[1].note, 'Original note');
+editor.save();editor.save();
+assert.equal(savedRecords().length, 2);assert.equal(backCount, 2);
+assert.equal(editHistory.data.selectedRecord.id, 'older');assert.equal(editHistory.data.selectedRecord.note, 'Updated note');
+assert.equal(editHistory.data.selectedRecord.distance, '3.5 km');assert.equal(editHistory.data.selectedRecord.mood, 'Good');
+assert.equal(editHistory.data.selectedRecord.noticeItems.length, 3);
+assert.equal(editHistory.data.monthRows.find(item => item.id === 'older').note, 'Updated note');
+assert.equal(editHistory.data.yearSummary.total, '2 min.');
+assert.deepEqual(savedRecords()[0], originalRecords[0]);
+for (const field of ['id', 'date', 'durationSeconds', 'weather', 'startedAt']) assert.equal(savedRecords()[1][field], originalRecords[1][field]);
+const clearing = load('recap', editRuntime);clearing.onLoad({ recordId: 'older' });
+clearing.chooseMood(pick('good'));for (const notice of ['tree','wind','flower']) clearing.chooseNotice(pick(notice));
+clearing.updateDistance(input(''));clearing.updateNote(input(''));clearing.save();
+assert.equal(editHistory.data.selectedRecord.note, '');assert.equal(editHistory.data.selectedRecord.distance, '— km');
+assert.equal(editHistory.data.selectedRecord.mood, 'Not set');assert.equal(editHistory.data.selectedRecord.noticeItems.length, 0);
+const cancelling = load('recap', editRuntime);cancelling.onLoad({ recordId: 'older' });
+assert.equal(cancelling.data.mood, '');assert.equal(cancelling.data.distance, '');
+cancelling.updateNote(input('Do not save'));cancelling.chooseNotice(pick('dog'));cancelling.cancelEdit();cancelling.onUnload();
+assert.equal(savedRecords()[1].note, '');assert.equal(savedRecords()[1].notices.length, 0);
+const failedEdit = load('recap', { ...editRuntime, setStorageSync: () => { throw new Error('full'); } });
+failedEdit.onLoad({ recordId: 'older' });failedEdit.updateNote(input('Retry this'));
+const beforeFailedEdit = backCount;failedEdit.save();assert.equal(backCount, beforeFailedEdit);
+assert.equal(failedEdit.data.note, 'Retry this');assert.equal(failedEdit.saved, false);assert.equal(savedRecords()[1].note, '');
+const missingEdit = load('recap', editRuntime);missingEdit.onLoad({ recordId: 'missing' });missingEdit.save();missingEdit.discard();
+assert.equal(savedRecords().length, 2);assert.equal(missingEdit.draftId, null);
+const fallbackEdit = load('recap', { ...editRuntime, navigateBack: x => { x.fail();x.complete(); } });
+fallbackEdit.onLoad({ recordId: 'older' });fallbackEdit.updateNote(input('Persist after navigation failure'));fallbackEdit.save();
+assert.equal(navigation, '/pages/history/history?recordId=older');
+const reopenedDetail = load('history', {});reopenedDetail.onLoad({ recordId: 'older' });reopenedDetail.onShow();
+assert.equal(reopenedDetail.data.selectedRecord.id, 'older');assert.equal(reopenedDetail.data.selectedRecord.note, 'Persist after navigation failure');
+assert.equal(storage.get('paoxia.recapDraft'), untouchedDraft);assert.equal(storage.get('paoxia.activeRun'), untouchedRun);
+assert(historyWxml.includes('bindtap="editRecord"'));assert(recapWxml.includes('bindtap="cancelEdit"'));
+console.log('PASS: Slice 7 — original values, targeted update, immediate detail refresh, clearing, cancellation, no duplicates, timing preservation, draft isolation and failure handling.');

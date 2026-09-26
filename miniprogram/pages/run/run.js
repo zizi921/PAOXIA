@@ -1,3 +1,4 @@
+const { readDraft, saveDraft } = require('../../utils/recap-draft');
 const { safeTop } = require('../../utils/layout');
 const { formatElapsed } = require('../../utils/time');
 const { readActiveRun, saveActiveRun, clearActiveRun } = require('../../utils/active-run');
@@ -14,7 +15,16 @@ Page({
     this.setData({ safeTop: safeTop() });
     this.ended = true;
     try {
-      const run = readActiveRun() || {
+      let run = readActiveRun();
+      if (!run && options && options.continue === '1') {
+        const draft = readDraft();
+        if (!draft || !draft.run) return;
+        const { startedAt, pausedAt, totalPausedMs, finishedAt } = draft.run;
+        // Restore at page entry so all time spent in the form stays excluded.
+        run = { startedAt, pausedAt,
+          totalPausedMs: totalPausedMs + (pausedAt ? 0 : Date.now() - finishedAt) };
+      }
+      run = run || {
         startedAt: Number(options && options.startedAt) || Date.now(),
         totalPausedMs: 0,
         pausedAt: 0
@@ -87,14 +97,24 @@ Page({
 
   finish() {
     if (this.navigating || this.ended) return;
+    const finishedAt = Date.now();
+    const elapsedSeconds = this.elapsedAt(finishedAt);
     try {
+      const previous = readDraft();
+      const draft = previous && previous.run && previous.run.startedAt === this.startedAt
+        ? previous
+        : { id: `draft-${finishedAt}-${Math.random().toString(36).slice(2)}`,
+          weather: '', mood: '', selectedNotices: {}, distance: '', note: '' };
+      saveDraft({ ...draft, durationSeconds: elapsedSeconds,
+        run: { startedAt: this.startedAt, pausedAt: this.pausedAt,
+          totalPausedMs: this.totalPausedMs, finishedAt } });
       clearActiveRun();
     } catch (error) {
       wx.showToast({ title: '未能结束本次跑步', icon: 'none' });
       return;
     }
     this.navigating = true;
-    const elapsedSeconds = this.updateClock();
+    this.updateClock();
     this.ended = true;
     this.clearTicker();
     wx.redirectTo({
