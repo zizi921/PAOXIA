@@ -224,7 +224,8 @@ Page({
   applyDay(value, recordId) {
     const { label, weekday } = dayPresentation(value);
     const periodLabels = { ...this.data.periodLabels, day: label };
-    const selectedRecord = decorateRecord(this.data.records.find(record => record.date === value && (!recordId || record.id === recordId)));
+    const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
+    const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)));
     this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels });
   },
 

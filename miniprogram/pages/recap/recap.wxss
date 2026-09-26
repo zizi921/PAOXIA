@@ -84,8 +84,9 @@
   .recap .save-button { min-height: 96rpx; margin-top: 64rpx; }
 }
 
-.recap .continue-button, .recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 4rpx; font-size: 34rpx; text-decoration: underline; text-underline-offset: 6rpx; }
-.recap .continue-button::after, .recap .discard-button::after { border: 0; }
+.recap .continue-button, .recap .discard-button, .recap .delete-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 4rpx; font-size: 34rpx; text-decoration: underline; text-underline-offset: 6rpx; }
+.recap .delete-button { color: #a65445; }
+.recap .continue-button::after, .recap .discard-button::after, .recap .delete-button::after { border: 0; }
 
 @media (max-height: 740px) {
   .recap { padding-bottom: calc(36rpx + env(safe-area-inset-bottom)); }
@@ -104,5 +105,5 @@
   .distance-input { height: 52rpx; }
   .note-input { height: 70rpx; margin-top: 8rpx; }
   .recap .save-button { margin-top: 12rpx; min-height: 44px; }
-  .recap .continue-button, .recap .discard-button { margin-bottom: 0; font-size: 32rpx; }
+  .recap .continue-button, .recap .discard-button, .recap .delete-button { margin-bottom: 0; font-size: 32rpx; }
 }

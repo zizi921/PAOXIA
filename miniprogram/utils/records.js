@@ -25,4 +25,12 @@ function updateRecord(id, changes) {
   wx.setStorageSync(STORAGE_KEY, records);
 }
 
-module.exports = { readRecords, saveRecord, updateRecord };
+function deleteRecord(id) {
+  const records = readRecords();
+  const index = records.findIndex(record => record.id === id);
+  if (index < 0) throw new Error('Record not found');
+  records.splice(index, 1);
+  wx.setStorageSync(STORAGE_KEY, records);
+}
+
+module.exports = { readRecords, saveRecord, updateRecord, deleteRecord };

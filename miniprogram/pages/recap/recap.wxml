@@ -90,5 +90,6 @@
     <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun" aria-label="继续本次跑步，返回计时页面">Continue this run</button>
     <button wx:if="{{editing}}" class="discard-button handwritten" hover-class="pressed" bindtap="cancelEdit" aria-label="取消编辑">Cancel</button>
     <button wx:else class="discard-button handwritten" hover-class="pressed" bindtap="discard" aria-label="Discard draft">Discard draft</button>
+    <button wx:if="{{editing}}" class="delete-button handwritten" hover-class="pressed" bindtap="deleteRun" aria-label="永久删除这条跑步记录">Delete this run</button>
   </view>
 </view>

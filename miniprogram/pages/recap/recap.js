@@ -1,6 +1,6 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
-const { readRecords, saveRecord, updateRecord } = require('../../utils/records');
+const { readRecords, saveRecord, updateRecord, deleteRecord } = require('../../utils/records');
 
 const { readDraft, saveDraft, clearDraft } = require('../../utils/recap-draft');
 Page({
@@ -220,6 +220,43 @@ Page({
   cancelEdit() {
     if (!this.editId || this.navigating) return;
     this.returnToDetail();
+  },
+
+  deleteRun() {
+    if (!this.editId || !this.editRecord || this.navigating) return;
+    this.navigating = true;
+    wx.showModal({
+      title: 'Delete this run?',
+      content: 'This saved run and its details will be permanently deleted.',
+      confirmText: 'Delete',
+      confirmColor: '#a65445',
+      cancelText: 'Cancel',
+      success: result => {
+        if (!result.confirm) return;
+        try {
+          deleteRecord(this.editId);
+        } catch (error) {
+          wx.showToast({ title: 'Could not delete this run. Try again.', icon: 'none' });
+          return;
+        }
+        this.discarded = true;
+        this.editRecord = null;
+        wx.navigateBack({
+          delta: 1,
+          fail: () => {
+            wx.redirectTo({
+              url: '/pages/history/history',
+              fail: () => { wx.showToast({ title: 'Run deleted. Could not open history.', icon: 'none' }); },
+              complete: () => { this.navigating = false; }
+            });
+          },
+          complete: () => { this.navigating = false; }
+        });
+      },
+      complete: () => {
+        if (!this.discarded) this.navigating = false;
+      }
+    });
   },
 
   saveEdit() {

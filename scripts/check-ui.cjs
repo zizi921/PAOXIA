@@ -602,6 +602,22 @@ fallbackEdit.onLoad({ recordId: 'older' });fallbackEdit.updateNote(input('Persis
 assert.equal(navigation, '/pages/history/history?recordId=older');
 const reopenedDetail = load('history', {});reopenedDetail.onLoad({ recordId: 'older' });reopenedDetail.onShow();
 assert.equal(reopenedDetail.data.selectedRecord.id, 'older');assert.equal(reopenedDetail.data.selectedRecord.note, 'Persist after navigation failure');
+let confirmDelete = false;
+const deleteRuntime = { ...editRuntime,
+  showModal: x => { x.success({ confirm: confirmDelete });x.complete(); }
+};
+const deleteEditor = load('recap', deleteRuntime);deleteEditor.onLoad({ recordId: 'older' });
+const beforeDeleteBack = backCount;deleteEditor.deleteRun();
+assert.equal(savedRecords().length, 2);assert.equal(backCount, beforeDeleteBack);
+confirmDelete = true;deleteEditor.deleteRun();
+assert.equal(savedRecords().length, 1);assert.equal(savedRecords()[0].id, 'newer');assert.equal(backCount, beforeDeleteBack + 1);
+assert.equal(editHistory.data.selectedRecord.id, 'newer');assert.equal(editHistory.data.yearSummary.times, '1 times out.');
+const failedDelete = load('recap', { ...deleteRuntime,
+  setStorageSync: () => { throw new Error('full'); }
+});
+failedDelete.onLoad({ recordId: 'newer' });failedDelete.deleteRun();
+assert.equal(savedRecords().length, 1);assert.equal(failedDelete.discarded, false);
+assert.equal(toast, 'Could not delete this run. Try again.');
 assert.equal(storage.get('paoxia.recapDraft'), untouchedDraft);assert.equal(storage.get('paoxia.activeRun'), untouchedRun);
-assert(historyWxml.includes('bindtap="editRecord"'));assert(recapWxml.includes('bindtap="cancelEdit"'));
-console.log('PASS: Slice 7 — original values, targeted update, immediate detail refresh, clearing, cancellation, no duplicates, timing preservation, draft isolation and failure handling.');
+assert(historyWxml.includes('bindtap="editRecord"'));assert(recapWxml.includes('bindtap="cancelEdit"'));assert(recapWxml.includes('bindtap="deleteRun"'));
+console.log('PASS: Slice 7 — original values, targeted update, deletion confirmation, immediate detail refresh, clearing, cancellation, no duplicates, timing preservation, draft isolation and failure handling.');
