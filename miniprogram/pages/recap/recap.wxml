@@ -17,7 +17,7 @@
       </view>
     </view>
 
-    <view class="section">
+    <view class="section mood-section">
       <text class="handwritten section-title">How was it?</text>
       <view class="mood-grid">
         <button class="choice mood-choice {{mood === 'good' ? 'selected mood-green' : ''}}" data-value="good" bindtap="chooseMood" hover-class="choice-pressed" aria-label="心情不错">
@@ -79,15 +79,15 @@
     </view>
 
     <view class="form-row distance-row">
-      <text class="handwritten field-label">Distance <text class="optional">(optional)</text></text>
-      <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="跑步距离，可选" />
+      <text class="handwritten field-label">Distance <text wx:if="{{editing}}" class="optional">(edit)</text></text>
+      <input wx:if="{{editing}}" class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="修改跑步距离" />
+      <text wx:else class="handwritten distance-value" aria-label="自动记录的跑步距离 {{distance || '0.00'}} 公里">{{distance || '0.00'}}</text>
       <text class="handwritten unit">km</text>
     </view>
     <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="A little note, if you like" placeholder-class="note-placeholder" aria-label="跑步备注，可选" />
 
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="{{editing ? '保存修改并返回详情' : '保存本次记录并查看历史记录'}}">{{editing ? 'Save changes →' : 'Save →'}}</button>
-    <text class="handwritten helper">You can leave it all blank.</text>
-    <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun" aria-label="继续跑，返回本次计时">Keep running</button>
+    <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun" aria-label="继续本次跑步，返回计时页面">Continue this run</button>
     <button wx:if="{{editing}}" class="discard-button handwritten" hover-class="pressed" bindtap="cancelEdit" aria-label="取消编辑">Cancel</button>
     <button wx:else class="discard-button handwritten" hover-class="pressed" bindtap="discard" aria-label="Discard draft">Discard draft</button>
   </view>

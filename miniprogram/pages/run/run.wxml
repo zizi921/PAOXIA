@@ -1,6 +1,8 @@
 <view class="screen run" style="--safe-top: {{safeTop}}px;">
   <text class="handwritten headline">{{paused ? 'Take a breath.' : 'Out there.'}}</text>
   <text class="handwritten timer" aria-label="当前跑步时长 {{elapsedText}}">{{elapsedText}}</text>
+  <text class="handwritten distance" aria-label="当前跑步距离 {{distanceText}}">{{distanceText}}</text>
+  <text class="handwritten location-status">{{locationStatus}}</text>
   <view class="run-art"><image class="runner run-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
   <view class="actions run-actions">
     <button class="pill handwritten" hover-class="pressed" bindtap="togglePause" aria-label="{{paused ? '继续跑步计时' : '暂停跑步计时'}}">{{paused ? 'Resume' : 'Pause'}}</button>

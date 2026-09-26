@@ -8,14 +8,24 @@ function readActiveRun() {
       !Number.isFinite(run.totalPausedMs) || run.totalPausedMs < 0) {
     throw new Error('Invalid active run');
   }
-  return run;
+  const distanceMeters = Number.isFinite(run.distanceMeters) && run.distanceMeters >= 0
+    ? run.distanceMeters : 0;
+  const lastLocation = validLocation(run.lastLocation) ? run.lastLocation : null;
+  return { ...run, distanceMeters, lastLocation };
+}
+
+function validLocation(location) {
+  return !location || (Number.isFinite(location.latitude) &&
+    Number.isFinite(location.longitude) && Number.isFinite(location.at) && location.at > 0);
 }
 
 function saveActiveRun(run) {
   wx.setStorageSync(STORAGE_KEY, {
     startedAt: run.startedAt,
     pausedAt: run.pausedAt,
-    totalPausedMs: run.totalPausedMs
+    totalPausedMs: run.totalPausedMs,
+    distanceMeters: Math.max(0, Number(run.distanceMeters) || 0),
+    lastLocation: validLocation(run.lastLocation) ? run.lastLocation : null
   });
 }
 

@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const time = require('../miniprogram/utils/time');
+const distance = require('../miniprogram/utils/distance');
 class TestDate extends Date {
   constructor(...args) { super(...(args.length ? args : [2028, 8, 26, 12])); }
   static now() { return new TestDate().getTime(); }
@@ -13,7 +14,12 @@ const storageWx = {
   removeStorageSync: key => storage.delete(key)
 };
 function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns') || []; }
-const pages = JSON.parse(fs.readFileSync('miniprogram/app.json')).pages;
+const appConfig = JSON.parse(fs.readFileSync('miniprogram/app.json'));
+const pages = appConfig.pages;
+assert(appConfig.requiredBackgroundModes.includes('location'));
+for (const api of ['onLocationChange','startLocationUpdate','startLocationUpdateBackground']) {
+  assert(appConfig.requiredPrivateInfos.includes(api));
+}
 for (const route of pages) for (const ext of ['js','json','wxml','wxss']) assert(fs.existsSync(`miniprogram/${route}.${ext}`));
 function load(route, wx, globals = {}) {
   let page;
@@ -28,7 +34,7 @@ function load(route, wx, globals = {}) {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/time') ? time : request.endsWith('/distance') ? distance : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -76,6 +82,42 @@ now=12500;tick();assert.equal(run.data.elapsedText,'00:00:08');
 run.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=8');
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
 home.onShow();assert.equal(home.data.hasActiveRun,false);
+
+// Real-time distance survives page backgrounding and is carried into the recap draft.
+const savedStorage = new Map(storage);
+storage.clear();
+let locationListener, locationStarts = 0, locationStops = 0;
+const locationWx = {
+  redirectTo: x => { navigation=x.url;x.complete(); },
+  onLocationChange: fn => { locationListener = fn; },
+  offLocationChange: fn => { if (locationListener === fn) locationListener = null; },
+  startLocationUpdateBackground: x => { locationStarts++;x.success(); },
+  stopLocationUpdate: () => { locationStops++; }
+};
+now=20000;
+const distanceRun=load('run',locationWx,{ Date:clock,
+  setInterval: fn => { tick=fn;return 1; }, clearInterval: () => {} });
+distanceRun.onLoad({startedAt:'20000'});distanceRun.onShow();
+assert.equal(locationStarts,1);assert.equal(distanceRun.data.distanceText,'0.00 km');
+locationListener({latitude:31,longitude:121,accuracy:5});
+now=30000;locationListener({latitude:31.0001,longitude:121,accuracy:5});
+const foregroundMeters=distanceRun.distanceMeters;
+assert(foregroundMeters > 10 && foregroundMeters < 12);
+distanceRun.onHide();now=40000;locationListener({latitude:31.0002,longitude:121,accuracy:5});
+assert(distanceRun.distanceMeters > foregroundMeters);
+distanceRun.togglePause();assert(locationStops >= 1);assert.equal(distanceRun.data.locationStatus,'Distance paused');
+const pausedMeters=distanceRun.distanceMeters;
+distanceRun.handleLocation({latitude:31.0003,longitude:121,accuracy:5});
+assert.equal(distanceRun.distanceMeters,pausedMeters);
+now=50000;distanceRun.togglePause();assert.equal(locationStarts,2);
+locationListener({latitude:31.0003,longitude:121,accuracy:5});
+now=60000;locationListener({latitude:31.0004,longitude:121,accuracy:5});
+distanceRun.finish();
+const distanceDraft=storageWx.getStorageSync('paoxia.recapDraft');
+assert.equal(distanceDraft.distance,'0.03');
+assert(distanceDraft.run.distanceMeters > 30 && distanceDraft.run.distanceMeters < 35);
+storage.clear();for (const [key,value] of savedStorage) storage.set(key,value);
+
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
 assert.equal(recap.data.weather,'');assert.equal(recap.data.mood,'');assert.equal(Object.keys(recap.data.selectedNotices).length,0);recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
@@ -504,7 +546,7 @@ assert.equal(staleContinue.ended, true);
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
 assert(recapWxml.includes('wx:if="{{canContinue}}"'));
 assert(recapWxml.includes('bindtap="continueRun"'));
-console.log('PASS: routes, timer, active-run recovery, persistent history, recap drafts, Done/continue round trips, paused state, updated duration, save lockout and storage/navigation failures.');
+console.log('PASS: routes, timer, automatic distance, background location, active-run recovery, persistent history, recap drafts, Done/continue round trips, paused state, updated duration, save lockout and storage/navigation failures.');
 // Slice 7: edit an older run on a day with multiple records, without touching drafts.
 storage.clear();
 const originalRecords = [

@@ -64,31 +64,31 @@
 .field-label, .unit { font-size: 38rpx; line-height: 1; white-space: nowrap; }
 .optional { font-size: 31rpx; opacity: .72; }
 .distance-input { box-sizing: border-box; flex: 1; min-width: 90rpx; height: 62rpx; margin: 0 16rpx; padding: 0 12rpx; border: 3rpx solid #595a53; border-radius: 5rpx 2rpx 4rpx 3rpx; background: #fffefa; font-size: 38rpx; text-align: center; }
+.distance-value { flex: 1; margin: 0 16rpx; font-size: 42rpx; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
 .note-input { box-sizing: border-box; width: 100%; height: 92rpx; margin-top: 24rpx; padding: 0 26rpx 7rpx; border: 3rpx solid #595a53; border-radius: 8rpx 5rpx 7rpx 4rpx; background: #fffefa; color: #262622; font-size: 43rpx; }
 .note-placeholder { color: #77756d; font-family: 'PaoxiaHand', cursive; font-size: 40rpx; font-weight: 500; }
 .recap .save-button { min-height: 108rpx; margin-top: 36rpx; background: #e5ecdf; font-size: 62rpx; }
-.helper { display: block; margin-top: 20rpx; margin-bottom: 36rpx; font-size: 34rpx; line-height: 1; text-align: center; }
-@media (max-height: 900px) {
+@media (max-height: 960px) {
   .recap { padding-top: max(var(--safe-top, 80px), 76px); }
   .recap-heading-row { min-height: 102rpx; }
   .recap-title { font-size: 78rpx; }
   .section { margin-top: 20rpx; }
+  .mood-section { margin-top: 60rpx; }
   .mood-grid { margin-top: 10rpx; }
   .mood-choice { min-height: 124rpx; }
-  .notice-section { margin-top: 22rpx; }
+  .notice-section { margin-top: 62rpx; }
   .notice-grid { margin-top: 8rpx; }
   .notice-choice { min-height: 148rpx; }
-  .distance-row { margin-top: 20rpx; }
-  .note-input { margin-top: 16rpx; height: 78rpx; }
-  .recap .save-button { min-height: 96rpx; margin-top: 22rpx; }
-  .helper { margin-top: 14rpx; margin-bottom: 20rpx; }
+  .distance-row { margin-top: 92rpx; }
+  .note-input { margin-top: 32rpx; height: 78rpx; }
+  .recap .save-button { min-height: 96rpx; margin-top: 64rpx; }
 }
 
-.recap .continue-button, .recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 20rpx; font-size: 36rpx; text-decoration: underline; text-underline-offset: 6rpx; }
+.recap .continue-button, .recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 4rpx; font-size: 34rpx; text-decoration: underline; text-underline-offset: 6rpx; }
 .recap .continue-button::after, .recap .discard-button::after { border: 0; }
 
 @media (max-height: 740px) {
-  .recap { padding-bottom: env(safe-area-inset-bottom); }
+  .recap { padding-bottom: calc(36rpx + env(safe-area-inset-bottom)); }
   .recap-heading-row { min-height: 72rpx; }
   .recap-title { font-size: 62rpx; }
   .recap-duration { margin-top: 8rpx; font-size: 36rpx; }
@@ -104,6 +104,5 @@
   .distance-input { height: 52rpx; }
   .note-input { height: 70rpx; margin-top: 8rpx; }
   .recap .save-button { margin-top: 12rpx; min-height: 44px; }
-  .helper { margin: 8rpx 0 0; font-size: 28rpx; }
-  .recap .discard-button { margin-bottom: 0; }
+  .recap .continue-button, .recap .discard-button { margin-bottom: 0; font-size: 32rpx; }
 }

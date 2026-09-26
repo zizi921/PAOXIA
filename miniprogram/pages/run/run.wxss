@@ -1,6 +1,8 @@
 .run { padding-top: max(128px, 18vh, var(--safe-top, 96px)); padding-bottom: calc(24rpx + env(safe-area-inset-bottom)); }
 .headline { font-size: 94rpx; line-height: 1.1; }
 .timer { margin-top: 44rpx; font-size: 140rpx; line-height: 1.05; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.distance { margin-top: 18rpx; font-size: 58rpx; line-height: 1; font-variant-numeric: tabular-nums; }
+.location-status { min-height: 34rpx; margin-top: 10rpx; color: #75927b; font-size: 29rpx; line-height: 1.1; }
 .run-art { flex: 1; width: 100%; min-height: 280rpx; display: flex; align-items: center; justify-content: center; padding: 22rpx 0 28rpx; }
 .run-runner { width: 360rpx; height: 375rpx; max-height: 29vh; }
 .run-actions .pill { font-size: 72rpx; }

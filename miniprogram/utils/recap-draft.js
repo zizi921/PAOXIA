@@ -14,7 +14,9 @@ function readDraft() {
   if (draft.run && (!Number.isFinite(draft.run.startedAt) || draft.run.startedAt <= 0 ||
       !Number.isFinite(draft.run.pausedAt) || draft.run.pausedAt < 0 ||
       !Number.isFinite(draft.run.totalPausedMs) || draft.run.totalPausedMs < 0 ||
-      !Number.isFinite(draft.run.finishedAt) || draft.run.finishedAt < draft.run.startedAt)) {
+      !Number.isFinite(draft.run.finishedAt) || draft.run.finishedAt < draft.run.startedAt ||
+      (draft.run.distanceMeters !== undefined &&
+        (!Number.isFinite(draft.run.distanceMeters) || draft.run.distanceMeters < 0)))) {
     throw new Error('Invalid draft run');
   }
   // A completed record remains authoritative if draft removal failed.
