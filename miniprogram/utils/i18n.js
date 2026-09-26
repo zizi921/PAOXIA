@@ -39,12 +39,12 @@ const COPY = {
   },
   zh: {
     home: {
-      go: '出发', continueRun: '继续跑步', continueDraft: '继续填写', history: '跑步记录',
+      go: '出发', continueRun: '继续跑步', continueDraft: '继续填写', history: '跑跑记记',
       goAria: '开始跑步计时', continueRunAria: '继续本次跑步', continueDraftAria: '继续填写跑后记录', historyAria: '查看跑步记录',
       loadError: '无法读取跑步或草稿'
     },
     run: {
-      moving: '跑起来', breath: '休息一下', pause: '暂停', resume: '继续', done: '完成',
+      moving: '跑下', breath: '休息一下', pause: '暂停', resume: '继续', done: '完成',
       timeAria: '当前跑步时长', distanceAria: '当前跑步距离', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
       findingGps: '正在寻找 GPS…', gpsOn: 'GPS 已开启 · 距离自动更新', distancePaused: '距离记录已暂停', gpsNeeded: '距离记录需要手机 GPS', allowLocation: '请允许定位以计算距离',
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
@@ -63,7 +63,7 @@ const COPY = {
       deleteError: '无法删除这条记录，请重试', deleteNavError: '记录已删除，但无法打开跑步记录', saveChangesError: '无法保存修改，请重试', saveError: '无法保存这次记录，请重试', cleanupError: '记录已保存，但草稿清理失败', savedNavError: '记录已保存，请再次点击保存进入跑步记录'
     },
     history: {
-      title: '跑步记录', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', monthFilter: '筛选月份', dayFilter: '筛选日期', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
+      title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', monthFilter: '筛选月份', dayFilter: '筛选日期', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
       noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '记录会保存在这台设备上。',
       noMonth: '这个月还没有跑步记录', noMonthCopy: '换一个月份，或再跑一次。', noYear: '这一年还没有跑步记录', noYearCopy: '换一个年份，或开始一次跑步。',
       dayKicker: '日期', timeKicker: '跑步时长', distanceKicker: '距离', felt: '感受', spotted: '沿途看到', nothing: '这次没有特别记录', noNote: '这次没有备注',

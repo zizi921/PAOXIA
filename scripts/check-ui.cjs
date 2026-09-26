@@ -634,13 +634,15 @@ storage.clear();storageWx.setStorageSync('paoxia.language', 'zh');
 storageWx.setStorageSync('paoxia.completedRuns', [{ id: 'zh-run', date: '2026-09-26', durationSeconds: 125,
   distance: '2.4 km', mood: 'Calm', moodType: 'calm', notices: ['tree'], note: '', weather: 'rainy' }]);
 const zhHome = load('home', {});zhHome.onLoad();zhHome.onShow();
-assert.equal(zhHome.data.language, 'zh');assert.equal(zhHome.data.copy.go, '出发');assert.equal(zhHome.data.copy.history, '跑步记录');
+assert.equal(zhHome.data.language, 'zh');assert.equal(zhHome.data.copy.go, '出发');assert.equal(zhHome.data.copy.history, '跑跑记记');
 const zhRun = load('run', {}, { Date: clock, setInterval: () => 1, clearInterval: () => {} });zhRun.onLoad({ startedAt: String(now) });
-assert.equal(zhRun.data.copy.moving, '跑起来');assert.equal(zhRun.data.copy.pause, '暂停');
+assert.equal(zhRun.data.copy.moving, '跑下');assert.equal(zhRun.data.copy.pause, '暂停');
 const zhRecap = load('recap', {});zhRecap.onLoad({ recordId: 'zh-run' });
-assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.howWasIt, '感觉怎么样？');assert.equal(zhRecap.data.weatherLabel, '下雨');
+assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.so, '跑完啦');assert.equal(zhRecap.data.copy.howWasIt, '感觉怎么样？');assert.equal(zhRecap.data.weatherLabel, '下雨');
 const zhHistory = load('history', {});zhHistory.onLoad({ recordId: 'zh-run' });
 assert.equal(zhHistory.data.periodLabels.month, '2026年9月');assert.equal(zhHistory.data.periodLabels.day, '2026年9月26日');
+assert.equal(zhHistory.data.copy.title, '跑跑记记');
+assert.equal(zhHistory.data.monthRows[0].day, '9月26日');assert.equal(zhHistory.data.yearRows[0].month, '9月');
 assert.equal(zhHistory.data.selectedRecord.duration, '2分钟');assert.equal(zhHistory.data.selectedRecord.mood, '平静');assert.equal(zhHistory.data.selectedRecord.noticeItems[0].label, '树');
 assert.equal(zhHistory.data.yearSummary.times, '1次跑步');assert.equal(zhHistory.data.monthSummary.total, '2分钟');
 const homeWxml = fs.readFileSync('miniprogram/pages/home/home.wxml','utf8');
