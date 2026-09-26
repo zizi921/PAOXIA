@@ -26,7 +26,8 @@
   </view>
 
   <view class="history-content">
-    <block wx:if="{{mode === 'month'}}">
+    <view wx:if="{{!records.length}}" class="day-empty"><image class="empty-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">No days out yet.</text><text class="handwritten empty-copy">Go again, then save your first run.</text><text class="handwritten empty-copy">Only your latest run in this session appears here.</text></view>
+    <block wx:elif="{{mode === 'month'}}">
       <view class="summary month-summary">
         <view><text class="handwritten summary-line">{{monthSummary.times}}</text><text class="handwritten summary-line">{{monthSummary.total}}</text></view>
         <image class="summary-runner month-rest-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" />
@@ -37,7 +38,7 @@
           <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark.className}}" wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label">{{mark.glyph}}</text></view></view>
           <text class="handwritten row-chevron">›</text>
         </view>
-        <view wx:if="{{!monthRows.length}}" class="history-empty"><text class="handwritten empty-title">No detailed days here yet.</text><text class="handwritten empty-copy">Pick another month or go again.</text></view>
+        <view wx:if="{{!monthRows.length}}" class="history-empty"><text class="handwritten empty-title">No days out this month.</text><text class="handwritten empty-copy">Pick another month or go again.</text></view>
       </scroll-view>
     </block>
 

@@ -21,27 +21,6 @@ const WEATHER_META = {
   windy: { glyph: '≋', className: 'windy' }
 };
 
-const DEMO_RECORDS = [
-  { id: 'demo-2026-09-25', date: '2026-09-25', durationSeconds: 37 * 60, distance: '1.8 km', mood: 'Calm', moodType: 'calm', notices: ['cat', 'wind'], note: '' },
-  { id: 'demo-2026-09-21', date: '2026-09-21', durationSeconds: 52 * 60, distance: '5.2 km', mood: 'Good', moodType: 'good', notices: ['tree', 'cloud'], note: 'Such a beautiful sunset!' },
-  { id: 'demo-2026-09-18', date: '2026-09-18', durationSeconds: 18 * 60, distance: '— km', mood: 'Tired', moodType: 'tired', notices: ['wind'], note: '' },
-  { id: 'demo-2026-09-16', date: '2026-09-16', durationSeconds: 23 * 60, distance: '3.2 km', mood: 'Calm', moodType: 'calm', notices: ['sun'], note: '' },
-  { id: 'demo-2026-09-12', date: '2026-09-12', durationSeconds: 41 * 60, distance: '4.1 km', mood: 'Good', moodType: 'good', notices: ['tree', 'cat'], note: '' },
-  { id: 'demo-2026-09-06', date: '2026-09-06', durationSeconds: 56 * 60, distance: '6.0 km', mood: 'Good', moodType: 'good', notices: ['cloud', 'moon'], note: '' }
-];
-
-const BASE_YEAR_ROWS = [
-  { month: 'SEP', value: '2026-09', times: 6, totalSeconds: 227 * 60, level: 4 },
-  { month: 'AUG', value: '2026-08', times: 9, totalSeconds: 252 * 60, level: 5 },
-  { month: 'JUL', value: '2026-07', times: 8, totalSeconds: 216 * 60, level: 4 },
-  { month: 'JUN', value: '2026-06', times: 5, totalSeconds: 118 * 60, level: 3 },
-  { month: 'MAY', value: '2026-05', times: 7, totalSeconds: 204 * 60, level: 5 },
-  { month: 'APR', value: '2026-04', times: 4, totalSeconds: 96 * 60, level: 3 },
-  { month: 'MAR', value: '2026-03', times: 5, totalSeconds: 130 * 60, level: 3 },
-  { month: 'FEB', value: '2026-02', times: 3, totalSeconds: 68 * 60, level: 2 },
-  { month: 'JAN', value: '2026-01', times: 1, totalSeconds: 28 * 60, level: 1 }
-];
-
 function dateParts(value) {
   const [yearText, monthText, dayText] = String(value || '').split('-');
   return {
@@ -105,34 +84,18 @@ function decorateRecord(record) {
 }
 
 function yearRowsFor(records, year) {
-  if (Number(year) !== 2026) {
-    const byMonth = {};
-    records.filter(record => record.date.startsWith(`${year}-`)).forEach(record => {
-      const value = record.date.slice(0, 7);
-      if (!byMonth[value]) byMonth[value] = { times: 0, totalSeconds: 0 };
-      byMonth[value].times += 1;
-      byMonth[value].totalSeconds += record.durationSeconds;
-    });
-    return Object.keys(byMonth).sort().reverse().map(value => {
-      const monthIndex = Number(value.slice(5, 7)) - 1;
-      const aggregate = byMonth[value];
-      return { month: MONTH_ABBR[monthIndex], value, times: aggregate.times, totalSeconds: aggregate.totalSeconds, level: Math.min(5, aggregate.times) };
-    });
-  }
-
-  const rows = BASE_YEAR_ROWS.map(row => ({ ...row }));
-  records.filter(record => !String(record.id).startsWith('demo-') && record.date.startsWith('2026-')).forEach(record => {
+  const byMonth = {};
+  records.filter(record => record.date.startsWith(`${year}-`)).forEach(record => {
     const value = record.date.slice(0, 7);
-    const row = rows.find(item => item.value === value);
-    if (row) {
-      row.times += 1;
-      row.totalSeconds += record.durationSeconds;
-    } else {
-      const monthIndex = Number(value.slice(5, 7)) - 1;
-      rows.push({ month: MONTH_ABBR[monthIndex], value, times: 1, totalSeconds: record.durationSeconds, level: 1 });
-    }
+    if (!byMonth[value]) byMonth[value] = { times: 0, totalSeconds: 0 };
+    byMonth[value].times += 1;
+    byMonth[value].totalSeconds += record.durationSeconds;
   });
-  return rows.sort((a, b) => b.value.localeCompare(a.value));
+  return Object.keys(byMonth).sort().reverse().map(value => {
+    const monthIndex = Number(value.slice(5, 7)) - 1;
+    const aggregate = byMonth[value];
+    return { month: MONTH_ABBR[monthIndex], value, times: aggregate.times, totalSeconds: aggregate.totalSeconds, level: Math.min(5, aggregate.times) };
+  });
 }
 
 function presentYearRows(rows) {
@@ -147,26 +110,28 @@ Page({
   data: {
     safeTop: 96,
     mode: 'year',
-    periodLabels: { year: '2026', month: 'September 2026', day: 'September 21, 2026' },
-    monthValue: '2026-09',
-    dayValue: '2026-09-21',
-    dayWeekday: 'Monday',
-    records: DEMO_RECORDS,
+    periodLabels: { year: '', month: '', day: '' },
+    monthValue: '',
+    dayValue: '',
+    dayWeekday: '',
+    records: [],
     monthRows: [],
-    yearRows: presentYearRows(BASE_YEAR_ROWS),
-    yearSummary: { times: '48 times out.', total: '22 h 19 min.' },
-    monthSummary: { times: '6 times out.', total: '3 h 47 min.' },
-    selectedRecord: decorateRecord(DEMO_RECORDS[1])
+    yearRows: [],
+    yearSummary: { times: '', total: '' },
+    monthSummary: { times: '', total: '' },
+    selectedRecord: null
   },
 
   onLoad() {
     const app = getApp();
     const latestRun = app && app.globalData ? app.globalData.latestRun : null;
-    const records = latestRun ? [latestRun, ...DEMO_RECORDS] : [...DEMO_RECORDS];
-    const dayValue = latestRun ? latestRun.date : this.data.dayValue;
+    const records = latestRun ? [latestRun] : [];
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const dayValue = latestRun ? latestRun.date : today;
     const monthValue = dayValue.slice(0, 7);
     this.setData({ safeTop: safeTop(), records, dayValue, monthValue, mode: latestRun ? 'day' : 'year' });
-    this.applyYear(this.data.periodLabels.year);
+    this.applyYear(dayValue.slice(0, 4));
     this.applyMonth(monthValue);
     this.applyDay(dayValue);
   },

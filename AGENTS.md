@@ -1,0 +1,10 @@
+# 项目约定
+
+- PAOXIA（跑下）是轻松记录跑步与沿途感受的微信原生小程序，使用 WXML、WXSS 和 JavaScript。
+- 当前交付为前端 UI 演示，不连接 CloudBase、数据库或网络，不持久化跑步记录；会话内数据传递不等于保存。
+- `plan.md` 是开发前建议方案，其中的 TypeScript、云端与同步设计不是已落实的技术约定。
+- 在微信开发者工具中导入仓库根目录，保留 `project.config.json` 中已有的 AppID。
+- 界面修改遵循已有的 `DESIGN.md`；具体视觉规则不在此重复。
+- 本地行为检查在仓库根目录运行：`node scripts/check-ui.cjs`。
+- `python3 scripts/preview-ui.py` 仅生成浏览器近似布局预览，不能替代微信运行环境验证。
+- 完成任务时，仅在改动使本文事实或约定失效时更新本文，并删除过时规则。
