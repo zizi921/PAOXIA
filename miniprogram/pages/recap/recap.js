@@ -18,7 +18,7 @@ Page({
       { value: 'windy', label: 'Windy', glyph: '≋' }
     ],
     mood: '',
-    notice: '',
+    selectedNotices: {},
     distance: '',
     note: ''
   },
@@ -59,7 +59,17 @@ Page({
 
   chooseNotice(event) {
     const notice = event.currentTarget.dataset.value;
-    this.setData({ notice: this.data.notice === notice ? '' : notice });
+    const selectedNotices = { ...this.data.selectedNotices };
+    if (selectedNotices[notice]) {
+      delete selectedNotices[notice];
+    } else if (notice === 'nothing') {
+      this.setData({ selectedNotices: { nothing: true } });
+      return;
+    } else {
+      delete selectedNotices.nothing;
+      selectedNotices[notice] = true;
+    }
+    this.setData({ selectedNotices });
   },
 
   updateDistance(event) {
@@ -84,7 +94,7 @@ Page({
       distance: this.data.distance ? `${this.data.distance} km` : '— km',
       mood: moodLabels[this.data.mood] || 'Not set',
       moodType: this.data.mood || 'unsure',
-      notices: this.data.notice ? [this.data.notice] : [],
+      notices: Object.keys(this.data.selectedNotices),
       note: this.data.note,
       weather: this.data.weather
     };

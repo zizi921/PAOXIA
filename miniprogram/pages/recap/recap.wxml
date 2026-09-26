@@ -43,27 +43,27 @@
     <view class="section notice-section">
       <text class="handwritten section-title">What did you notice?</text>
       <view class="notice-grid">
-        <button class="choice notice-choice {{notice === 'tree' ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见树">
+        <button class="choice notice-choice {{selectedNotices.tree ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见树">
           <view class="pictogram tree-icon"><view class="tree-crown crown-a"></view><view class="tree-crown crown-b"></view><view class="tree-crown crown-c"></view><view class="tree-trunk"></view><view class="tree-branch"></view></view>
           <text class="choice-label handwritten">Tree</text>
         </button>
-        <button class="choice notice-choice {{notice === 'wind' ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="感到风">
+        <button class="choice notice-choice {{selectedNotices.wind ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="感到风">
           <view class="pictogram wind-icon"><view class="wind-line wind-a"></view><view class="wind-line wind-b"></view><view class="wind-line wind-c"></view></view>
           <text class="choice-label handwritten">Wind</text>
         </button>
-        <button class="choice notice-choice {{notice === 'cloud' ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见云">
+        <button class="choice notice-choice {{selectedNotices.cloud ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见云">
           <view class="pictogram cloud-icon"><view class="cloud-puff puff-a"></view><view class="cloud-puff puff-b"></view><view class="cloud-puff puff-c"></view><view class="cloud-base"></view></view>
           <text class="choice-label handwritten">Cloud</text>
         </button>
-        <button class="choice notice-choice {{notice === 'cat' ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见猫">
+        <button class="choice notice-choice {{selectedNotices.cat ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见猫">
           <view class="pictogram cat-icon"><view class="cat-head"><view class="cat-ear cat-ear-a"></view><view class="cat-ear cat-ear-b"></view><view class="cat-face"></view></view><view class="cat-body"></view><view class="cat-leg cat-leg-a"></view><view class="cat-leg cat-leg-b"></view><view class="cat-tail"></view></view>
           <text class="choice-label handwritten">Cat</text>
         </button>
-        <button class="choice notice-choice {{notice === 'streetlight' ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见路灯">
+        <button class="choice notice-choice {{selectedNotices.streetlight ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见路灯">
           <view class="pictogram lamp-icon"><view class="lamp-pole"></view><view class="lamp-arm"></view><view class="lamp-shade"></view><view class="lamp-light"></view><view class="lamp-ground"></view></view>
           <text class="choice-label handwritten">Streetlight</text>
         </button>
-        <button class="choice notice-choice {{notice === 'nothing' ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="没有特别留意">
+        <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="没有特别留意">
           <view class="pictogram nothing-icon"><view class="dot dot-a"></view><view class="dot dot-b"></view><view class="dot dot-c"></view><view class="dot dot-d"></view><view class="dot dot-e"></view></view>
           <view class="choice-label two-line handwritten"><text>Didn’t</text><text>notice</text></view>
         </button>
