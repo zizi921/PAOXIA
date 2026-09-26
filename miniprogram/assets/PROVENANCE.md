@@ -10,4 +10,8 @@ Prompt: Extract only the large running character illustration from the LEFT phon
 
 # Typography
 
-Caveat variable font, from https://github.com/google/fonts/tree/main/ofl/caveat. SIL Open Font License included as Caveat-OFL.txt. Embedded in styles/handwriting.wxss so no network access is required.
+Caveat variable font, from https://github.com/google/fonts/tree/main/ofl/caveat. SIL Open Font License included as `Caveat-OFL.txt`. Embedded in `styles/handwriting.wxss` for the Run, Recap and Days Out. pages.
+
+Kalam Regular and Bold Latin subsets, from https://github.com/google/fonts/tree/main/ofl/kalam. SIL Open Font License included as `Kalam-OFL.txt`. Embedded in `styles/typography.wxss` for the Home page.
+
+Both families are bundled as data URLs, so no runtime network access is required.

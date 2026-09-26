@@ -14,6 +14,10 @@ typography:
     fontFamily: "PaoxiaHand, cursive"
     fontWeight: 600
     lineHeight: 1.05
+  homeDisplay:
+    fontFamily: "Kalam, cursive"
+    fontWeight: 700
+    lineHeight: 1.05
 rounded:
   action-top-left: "76rpx"
   action-top-right: "72rpx"
@@ -48,7 +52,7 @@ PAOXIA 使用纸张、炭笔和蜡笔的视觉语言，把跑步呈现为轻松�
 
 ## Typography
 
-界面英文和计时数字统一使用 Caveat 的本地嵌入版本。文案保持短促、口语化；数字使用稳定宽度，避免计时跳动时改变布局。
+首页使用 Kalam Bold，强化第一眼的轻松手写感。跑步页、跑后记录页和 Days Out. 页面继续使用 Caveat 的本地嵌入版本，保持既有视觉与数据排版。两套字体都随包嵌入，不依赖运行时网络。
 
 ## Layout
 
