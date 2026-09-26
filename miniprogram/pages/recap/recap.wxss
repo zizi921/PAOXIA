@@ -25,7 +25,8 @@
 .choice::after { border: 0; }
 .choice-pressed { opacity: .62; transform: scale(.97); }
 .mood-choice { flex: 0 0 25%; width: 25%; min-height: 142rpx; }
-.notice-choice { flex: 0 0 33.333%; width: 33.333%; min-height: 168rpx; }
+.notice-choice { flex: 0 0 25%; width: 25%; min-height: 168rpx; }
+.notice-choice .choice-label { font-size: 32rpx; }
 .choice.selected::before { content: ''; position: absolute; top: 0; right: 7rpx; bottom: 0; left: 7rpx; border: 5rpx solid #75927b; border-radius: 49% 53% 46% 55%; transform: rotate(-5deg); opacity: .78; }
 .notice-choice.selected::before { top: 0; right: 12rpx; bottom: 0; left: 12rpx; border-color: #db6954; transform: rotate(7deg); }
 .choice-label { position: relative; z-index: 2; margin-top: 5rpx; font-size: 38rpx; line-height: .95; white-space: nowrap; }
@@ -67,7 +68,7 @@
 .note-placeholder { color: #77756d; }
 .recap .save-button { min-height: 108rpx; margin-top: 36rpx; background: #e5ecdf; font-size: 62rpx; }
 .helper { display: block; margin-top: 20rpx; margin-bottom: 36rpx; font-size: 34rpx; line-height: 1; text-align: center; }
-@media (max-height: 700px) {
+@media (max-height: 900px) {
   .recap { padding-top: max(var(--safe-top, 80px), 76px); }
   .recap-heading-row { min-height: 102rpx; }
   .recap-title { font-size: 78rpx; }
@@ -85,3 +86,24 @@
 
 .recap .discard-button { background: transparent; min-height: 44px; line-height: 44px; margin-bottom: 20rpx; font-size: 36rpx; text-decoration: underline; text-underline-offset: 6rpx; }
 .recap .discard-button::after { border: 0; }
+
+@media (max-height: 740px) {
+  .recap { padding-bottom: env(safe-area-inset-bottom); }
+  .recap-heading-row { min-height: 72rpx; }
+  .recap-title { font-size: 62rpx; }
+  .recap-duration { margin-top: 8rpx; font-size: 36rpx; }
+  .weather-trigger { height: 80rpx; margin-top: 0; }
+  .weather-glyph { font-size: 60rpx; }
+  .section, .notice-section { margin-top: 10rpx; }
+  .section-title { font-size: 42rpx; }
+  .mood-grid, .notice-grid { margin-top: 4rpx; }
+  .mood-choice { min-height: 100rpx; }
+  .notice-choice { min-height: 118rpx; padding-top: 0; padding-bottom: 0; }
+  .notice-choice .pictogram { transform: scale(.8); margin-top: -8rpx; margin-bottom: -10rpx; }
+  .distance-row { margin-top: 8rpx; }
+  .distance-input { height: 52rpx; }
+  .note-input { height: 70rpx; margin-top: 8rpx; }
+  .recap .save-button { margin-top: 12rpx; min-height: 44px; }
+  .helper { margin: 8rpx 0 0; font-size: 28rpx; }
+  .recap .discard-button { margin-bottom: 0; }
+}

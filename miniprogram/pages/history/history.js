@@ -10,6 +10,8 @@ const NOTICE_META = {
   wind: { label: 'Wind', glyph: '≋', className: 'wind' },
   cloud: { label: 'Cloud', glyph: '☁', className: 'cloud' },
   cat: { label: 'Cat', glyph: '⌁', className: 'cat' },
+  dog: { label: 'Dog', image: '/assets/notice-dog.svg', className: 'dog' },
+  flower: { label: 'Flower', image: '/assets/notice-flower.svg', className: 'flower' },
   sun: { label: 'Sun', glyph: '☀', className: 'sun' },
   moon: { label: 'Moon', glyph: '☾', className: 'moon' },
   streetlight: { label: 'Streetlight', glyph: '⌑', className: 'streetlight' },

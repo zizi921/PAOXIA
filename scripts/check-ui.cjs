@@ -158,7 +158,7 @@ assert.equal(blankHistory.data.selectedRecord.weather,'');
 assert.equal(blankHistory.data.selectedRecord.mood,'Not set');
 assert.equal(blankHistory.data.selectedRecord.note,'');
 const recapWxml = fs.readFileSync('miniprogram/pages/recap/recap.wxml','utf8');
-for (const value of ['tree','wind','cloud','cat','streetlight','nothing']) {
+for (const value of ['tree','wind','cloud','cat','streetlight','dog','flower','nothing']) {
   assert(recapWxml.includes("selectedNotices." + value + " ? 'selected notice-red'"));
 }
 // A new page/module context reads persistent storage without app globals.
@@ -291,6 +291,11 @@ draftPage.chooseWeather(pick('cloudy'));
 draftPage.chooseMood(pick('calm'));
 draftPage.chooseNotice(pick('tree'));
 draftPage.chooseNotice(pick('wind'));
+draftPage.chooseNotice(pick('dog'));
+draftPage.chooseNotice(pick('flower'));
+draftPage.chooseNotice(pick('dog'));
+assert.equal(draftPage.data.selectedNotices.dog, undefined);
+draftPage.chooseNotice(pick('dog'));
 // Fields are persisted during input, without depending on exit callbacks.
 let recovered = load('recap', draftRuntime);
 recovered.onLoad({});
@@ -299,7 +304,7 @@ assert.equal(recovered.data.weather, 'cloudy');
 assert.equal(recovered.data.weatherLabel, 'Cloudy');
 assert.equal(recovered.data.weatherGlyph, '☁︎');
 assert.equal(recovered.data.mood, 'calm');
-assert.equal(Object.keys(recovered.data.selectedNotices).join(','), 'tree,wind');
+assert.equal(Object.keys(recovered.data.selectedNotices).join(','), 'tree,wind,flower,dog');
 assert.equal(recovered.data.distance, '');
 assert.equal(recovered.data.note, '');
 const draftHome = load('home', { navigateTo: x => { navigation = x.url; x.complete(); } });
@@ -317,6 +322,12 @@ assert.equal(recovered.data.durationSeconds, 125);
 recovered.save();recovered.onHide();recovered.onUnload();
 assert.equal(savedRecords().length, 1);
 assert.equal(savedRecords()[0].note, '沿途有风 🌿');
+const newNoticeHistory = load('history', {});newNoticeHistory.onLoad();
+assert.equal(newNoticeHistory.data.selectedRecord.noticeItems.map(item => item.label).join(','), 'Tree,Wind,Flower,Dog');
+for (const item of newNoticeHistory.data.selectedRecord.noticeItems.filter(item => item.image)) {
+  assert(fs.existsSync('miniprogram' + item.image));
+}
+assert.equal(newNoticeHistory.data.monthRows[0].noticeItems.length, 4);
 assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');
 draftHome.onShow();assert.equal(draftHome.data.hasDraft, false);
 const fresh = load('recap', draftRuntime);fresh.onLoad({ durationSeconds: '10' });
@@ -324,7 +335,12 @@ for (const field of ['weather', 'mood', 'distance', 'note']) assert.equal(fresh.
 assert.equal(Object.keys(fresh.data.selectedNotices).length, 0);
 fresh.chooseWeather(pick('rainy'));fresh.chooseWeather(pick('rainy'));
 fresh.chooseMood(pick('good'));fresh.chooseMood(pick('good'));
-fresh.chooseNotice(pick('nothing'));fresh.chooseNotice(pick('nothing'));
+fresh.chooseNotice(pick('dog'));fresh.chooseNotice(pick('flower'));
+fresh.chooseNotice(pick('nothing'));
+assert.equal(Object.keys(fresh.data.selectedNotices).join(','), 'nothing');
+fresh.chooseNotice(pick('flower'));
+assert.equal(Object.keys(fresh.data.selectedNotices).join(','), 'flower');
+fresh.chooseNotice(pick('flower'));
 fresh.updateDistance(input('2'));fresh.updateDistance(input(''));
 fresh.updateNote(input('erase me'));fresh.updateNote(input(''));
 const cleared = load('recap', draftRuntime);cleared.onLoad({});

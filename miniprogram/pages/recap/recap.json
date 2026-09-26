@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "跑后记录"
+  "navigationBarTitleText": "跑后记录",
+  "disableScroll": true
 }

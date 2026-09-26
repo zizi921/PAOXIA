@@ -2,7 +2,7 @@
   <view class="recap-inner">
     <view class="recap-heading-row">
       <view>
-        <text class="handwritten recap-title">Back.</text>
+        <text class="handwritten recap-title">So?</text>
         <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
       <button class="weather-trigger weather-{{weather || 'none'}} {{weatherOpen ? 'open' : ''}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="选择天气，当前为{{weatherLabel}}">
@@ -62,6 +62,14 @@
         <button class="choice notice-choice {{selectedNotices.streetlight ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="看见路灯">
           <view class="pictogram lamp-icon"><view class="lamp-pole"></view><view class="lamp-arm"></view><view class="lamp-shade"></view><view class="lamp-light"></view><view class="lamp-ground"></view></view>
           <text class="choice-label handwritten">Streetlight</text>
+        </button>
+        <button class="choice notice-choice {{selectedNotices.dog ? 'selected notice-red' : ''}}" data-value="dog" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="Saw a dog">
+          <image class="pictogram" src="/assets/notice-dog.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">Dog</text>
+        </button>
+        <button class="choice notice-choice {{selectedNotices.flower ? 'selected notice-red' : ''}}" data-value="flower" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="Saw a flower">
+          <image class="pictogram" src="/assets/notice-flower.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">Flower</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="没有特别留意">
           <view class="pictogram nothing-icon"><view class="dot dot-a"></view><view class="dot dot-b"></view><view class="dot dot-c"></view><view class="dot dot-d"></view><view class="dot dot-e"></view></view>
