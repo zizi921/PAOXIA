@@ -6,7 +6,7 @@
 - miniprogram/app.wxss：共享按钮宽度优先级、最小触控高度、动态顶部安全间距。
 - miniprogram/pages/home/home.{js,wxml,wxss}：注入胶囊安全间距，短屏留白，确保 GO 浅绿底生效。
 - miniprogram/pages/run/run.{js,wxml,wxss}：注入胶囊安全间距，调整短屏插画空间，明确返回链接定位。
-- miniprogram/pages/recap/recap.{js,json,wxml,wxss}：跑后记录页包含四个心情、六个见闻选项、距离及备注输入，并可保存返回首页。
+- miniprogram/pages/recap/recap.{js,json,wxml,wxss}：跑后记录页包含四种天气、四个心情、六个见闻选项、距离及备注输入，并可进入记录页。
 - miniprogram/pages/history/history.{js,json,wxml,wxss}：新增第四页跑步记录 UI、Year / Month / Day 切换、周期切换、记录下钻与 Go again 返回首页。
 - miniprogram/app.json：注册第三页路由。
 - miniprogram/utils/layout.js：读取微信胶囊底边并预留 20px；不可用时回退 96px。
@@ -27,4 +27,4 @@
 - 按安全区和短屏高度压缩留白，保持操作可触达。
 - 补充 Take a breath. / Resume 暂停态；计时以 GO 点击时间为起点，并用绝对时间差避免页面渲染延迟造成明显漂移。
 - 跑步页提供 Pause／Resume 和 Done 两个独立操作；Done 在跑动中与暂停时均可结束，两个操作文字字号一致。
-- 第三页的小图标均由 WXML/WXSS 绘制，保持可编辑；默认选择 Calm 与 Cat，感受与见闻重复点击均可清空。
+- 第三页的小图标均由 WXML/WXSS 绘制，保持可编辑；点击顶部天气图标可在 Sunny、Cloudy、Rainy、Windy 之间选择，默认选择 Sunny；默认选择 Calm 与 Cat，感受与见闻重复点击均可清空。

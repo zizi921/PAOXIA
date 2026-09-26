@@ -5,11 +5,15 @@
         <text class="handwritten recap-title">Back.</text>
         <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
-      <view class="sun" aria-hidden="true">
-        <view class="sun-core"></view>
-        <view class="sun-ray sun-ray-1"></view><view class="sun-ray sun-ray-2"></view>
-        <view class="sun-ray sun-ray-3"></view><view class="sun-ray sun-ray-4"></view>
-        <view class="sun-ray sun-ray-5"></view><view class="sun-ray sun-ray-6"></view>
+      <button class="weather-trigger weather-{{weather}} {{weatherOpen ? 'open' : ''}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="选择天气，当前为{{weatherLabel}}">
+        <text class="weather-glyph" aria-hidden="true">{{weatherGlyph}}</text>
+        <text class="handwritten weather-caption">Weather</text>
+      </button>
+      <view wx:if="{{weatherOpen}}" class="weather-menu" aria-label="天气选项">
+        <button class="weather-option {{weather === item.value ? 'selected' : ''}}" wx:for="{{weatherOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="chooseWeather" hover-class="choice-pressed" aria-label="{{item.label}}">
+          <text class="weather-option-glyph {{item.value}}" aria-hidden="true">{{item.glyph}}</text>
+          <text class="handwritten weather-option-label">{{item.label}}</text>
+        </button>
       </view>
     </view>
 

@@ -42,6 +42,8 @@ now=12500;tick();assert.equal(run.data.elapsedText,'00:00:08');
 run.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=8');
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
+assert.equal(recap.data.weather,'sunny');recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
+recap.chooseWeather({currentTarget:{dataset:{value:'rainy'}}});assert.equal(recap.data.weather,'rainy');assert.equal(recap.data.weatherLabel,'Rainy');assert.equal(recap.data.weatherOpen,false);
 recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'good');
 recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'');
 recap.chooseNotice({currentTarget:{dataset:{value:'tree'}}});assert.equal(recap.data.notice,'tree');
