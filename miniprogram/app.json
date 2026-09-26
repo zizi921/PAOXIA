@@ -6,17 +6,6 @@
     "backgroundColor": "#fdfcf9",
     "backgroundTextStyle": "dark"
   },
-  "requiredBackgroundModes": ["location"],
-  "permission": {
-    "scope.userLocation": {
-      "desc": "用于在跑步期间自动计算距离"
-    }
-  },
-  "requiredPrivateInfos": [
-    "onLocationChange",
-    "startLocationUpdate",
-    "startLocationUpdateBackground"
-  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

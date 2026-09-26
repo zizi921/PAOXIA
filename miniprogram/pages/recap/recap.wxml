@@ -79,9 +79,8 @@
     </view>
 
     <view class="form-row distance-row">
-      <text class="handwritten field-label">{{copy.distance}} <text wx:if="{{editing}}" class="optional">{{copy.editHint}}</text></text>
-      <input wx:if="{{editing}}" class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" bindinput="updateDistance" aria-label="{{copy.distance}}" />
-      <text wx:else class="handwritten distance-value" aria-label="自动记录的跑步距离 {{distance || '0.00'}} 公里">{{distance || '0.00'}}</text>
+      <text class="handwritten field-label">{{copy.distance}} <text class="optional">{{copy.optional}}</text></text>
+      <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" placeholder="0.00" bindinput="updateDistance" aria-label="{{copy.distanceInputAria}}" />
       <text class="handwritten unit">km</text>
     </view>
     <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="{{copy.notePlaceholder}}" placeholder-class="note-placeholder" aria-label="{{copy.notePlaceholder}}" />

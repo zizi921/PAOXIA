@@ -9,8 +9,7 @@ const COPY = {
     },
     run: {
       moving: 'Moving', breath: 'Take a breath.', pause: 'Pause', resume: 'Resume', done: 'Done',
-      timeAria: 'Current run time', distanceAria: 'Current run distance', pauseAria: 'Pause run timer', resumeAria: 'Resume run timer', doneAria: 'Finish run and fill in recap',
-      findingGps: 'Finding GPS…', gpsOn: 'GPS on · distance updates automatically', distancePaused: 'Distance paused', gpsNeeded: 'Distance needs phone GPS', allowLocation: 'Allow location to calculate distance',
+      timeAria: 'Current run time', pauseAria: 'Pause run timer', resumeAria: 'Resume run timer', doneAria: 'Finish run and fill in recap',
       restoreError: 'Could not save or restore this run.', stateError: 'Could not save run state.', finishError: 'Could not finish this run.'
     },
     recap: {
@@ -18,7 +17,7 @@ const COPY = {
       weatherOptions: { sunny: 'Sunny', cloudy: 'Cloudy', rainy: 'Rainy', windy: 'Windy' },
       howWasIt: 'How was it?', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
       whatNotice: 'What did you notice?', tree: 'Tree', wind: 'Wind', cloud: 'Cloud', cat: 'Cat', streetlight: 'Streetlight', dog: 'Dog', flower: 'Flower', didnt: 'Didn’t', notice: 'notice',
-      distance: 'Distance', editHint: '(edit)', notePlaceholder: 'A little note, if you like',
+      distance: 'Distance', optional: '(optional)', distanceInputAria: 'Enter run distance in kilometers', notePlaceholder: 'A little note, if you like',
       save: 'Save →', saveChanges: 'Save changes →', continueRun: 'Continue this run', cancel: 'Cancel', discardDraft: 'Discard draft', deleteRun: 'Delete this run',
       discardTitle: 'Discard draft?', discardContent: 'Your time and notes will be deleted. This run will not be saved.', discardConfirm: 'Discard', keep: 'Keep',
       deleteTitle: 'Delete this run?', deleteContent: 'This saved run and its details will be permanently deleted.', deleteConfirm: 'Delete',
@@ -45,8 +44,7 @@ const COPY = {
     },
     run: {
       moving: '跑下', breath: '休息一下', pause: '暂停', resume: '继续', done: '完成',
-      timeAria: '当前跑步时长', distanceAria: '当前跑步距离', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
-      findingGps: '正在寻找 GPS…', gpsOn: 'GPS 已开启 · 距离自动更新', distancePaused: '距离记录已暂停', gpsNeeded: '距离记录需要手机 GPS', allowLocation: '请允许定位以计算距离',
+      timeAria: '当前跑步时长', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
     },
     recap: {
@@ -54,7 +52,7 @@ const COPY = {
       weatherOptions: { sunny: '晴天', cloudy: '多云', rainy: '下雨', windy: '有风' },
       howWasIt: '感觉怎么样？', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
       whatNotice: '一路看到了什么？', tree: '树', wind: '风', cloud: '云', cat: '猫', streetlight: '路灯', dog: '狗', flower: '花', didnt: '没特别', notice: '留意',
-      distance: '距离', editHint: '（修改）', notePlaceholder: '想写点什么也可以',
+      distance: '距离', optional: '（可选）', distanceInputAria: '填写跑步距离，单位公里', notePlaceholder: '想写点什么也可以',
       save: '保存 →', saveChanges: '保存修改 →', continueRun: '继续这次跑步', cancel: '取消', discardDraft: '放弃草稿', deleteRun: '删除这次记录',
       discardTitle: '放弃草稿？', discardContent: '本次时长和填写内容将被删除，且不会保存为跑步记录。', discardConfirm: '放弃', keep: '保留',
       deleteTitle: '删除这次记录？', deleteContent: '这条跑步记录及其内容将被永久删除。', deleteConfirm: '删除',

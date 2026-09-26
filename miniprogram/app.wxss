@@ -8,9 +8,7 @@ page { background: #fdfcf9; color: #262622; font-family: 'PaoxiaHand', cursive; 
 .home.lang-zh .go,
 .home.lang-zh .history-link { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-weight: 400; }
 .lang-zh .timer,
-.lang-zh .distance,
 .lang-zh .recap-duration,
-.lang-zh .distance-value,
 .lang-zh .distance-input,
 .lang-zh .unit,
 .lang-zh .period-label,

@@ -1,7 +1,6 @@
 const { readDraft, saveDraft } = require('../../utils/recap-draft');
 const { safeTop } = require('../../utils/layout');
 const { formatElapsed } = require('../../utils/time');
-const { distanceBetween, formatDistanceMeters } = require('../../utils/distance');
 const { readActiveRun, saveActiveRun, clearActiveRun } = require('../../utils/active-run');
 const { readLanguage, copyFor } = require('../../utils/i18n');
 
@@ -11,8 +10,6 @@ Page({
     safeTop: 96,
     elapsedSeconds: 0,
     elapsedText: '00:00:00',
-    distanceText: '0.00 km',
-    locationStatus: 'Finding GPS…',
     language: 'en',
     copy: copyFor('en', 'run')
   },
@@ -26,25 +23,20 @@ Page({
       if (!run && options && options.continue === '1') {
         const draft = readDraft();
         if (!draft || !draft.run) return;
-        const { startedAt, pausedAt, totalPausedMs, finishedAt, distanceMeters } = draft.run;
+        const { startedAt, pausedAt, totalPausedMs, finishedAt } = draft.run;
         // Restore at page entry so all time spent in the form stays excluded.
         run = { startedAt, pausedAt,
-          totalPausedMs: totalPausedMs + (pausedAt ? 0 : Date.now() - finishedAt),
-          distanceMeters: Math.max(0, Number(distanceMeters) || 0), lastLocation: null };
+          totalPausedMs: totalPausedMs + (pausedAt ? 0 : Date.now() - finishedAt) };
       }
       run = run || {
         startedAt: Number(options && options.startedAt) || Date.now(),
         totalPausedMs: 0,
-        pausedAt: 0,
-        distanceMeters: 0,
-        lastLocation: null
+        pausedAt: 0
       };
       saveActiveRun(run);
       Object.assign(this, run);
       this.ended = false;
-      this.setData({ paused: !!this.pausedAt,
-        distanceText: `${formatDistanceMeters(this.distanceMeters)} km` });
-      this.setLocationStatus(this.pausedAt ? 'distancePaused' : 'findingGps');
+      this.setData({ paused: !!this.pausedAt });
       this.updateClock();
     } catch (error) {
       wx.showToast({ title: this.data.copy.restoreError, icon: 'none' });
@@ -54,7 +46,6 @@ Page({
   onShow() {
     if (!this.data.paused && !this.ended) {
       this.beginTicker();
-      this.startLocationTracking();
     }
   },
 
@@ -65,7 +56,6 @@ Page({
 
   onUnload() {
     this.clearTicker();
-    this.stopLocationTracking();
   },
 
   elapsedAt(now) {
@@ -101,99 +91,13 @@ Page({
     }
   },
 
-  setLocationStatus(key) {
-    this.locationStatusKey = key;
-    this.setData({ locationStatus: this.data.copy[key] || '' });
-  },
-
-  startLocationTracking() {
-    if (this.locationStarting || this.locationActive || this.data.paused || this.ended) return;
-    if (typeof wx.onLocationChange !== 'function') {
-      this.setLocationStatus('gpsNeeded');
-      return;
-    }
-    this.locationStarting = true;
-    if (!this.locationHandler) this.locationHandler = location => this.handleLocation(location);
-    if (!this.locationListenerAttached) {
-      wx.onLocationChange(this.locationHandler);
-      this.locationListenerAttached = true;
-    }
-    const succeeded = () => {
-      this.locationStarting = false;
-      this.locationActive = true;
-      this.setLocationStatus('gpsOn');
-    };
-    const failed = () => {
-      if (typeof wx.startLocationUpdate === 'function' && !this.foregroundLocationAttempted) {
-        this.foregroundLocationAttempted = true;
-        wx.startLocationUpdate({ type: 'gcj02', success: succeeded, fail: () => this.locationFailed() });
-        return;
-      }
-      this.locationFailed();
-    };
-    if (typeof wx.startLocationUpdateBackground === 'function') {
-      wx.startLocationUpdateBackground({ type: 'gcj02', success: succeeded, fail: failed });
-    } else if (typeof wx.startLocationUpdate === 'function') {
-      this.foregroundLocationAttempted = true;
-      wx.startLocationUpdate({ type: 'gcj02', success: succeeded, fail: () => this.locationFailed() });
-    } else {
-      this.locationFailed();
-    }
-  },
-
-  locationFailed() {
-    this.locationStarting = false;
-    this.locationActive = false;
-    this.foregroundLocationAttempted = false;
-    this.setLocationStatus('allowLocation');
-  },
-
-  stopLocationTracking() {
-    if (this.locationListenerAttached && typeof wx.offLocationChange === 'function') {
-      wx.offLocationChange(this.locationHandler);
-    }
-    this.locationListenerAttached = false;
-    this.locationStarting = false;
-    this.locationActive = false;
-    this.foregroundLocationAttempted = false;
-    if (typeof wx.stopLocationUpdate === 'function') wx.stopLocationUpdate({});
-  },
-
-  handleLocation(location) {
-    if (this.ended || this.data.paused) return;
-    const latitude = Number(location && location.latitude);
-    const longitude = Number(location && location.longitude);
-    const accuracyValue = Number(location && (location.accuracy || location.horizontalAccuracy));
-    const accuracy = Number.isFinite(accuracyValue) && accuracyValue > 0 ? accuracyValue : 30;
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || accuracy > 80) return;
-    const point = { latitude, longitude, accuracy, at: Date.now() };
-    if (!this.lastLocation) {
-      this.lastLocation = point;
-      this.persistRun();
-      return;
-    }
-    const segmentMeters = distanceBetween(this.lastLocation, point);
-    const seconds = Math.max(1, (point.at - this.lastLocation.at) / 1000);
-    const jitterThreshold = Math.max(3,
-      Math.min(10, ((this.lastLocation.accuracy || 30) + accuracy) / 4));
-    if (segmentMeters < jitterThreshold) return;
-    if (segmentMeters / seconds > 12) return;
-    this.distanceMeters += segmentMeters;
-    this.lastLocation = point;
-    this.setData({ distanceText: `${formatDistanceMeters(this.distanceMeters)} km` });
-    this.setLocationStatus('gpsOn');
-    this.persistRun();
-  },
-
   togglePause() {
     if (this.ended) return;
     const now = Date.now();
     const run = {
       startedAt: this.startedAt,
       totalPausedMs: this.totalPausedMs + (this.pausedAt ? now - this.pausedAt : 0),
-      pausedAt: this.pausedAt ? 0 : now,
-      distanceMeters: this.distanceMeters,
-      lastLocation: null
+      pausedAt: this.pausedAt ? 0 : now
     };
     try {
       saveActiveRun(run);
@@ -206,11 +110,8 @@ Page({
     this.updateClock();
     if (this.data.paused) {
       this.clearTicker();
-      this.stopLocationTracking();
-      this.setLocationStatus('distancePaused');
     } else {
       this.beginTicker();
-      this.startLocationTracking();
     }
   },
 
@@ -225,12 +126,9 @@ Page({
         : { id: `draft-${finishedAt}-${Math.random().toString(36).slice(2)}`,
           weather: '', mood: '', selectedNotices: {}, distance: '', note: '' };
       saveDraft({ ...draft, durationSeconds: elapsedSeconds,
-        distance: this.distanceMeters > 0
-          ? formatDistanceMeters(this.distanceMeters)
-          : (draft.distance || formatDistanceMeters(0)),
+        distance: draft.distance || '',
         run: { startedAt: this.startedAt, pausedAt: this.pausedAt,
-          totalPausedMs: this.totalPausedMs, finishedAt,
-          distanceMeters: this.distanceMeters, lastLocation: this.lastLocation } });
+          totalPausedMs: this.totalPausedMs, finishedAt } });
       clearActiveRun();
     } catch (error) {
       wx.showToast({ title: this.data.copy.finishError, icon: 'none' });
@@ -240,7 +138,6 @@ Page({
     this.updateClock();
     this.ended = true;
     this.clearTicker();
-    this.stopLocationTracking();
     wx.redirectTo({
       url: `/pages/recap/recap?durationSeconds=${elapsedSeconds}`,
       fail: () => {
@@ -252,7 +149,6 @@ Page({
         this.ended = false;
         if (!this.data.paused) {
           this.beginTicker();
-          this.startLocationTracking();
         }
       },
       complete: () => { this.navigating = false; }

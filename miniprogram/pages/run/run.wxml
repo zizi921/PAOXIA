@@ -1,8 +1,6 @@
 <view class="screen run lang-{{language}}" style="--safe-top: {{safeTop}}px;">
   <text class="handwritten headline">{{paused ? copy.breath : copy.moving}}</text>
   <text class="handwritten timer" aria-label="{{copy.timeAria}} {{elapsedText}}">{{elapsedText}}</text>
-  <text class="handwritten distance" aria-label="{{copy.distanceAria}} {{distanceText}}">{{distanceText}}</text>
-  <text class="handwritten location-status">{{locationStatus}}</text>
   <view class="run-art"><image class="runner run-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
   <view class="actions run-actions">
     <button class="pill handwritten" hover-class="pressed" bindtap="togglePause" aria-label="{{paused ? copy.resumeAria : copy.pauseAria}}">{{paused ? copy.resume : copy.pause}}</button>
