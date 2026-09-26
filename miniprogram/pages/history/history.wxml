@@ -2,14 +2,13 @@
   <view class="history-header">
     <view class="title-row">
       <text class="handwritten history-title">Days Out.</text>
-      <view class="filter-mark" aria-hidden="true"><view></view><view></view><view></view></view>
     </view>
     <view class="mode-tabs" role="tablist">
-      <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" data-mode="year" bindtap="switchMode" hover-class="choice-pressed">Year</button>
+      <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'year'}}" aria-label="按年份查看" data-mode="year" bindtap="switchMode" hover-class="choice-pressed">Year</button>
       <text class="tab-divider">|</text>
-      <button class="mode-tab handwritten {{mode === 'month' ? 'active' : ''}}" data-mode="month" bindtap="switchMode" hover-class="choice-pressed">Month</button>
+      <button class="mode-tab handwritten {{mode === 'month' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'month'}}" aria-label="按月份查看" data-mode="month" bindtap="switchMode" hover-class="choice-pressed">Month</button>
       <text class="tab-divider">|</text>
-      <button class="mode-tab handwritten {{mode === 'day' ? 'active' : ''}}" data-mode="day" bindtap="switchMode" hover-class="choice-pressed">Day</button>
+      <button class="mode-tab handwritten {{mode === 'day' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'day'}}" aria-label="按日期查看" data-mode="day" bindtap="switchMode" hover-class="choice-pressed">Day</button>
     </view>
     <view class="period-nav">
       <button class="period-arrow handwritten" data-direction="-1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="上一时间段">‹</button>
@@ -29,38 +28,41 @@
   <view class="history-content">
     <block wx:if="{{mode === 'month'}}">
       <view class="summary month-summary">
-        <view><text class="handwritten summary-line">6 times out.</text><text class="handwritten summary-line">2 h 47 min.</text></view>
+        <view><text class="handwritten summary-line">{{monthSummary.times}}</text><text class="handwritten summary-line">{{monthSummary.total}}</text></view>
         <image class="summary-runner month-rest-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" />
       </view>
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
-        <view class="record-row" role="button" aria-label="查看 {{item.day}} 跑步记录" wx:for="{{monthRows}}" wx:key="day" bindtap="openDay" hover-class="row-pressed">
+        <view class="record-row" role="button" aria-label="查看 {{item.day}} 跑步记录" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" bindtap="openDay" hover-class="row-pressed">
           <view class="record-date"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
-          <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark}}" wx:for="{{item.marks}}" wx:for-item="mark" wx:key="*this">{{mark === 'tree' ? '♧' : mark === 'cloud' ? '☁' : mark === 'moon' ? '☾' : mark === 'sun' ? '☀' : mark === 'cat' ? '⌁' : '≋'}}</text></view></view>
+          <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><text class="mark {{mark.className}}" wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label">{{mark.glyph}}</text></view></view>
           <text class="handwritten row-chevron">›</text>
         </view>
+        <view wx:if="{{!monthRows.length}}" class="history-empty"><text class="handwritten empty-title">No detailed days here yet.</text><text class="handwritten empty-copy">Pick another month or go again.</text></view>
       </scroll-view>
     </block>
 
     <block wx:elif="{{mode === 'year'}}">
-      <view class="summary year-summary"><image class="year-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /><view><text class="handwritten summary-line">48 times out.</text><text class="handwritten summary-line">18 h 26 min.</text></view></view>
+      <view class="summary year-summary"><image class="year-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /><view><text class="handwritten summary-line">{{yearSummary.times}}</text><text class="handwritten summary-line">{{yearSummary.total}}</text></view></view>
       <scroll-view class="year-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
-        <view class="year-row" role="button" aria-label="查看 {{item.month}} 跑步记录" wx:for="{{yearRows}}" wx:key="month" bindtap="openMonth" hover-class="row-pressed"><text class="handwritten year-month">{{item.month}}</text><view class="year-copy"><text class="handwritten">{{item.times}}</text><text class="handwritten year-total">{{item.total}}</text></view><view class="bar-chart level-{{item.level}}"><view></view><view></view><view></view><view></view><view></view></view><text class="handwritten row-chevron">›</text></view>
+        <view class="year-row" role="button" aria-label="查看 {{item.month}} 跑步记录" wx:for="{{yearRows}}" wx:key="value" data-month="{{item.value}}" bindtap="openMonth" hover-class="row-pressed"><text class="handwritten year-month">{{item.month}}</text><view class="year-copy"><text class="handwritten">{{item.timesText}}</text><text class="handwritten year-total">{{item.total}}</text></view><view class="bar-chart level-{{item.level}}"><view></view><view></view><view></view><view></view><view></view></view><text class="handwritten row-chevron">›</text></view>
+        <view wx:if="{{!yearRows.length}}" class="history-empty"><text class="handwritten empty-title">No days out this year.</text><text class="handwritten empty-copy">Try another year or start a new run.</text></view>
       </scroll-view>
     </block>
 
-    <view wx:else class="day-detail">
+    <view wx:elif="{{selectedRecord}}" class="day-detail">
       <view class="day-feature">
         <view class="day-summary-copy">
-          <view class="day-stat"><text class="handwritten day-kicker">DAY</text><text class="handwritten day-metric day-weekday-value">{{dayWeekday || 'Sunday'}}</text></view>
-          <view class="day-stat"><text class="handwritten day-kicker">TIME OUT</text><text class="handwritten day-metric">52 min</text></view>
-          <view class="day-stat"><text class="handwritten day-kicker">DISTANCE</text><text class="handwritten day-metric day-distance">5.2 km</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">DAY</text><text class="handwritten day-metric day-weekday-value">{{selectedRecord.weekdayLong}}</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">TIME OUT</text><text class="handwritten day-metric">{{selectedRecord.duration}}</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">DISTANCE</text><text class="handwritten day-metric day-distance">{{selectedRecord.distance}}</text></view>
         </view>
-        <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud">☁</text><image class="day-runner" src="/assets/runner.png" mode="aspectFit" /></view>
+        <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud {{selectedRecord.weatherClass}}">{{selectedRecord.weatherGlyph}}</text><image class="day-runner" src="/assets/runner.png" mode="aspectFit" /></view>
       </view>
-      <view class="day-feeling"><text class="handwritten day-kicker">FELT</text><view class="mood-inline"><view class="mini-face good"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Good</text></view></view>
-      <view class="day-notice-block"><text class="handwritten day-section-title">Spotted out there</text><view class="day-notices"><view><text class="big-mark tree">♧</text><text class="handwritten">Tree</text></view><view><text class="big-mark cloud">☁</text><text class="handwritten">Cloud</text></view></view></view>
-      <view class="day-note-card"><text class="handwritten quote-mark">“</text><text class="handwritten day-note">Such a beautiful sunset!</text><text class="handwritten quote-mark quote-end">”</text></view>
+      <view class="day-feeling"><text class="handwritten day-kicker">FELT</text><view class="mood-inline"><view class="mini-face {{selectedRecord.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{selectedRecord.mood}}</text></view></view>
+      <view class="day-notice-block"><text class="handwritten day-section-title">Spotted out there</text><view wx:if="{{selectedRecord.noticeItems.length}}" class="day-notices"><view wx:for="{{selectedRecord.noticeItems}}" wx:key="label"><text class="big-mark {{item.className}}">{{item.glyph}}</text><text class="handwritten">{{item.label}}</text></view></view><text wx:else class="handwritten day-blank-copy">Nothing noted this time.</text></view>
+      <view class="day-note-card {{selectedRecord.note ? '' : 'empty-note'}}"><text class="handwritten quote-mark">“</text><text class="handwritten day-note">{{selectedRecord.note || 'No note this time.'}}</text><text class="handwritten quote-mark quote-end">”</text></view>
     </view>
+    <view wx:else class="day-empty"><image class="empty-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">No day out here yet.</text><text class="handwritten empty-copy">Choose another date or go again.</text></view>
   </view>
 
   <button class="history-action handwritten" bindtap="goAgain" hover-class="pressed" aria-label="再次开始跑步"><text class="plus">＋</text><text>Go again</text><text class="action-arrow">→</text></button>

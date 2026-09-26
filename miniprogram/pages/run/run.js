@@ -73,7 +73,7 @@ Page({
     const elapsedSeconds = this.updateClock();
     this.ended = true;
     this.clearTicker();
-    wx.navigateTo({
+    wx.redirectTo({
       url: `/pages/recap/recap?durationSeconds=${elapsedSeconds}`,
       complete: () => { this.navigating = false; }
     });

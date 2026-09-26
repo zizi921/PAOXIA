@@ -5,7 +5,7 @@
         <text class="handwritten recap-title">Back.</text>
         <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
-      <button class="weather-trigger weather-{{weather}} {{weatherOpen ? 'open' : ''}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="选择天气，当前为{{weatherLabel}}">
+      <button class="weather-trigger weather-{{weather || 'none'}} {{weatherOpen ? 'open' : ''}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="选择天气，当前为{{weatherLabel}}">
         <text class="weather-glyph" aria-hidden="true">{{weatherGlyph}}</text>
         <text class="handwritten weather-caption">Weather</text>
       </button>
@@ -77,7 +77,7 @@
     </view>
     <input class="note-input handwritten" maxlength="80" value="{{note}}" bindinput="updateNote" placeholder="A little note, if you like" placeholder-class="note-placeholder" aria-label="跑步备注，可选" />
 
-    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="保存演示记录并返回首页">Save →</button>
+    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save" aria-label="保存本次记录并查看历史记录">Save →</button>
     <text class="handwritten helper">You can leave it all blank.</text>
   </view>
 </view>

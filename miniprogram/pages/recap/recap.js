@@ -5,10 +5,11 @@ const { formatDuration } = require('../../utils/time');
 Page({
   data: {
     safeTop: 96,
+    durationSeconds: 0,
     durationText: '0 sec',
-    weather: 'sunny',
-    weatherLabel: 'Sunny',
-    weatherGlyph: '☀︎',
+    weather: '',
+    weatherLabel: 'Not selected',
+    weatherGlyph: '＋',
     weatherOpen: false,
     weatherOptions: [
       { value: 'sunny', label: 'Sunny', glyph: '☀︎' },
@@ -16,8 +17,8 @@ Page({
       { value: 'rainy', label: 'Rainy', glyph: '☂︎' },
       { value: 'windy', label: 'Windy', glyph: '≋' }
     ],
-    mood: 'calm',
-    notice: 'cat',
+    mood: '',
+    notice: '',
     distance: '',
     note: ''
   },
@@ -26,6 +27,7 @@ Page({
     const durationSeconds = Number(options && options.durationSeconds) || 0;
     this.setData({
       safeTop: safeTop(),
+      durationSeconds,
       durationText: formatDuration(durationSeconds)
     });
   },
@@ -43,6 +45,10 @@ Page({
     const weather = event.currentTarget.dataset.value;
     const selected = this.data.weatherOptions.find(option => option.value === weather);
     if (!selected) return;
+    if (this.data.weather === weather) {
+      this.setData({ weather: '', weatherLabel: 'Not selected', weatherGlyph: '＋', weatherOpen: false });
+      return;
+    }
     this.setData({
       weather,
       weatherLabel: selected.label,
@@ -67,6 +73,21 @@ Page({
   save() {
     if (this.navigating) return;
     this.navigating = true;
+    const now = new Date();
+    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const moodLabels = { good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure' };
+    const app = getApp();
+    app.globalData.latestRun = {
+      id: `run-${Date.now()}`,
+      date,
+      durationSeconds: this.data.durationSeconds,
+      distance: this.data.distance ? `${this.data.distance} km` : '— km',
+      mood: moodLabels[this.data.mood] || 'Not set',
+      moodType: this.data.mood || 'unsure',
+      notices: this.data.notice ? [this.data.notice] : [],
+      note: this.data.note,
+      weather: this.data.weather
+    };
     wx.redirectTo({
       url: '/pages/history/history',
       complete: () => { this.navigating = false; }

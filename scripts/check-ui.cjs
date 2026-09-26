@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const time = require('../miniprogram/utils/time');
+const appState = { globalData: { latestRun: null } };
 const pages = JSON.parse(fs.readFileSync('miniprogram/app.json')).pages;
 for (const route of pages) for (const ext of ['js','json','wxml','wxss']) assert(fs.existsSync(`miniprogram/${route}.${ext}`));
 function load(route, wx, globals = {}) {
@@ -9,6 +10,7 @@ function load(route, wx, globals = {}) {
   const context = {
     Page: x => page=x,
     wx,
+    getApp: () => appState,
     require: request => request.endsWith('/time') ? time : { safeTop: () => 108 },
     ...globals
   };
@@ -27,7 +29,7 @@ home.onLoad(); assert.equal(home.data.safeTop, 108);
 home.go(); assert.equal(navigation, '/pages/run/run?startedAt=1000');
 navigation=null;home.go();assert.equal(navigation,null);completed();home.go();assert.equal(navigation,'/pages/run/run?startedAt=1000');
 let tick;
-const run=load('run',{navigateTo:x=>{navigation=x.url;x.complete();}}, {
+const run=load('run',{redirectTo:x=>{navigation=x.url;x.complete();}}, {
   Date: clock,
   setInterval: fn => { tick = fn; return 1; },
   clearInterval: () => {}
@@ -42,26 +44,27 @@ now=12500;tick();assert.equal(run.data.elapsedText,'00:00:08');
 run.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=8');
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
-assert.equal(recap.data.weather,'sunny');recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
+assert.equal(recap.data.weather,'');assert.equal(recap.data.mood,'');assert.equal(recap.data.notice,'');recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
 recap.chooseWeather({currentTarget:{dataset:{value:'rainy'}}});assert.equal(recap.data.weather,'rainy');assert.equal(recap.data.weatherLabel,'Rainy');assert.equal(recap.data.weatherOpen,false);
 recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'good');
-recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'');
 recap.chooseNotice({currentTarget:{dataset:{value:'tree'}}});assert.equal(recap.data.notice,'tree');
 recap.updateDistance({detail:{value:'5.2'}});assert.equal(recap.data.distance,'5.2');
 recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,'Quiet streets');
-recap.save();assert.equal(navigation,'/pages/history/history');
+recap.save();assert.equal(navigation,'/pages/history/history');assert.equal(appState.globalData.latestRun.durationSeconds,8);assert.equal(appState.globalData.latestRun.distance,'5.2 km');assert.equal(appState.globalData.latestRun.mood,'Good');assert.equal(appState.globalData.latestRun.notices.join(','),'tree');
 const history=load('history',{reLaunch:x=>{navigation=x.url;}});
-history.onLoad();history.onShow();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'year');assert.equal(history.data.periodLabels.year,'2026');assert.equal(history.data.dayWeekday,'Monday');
+history.onLoad();history.onShow();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'day');assert.equal(history.data.selectedRecord.duration,'8 sec');assert.equal(history.data.selectedRecord.note,'Quiet streets');assert.equal(history.data.selectedRecord.weatherClass,'rainy');
+history.switchMode({currentTarget:{dataset:{mode:'year'}}});assert.equal(history.data.mode,'year');assert.equal(history.data.periodLabels.year,'2026');
 history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(history.data.periodLabels.year,'2025');
+assert.equal(history.data.yearRows.length,0);
 history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2026');
 history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.periodLabels.year,'2027');
 history.stepPeriod({currentTarget:{dataset:{direction:-1}}});assert.equal(history.data.periodLabels.year,'2026');
-history.openMonth();assert.equal(history.data.mode,'month');
-history.chooseMonth({detail:{value:'2026-08'}});assert.equal(history.data.monthValue,'2026-08');assert.equal(history.data.periodLabels.month,'August 2026');assert.equal(history.data.monthRows[0].day,'AUG 25');
-history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.monthValue,'2026-09');assert.equal(history.data.periodLabels.month,'September 2026');assert.equal(history.data.monthRows[0].day,'SEP 25');
-history.openDay();assert.equal(history.data.mode,'day');
-history.chooseDay({detail:{value:'2026-09-20'}});assert.equal(history.data.dayValue,'2026-09-20');assert.equal(history.data.periodLabels.day,'September 20, 2026');assert.equal(history.data.dayWeekday,'Sunday');
+history.openMonth({currentTarget:{dataset:{month:'2026-08'}}});assert.equal(history.data.mode,'month');assert.equal(history.data.monthRows.length,0);assert.equal(history.data.monthSummary.times,'9 times out.');
+history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.monthValue,'2026-09');assert.equal(history.data.periodLabels.month,'September 2026');assert.equal(history.data.monthRows[0].day.startsWith('SEP'),true);
+history.openDay({currentTarget:{dataset:{date:'2026-09-21'}}});assert.equal(history.data.mode,'day');assert.equal(history.data.selectedRecord.note,'Such a beautiful sunset!');
+history.chooseDay({detail:{value:'2026-09-20'}});assert.equal(history.data.dayValue,'2026-09-20');assert.equal(history.data.periodLabels.day,'September 20, 2026');assert.equal(history.data.dayWeekday,'Sunday');assert.equal(history.data.selectedRecord,null);
 history.stepPeriod({currentTarget:{dataset:{direction:1}}});assert.equal(history.data.dayValue,'2026-09-21');assert.equal(history.data.periodLabels.day,'September 21, 2026');assert.equal(history.data.dayWeekday,'Monday');
+assert.equal(history.data.selectedRecord.mood,'Good');
 const historyWxml=fs.readFileSync('miniprogram/pages/history/history.wxml','utf8');assert(!historyWxml.includes('day-run-row'));assert(historyWxml.includes('class="day-detail"'));
 assert(!historyWxml.includes('day-share'));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
@@ -72,4 +75,4 @@ assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/run/run.js','utf8')));
 assert(!/wx\.cloud|wx\.request|Storage/.test(fs.readFileSync('miniprogram/pages/recap/recap.js','utf8')));
-console.log('PASS: routes, live timer, pause exclusion, recap inputs, history views, navigation, and no persistence.');
+console.log('PASS: routes, live timer, pause exclusion, recap handoff, truthful history filters, navigation, and no database persistence.');
