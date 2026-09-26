@@ -1,7 +1,7 @@
 <view class="history" style="--safe-top: {{safeTop}}px;">
   <view class="history-header">
     <view class="title-row">
-      <text class="handwritten history-title">Been out.</text>
+      <text class="handwritten history-title">Days Out.</text>
       <view class="filter-mark" aria-hidden="true"><view></view><view></view><view></view></view>
     </view>
     <view class="mode-tabs" role="tablist">
@@ -16,7 +16,12 @@
       <picker wx:if="{{mode === 'month'}}" class="month-picker" mode="date" fields="month" value="{{monthValue}}" start="2020-01" end="2035-12" bindchange="chooseMonth" aria-label="筛选月份">
         <view class="period-copy month-period-copy"><text class="handwritten period-label">{{periodLabels.month}}</text><text class="handwritten month-filter-caret" aria-hidden="true">⌄</text></view>
       </picker>
-      <view wx:else class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text><text wx:if="{{mode === 'day'}}" class="handwritten weekday-label">Sunday</text></view>
+      <view wx:elif="{{mode === 'day'}}" class="period-copy day-date-stack">
+        <picker class="day-picker" mode="date" value="{{dayValue}}" start="2020-01-01" end="2035-12-31" bindchange="chooseDay" aria-label="筛选日期">
+          <view class="day-period-copy"><text class="handwritten period-label">{{periodLabels.day}}</text><text class="handwritten day-filter-caret" aria-hidden="true">⌄</text></view>
+        </picker>
+      </view>
+      <view wx:else class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text></view>
       <button class="period-arrow handwritten" data-direction="1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="下一时间段">›</button>
     </view>
   </view>
@@ -43,13 +48,19 @@
       </scroll-view>
     </block>
 
-    <scroll-view wx:else class="day-scroll scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
-      <view class="day-scene"><view class="day-sun"><view></view></view><text class="day-cloud">☁</text><text class="day-tree tree-a">♧</text><text class="day-tree tree-b">♧</text><image class="day-runner" src="/assets/runner.png" mode="aspectFit" aria-hidden="true" /></view>
-      <view class="day-feature"><view><text class="handwritten day-duration">52 min</text><text class="handwritten day-distance">5.2 km</text></view><view class="day-mood"><view class="mini-face good"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Good</text></view></view>
-      <view class="day-notices"><view><text class="big-mark tree">♧</text><text class="handwritten">Tree</text></view><view><text class="big-mark cloud">☁</text><text class="handwritten">Cloud</text></view></view>
-      <text class="handwritten day-note">Such a beautiful sunset!</text>
-      <view class="day-runs"><view class="day-run-row"><view><text class="handwritten run-time">12:05</text><text class="handwritten record-duration">23 min</text><text class="handwritten record-distance">2.1 km</text></view><view class="record-story"><view class="mood-inline"><view class="mini-face calm"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Calm</text></view><text class="mark cat">⌁</text></view><text class="handwritten row-chevron">›</text></view><view class="day-run-row"><view><text class="handwritten run-time">07:40</text><text class="handwritten record-duration">18 min</text><text class="handwritten record-distance">— km</text></view><view class="record-story"><view class="mood-inline"><view class="mini-face tired"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Tired</text></view><text class="mark wind">≋</text></view><text class="handwritten row-chevron">›</text></view></view>
-    </scroll-view>
+    <view wx:else class="day-detail">
+      <view class="day-feature">
+        <view class="day-summary-copy">
+          <view class="day-stat"><text class="handwritten day-kicker">DAY</text><text class="handwritten day-metric day-weekday-value">{{dayWeekday || 'Sunday'}}</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">TIME OUT</text><text class="handwritten day-metric">52 min</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">DISTANCE</text><text class="handwritten day-metric day-distance">5.2 km</text></view>
+        </view>
+        <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud">☁</text><image class="day-runner" src="/assets/runner.png" mode="aspectFit" /></view>
+      </view>
+      <view class="day-feeling"><text class="handwritten day-kicker">FELT</text><view class="mood-inline"><view class="mini-face good"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">Good</text></view></view>
+      <view class="day-notice-block"><text class="handwritten day-section-title">Spotted out there</text><view class="day-notices"><view><text class="big-mark tree">♧</text><text class="handwritten">Tree</text></view><view><text class="big-mark cloud">☁</text><text class="handwritten">Cloud</text></view></view></view>
+      <view class="day-note-card"><text class="handwritten quote-mark">“</text><text class="handwritten day-note">Such a beautiful sunset!</text><text class="handwritten quote-mark quote-end">”</text></view>
+    </view>
   </view>
 
   <button class="history-action handwritten" bindtap="goAgain" hover-class="pressed" aria-label="再次开始跑步"><text class="plus">＋</text><text>Go again</text><text class="action-arrow">→</text></button>

@@ -2,6 +2,7 @@ const { safeTop } = require('../../utils/layout');
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function monthPresentation(value) {
   const [yearText, monthText] = String(value).split('-');
@@ -16,6 +17,21 @@ function shiftMonth(value, direction) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
+function dayPresentation(value) {
+  const [yearText, monthText, dayText] = String(value).split('-');
+  const year = Number(yearText) || 2026;
+  const monthIndex = Math.min(11, Math.max(0, (Number(monthText) || 1) - 1));
+  const day = Number(dayText) || 1;
+  const date = new Date(year, monthIndex, day);
+  return { label: `${MONTH_NAMES[monthIndex]} ${day}, ${year}`, weekday: WEEKDAY_NAMES[date.getDay()] };
+}
+
+function shiftDay(value, direction) {
+  const [yearText, monthText, dayText] = String(value).split('-');
+  const date = new Date(Number(yearText) || 2026, (Number(monthText) || 1) - 1, (Number(dayText) || 1) + direction);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 Page({
   data: {
     safeTop: 96,
@@ -26,6 +42,8 @@ Page({
       day: 'September 21, 2026'
     },
     monthValue: '2026-09',
+    dayValue: '2026-09-21',
+    dayWeekday: 'Monday',
     monthRows: [
       { day: 'SEP 25', weekday: 'Thu', duration: '37 min', distance: '1.8 km', mood: 'Calm', moodType: 'calm', marks: ['cat', 'wind'] },
       { day: 'SEP 21', weekday: 'Sun', duration: '52 min', distance: '5.2 km', mood: 'Good', moodType: 'good', marks: ['tree', 'cloud'] },
@@ -51,12 +69,19 @@ Page({
     this.setData({ safeTop: safeTop() });
   },
 
+  onShow() {
+    this.applyDay(this.data.dayValue || '2026-09-21');
+  },
+
   switchMode(event) {
-    this.setData({ mode: event.currentTarget.dataset.mode });
+    const mode = event.currentTarget.dataset.mode;
+    this.setData({ mode });
+    if (mode === 'day') this.applyDay(this.data.dayValue);
   },
 
   openDay() {
     this.setData({ mode: 'day' });
+    this.applyDay(this.data.dayValue);
   },
 
   openMonth() {
@@ -65,6 +90,10 @@ Page({
 
   chooseMonth(event) {
     this.applyMonth(event.detail.value);
+  },
+
+  chooseDay(event) {
+    this.applyDay(event.detail.value);
   },
 
   applyMonth(value) {
@@ -77,6 +106,12 @@ Page({
     this.setData({ monthValue: value, periodLabels, monthRows });
   },
 
+  applyDay(value) {
+    const { label, weekday } = dayPresentation(value);
+    const periodLabels = { ...this.data.periodLabels, day: label };
+    this.setData({ dayValue: value, dayWeekday: weekday, periodLabels });
+  },
+
   stepPeriod(event) {
     const direction = Number(event.currentTarget.dataset.direction);
     const periodLabels = { ...this.data.periodLabels };
@@ -87,7 +122,8 @@ Page({
       this.applyMonth(shiftMonth(this.data.monthValue, direction));
       return;
     } else {
-      periodLabels.day = direction < 0 ? 'September 20, 2026' : 'September 22, 2026';
+      this.applyDay(shiftDay(this.data.dayValue, direction));
+      return;
     }
     this.setData({ periodLabels });
   },
