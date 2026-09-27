@@ -112,6 +112,7 @@ assert(!runWxml.includes('distanceText'));
 
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
+assert.equal(recap.data.copy.continueRun,'Continue');assert.equal(recap.data.copy.discardDraft,'Discard');
 assert.equal(recap.data.weather,'');assert.equal(recap.data.mood,'');assert.equal(Object.keys(recap.data.selectedNotices).length,0);recap.toggleWeather();assert.equal(recap.data.weatherOpen,true);
 recap.chooseWeather({currentTarget:{dataset:{value:'rainy'}}});assert.equal(recap.data.weather,'rainy');assert.equal(recap.data.weatherLabel,'Rainy');assert.equal(recap.data.weatherOpen,false);
 recap.chooseMood({currentTarget:{dataset:{value:'good'}}});assert.equal(recap.data.mood,'good');
@@ -511,7 +512,7 @@ for (const pausedBeforeDone of [false, true]) {
   assert.equal(savedRecords()[0].durationSeconds, beforePause + 5);
   assert.equal(savedRecords()[0].note, 'Keep this note');
   // Successful navigation leaves the outgoing form untouched, avoiding a
-  // one-frame flash where only "Discard draft" remains visible.
+  // one-frame flash where only "Discard" remains visible.
   assert.equal(lastForm.data.canContinue, true);
   navigation = null;lastForm.continueRun();assert.equal(navigation, null);
   assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');

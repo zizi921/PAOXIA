@@ -20,8 +20,8 @@ for name in ['home', 'run', 'recap']:
         'copy.whatNotice': 'What did you notice?', 'copy.tree': 'Tree', 'copy.wind': 'Wind',
         'copy.cloud': 'Cloud', 'copy.cat': 'Cat', 'copy.streetlight': 'Streetlight', 'copy.dog': 'Dog',
         'copy.flower': 'Flower', 'copy.didnt': 'Didn’t', 'copy.notice': 'notice', 'copy.distance': 'Distance',
-        'copy.notePlaceholder': 'A little note, if you like', 'copy.continueRun': 'Continue this run',
-        'copy.discardDraft': 'Discard draft', 'copy.done': 'Done'
+        'copy.notePlaceholder': 'A little note, if you like', 'copy.continueRun': 'Continue',
+        'copy.discardDraft': 'Discard', 'copy.done': 'Done'
     }
     for key, value in preview_copy.items():
         markup = markup.replace('{{' + key + '}}', value)
