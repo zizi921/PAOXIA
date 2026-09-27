@@ -510,7 +510,9 @@ for (const pausedBeforeDone of [false, true]) {
   assert.equal(savedRecords()[0].id, draftId);
   assert.equal(savedRecords()[0].durationSeconds, beforePause + 5);
   assert.equal(savedRecords()[0].note, 'Keep this note');
-  assert.equal(lastForm.data.canContinue, false);
+  // Successful navigation leaves the outgoing form untouched, avoiding a
+  // one-frame flash where only "Discard draft" remains visible.
+  assert.equal(lastForm.data.canContinue, true);
   navigation = null;lastForm.continueRun();assert.equal(navigation, null);
   assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
   assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');

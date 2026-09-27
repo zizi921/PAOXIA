@@ -323,7 +323,6 @@ Page({
       if (!this.saved) {
         saveRecord(record);
         this.saved = true;
-        this.setData({ canContinue: false });
       }
     } catch (error) {
       this.navigating = false;
@@ -337,7 +336,12 @@ Page({
     }
     wx.redirectTo({
       url: '/pages/history/history',
-      fail: () => { wx.showToast({ title: this.data.copy.savedNavError, icon: 'none' }); },
+      fail: () => {
+        // The record is already saved. Only update this page if navigation
+        // fails, so a successful save does not flash a rearranged action row.
+        this.setData({ canContinue: false });
+        wx.showToast({ title: this.data.copy.savedNavError, icon: 'none' });
+      },
       complete: () => { this.navigating = false; }
     });
   }
