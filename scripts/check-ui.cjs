@@ -30,11 +30,13 @@ function load(route, wx, globals = {}) {
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/recap-draft.js', 'utf8'), { module: draftModule, wx: runtimeWx, require: () => recordsModule.exports });
   const i18nModule = { exports: {} };
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/i18n.js', 'utf8'), { module: i18nModule, wx: runtimeWx });
+  const shareModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/share.js', 'utf8'), { module: shareModule, wx: runtimeWx });
   const context = {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/share') ? shareModule.exports : request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -634,3 +636,35 @@ const animatedRunWxss = fs.readFileSync('miniprogram/pages/run/run.wxss','utf8')
 assert(animatedRunWxml.includes("paused ? 'is-paused' : 'is-running'"));
 assert(animatedRunWxss.includes('@keyframes runner-stride'));assert(animatedRunWxss.includes('.run-runner.is-paused'));
 console.log('PASS: persistent EN / 中文 selection and localized home, run, recap, dates, summaries and saved-record presentation.');
+
+// Sharing must not forward a local record URL or use a private page screenshot.
+for (const route of ['home', 'run', 'recap', 'history']) {
+  let shareMenu;
+  const page = load(route, { showShareMenu: options => { shareMenu = options; } });
+  page.ended = true;
+  page.onShow();
+  assert.equal(JSON.stringify(shareMenu.menus), JSON.stringify(route === 'home'
+    ? ['shareAppMessage', 'shareTimeline'] : ['shareAppMessage']));
+  for (const language of ['en', 'zh']) {
+    page.data.language = language;
+    page.data.note = 'PRIVATE_NOTE';
+    page.options = { recordId: 'PRIVATE_RECORD', startedAt: '12345' };
+    const before = JSON.stringify([...storage]);
+    const shared = page.onShareAppMessage({ from: 'menu' });
+    assert.equal(shared.path, '/pages/home/home');
+    assert(shared.title.includes(language === 'zh' ? '跑下' : 'PAOXIA'));
+    assert.equal(shared.imageUrl, '/assets/runner.png');
+    assert(fs.existsSync(`miniprogram${shared.imageUrl}`));
+    assert(!JSON.stringify(shared).includes('PRIVATE'));
+    if (route === 'home') {
+      const timeline = page.onShareTimeline();
+      assert.equal(timeline.query, '');
+      assert.equal(timeline.title, shared.title);
+      assert.equal(timeline.imageUrl, shared.imageUrl);
+    } else {
+      assert.equal(page.onShareTimeline, undefined);
+    }
+    assert.equal(JSON.stringify([...storage]), before);
+  }
+}
+console.log('PASS: localized app shares open home, use a static image and never include local records; timeline is home-only.');

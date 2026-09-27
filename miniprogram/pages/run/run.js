@@ -3,8 +3,10 @@ const { safeTop } = require('../../utils/layout');
 const { formatElapsed } = require('../../utils/time');
 const { readActiveRun, saveActiveRun, clearActiveRun } = require('../../utils/active-run');
 const { readLanguage, copyFor } = require('../../utils/i18n');
+const { shareAppMessage, showShareMenu } = require('../../utils/share');
 
 Page({
+  onShareAppMessage: shareAppMessage,
   data: {
     paused: false,
     safeTop: 96,
@@ -44,6 +46,7 @@ Page({
   },
 
   onShow() {
+    showShareMenu();
     if (!this.data.paused && !this.ended) {
       this.beginTicker();
     }

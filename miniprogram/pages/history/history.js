@@ -2,6 +2,7 @@ const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
 const { readRecords } = require('../../utils/records');
 const { readLanguage, copyFor } = require('../../utils/i18n');
+const { shareAppMessage, showShareMenu } = require('../../utils/share');
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -138,6 +139,7 @@ function presentYearRows(rows, language) {
 }
 
 Page({
+  onShareAppMessage: shareAppMessage,
   data: {
     safeTop: 96,
     language: 'en',
@@ -176,6 +178,7 @@ Page({
   },
 
   onShow() {
+    showShareMenu();
     try {
       this.setData({ records: readRecords() });
     } catch (error) {

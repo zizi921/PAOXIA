@@ -2,9 +2,12 @@ const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
 const { readRecords, saveRecord, updateRecord, deleteRecord } = require('../../utils/records');
 const { readLanguage, copyFor } = require('../../utils/i18n');
+const { shareAppMessage, showShareMenu } = require('../../utils/share');
 
 const { readDraft, saveDraft, clearDraft } = require('../../utils/recap-draft');
 Page({
+  onShareAppMessage: shareAppMessage,
+  onShow() { showShareMenu(); },
   data: {
     safeTop: 96,
     language: 'en',

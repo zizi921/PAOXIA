@@ -2,10 +2,14 @@ const { safeTop } = require('../../utils/layout');
 const { readActiveRun } = require('../../utils/active-run');
 const { readDraft } = require('../../utils/recap-draft');
 const { readLanguage, saveLanguage, copyFor } = require('../../utils/i18n');
+const { shareAppMessage, shareTimeline, showShareMenu } = require('../../utils/share');
 Page({
+  onShareAppMessage: shareAppMessage,
+  onShareTimeline: shareTimeline,
   data: { safeTop: 96, hasActiveRun: false, hasDraft: false, language: 'en', copy: copyFor('en', 'home') },
   onLoad() { this.setData({ safeTop: safeTop() }); },
   onShow() {
+    showShareMenu(true);
     try {
       const language = readLanguage();
       this.setData({ language, copy: copyFor(language, 'home'), hasActiveRun: !!readActiveRun(), hasDraft: !!readDraft() });
