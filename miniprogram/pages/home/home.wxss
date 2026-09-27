@@ -7,7 +7,7 @@
 .home-art { width: 100%; flex: 1; min-height: 360rpx; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 36rpx; }
 .home-runner { width: 730rpx; height: 770rpx; max-height: 64vh; }
 .home-actions { margin-bottom: 52rpx; }
-.screen .go { background-color: #e5ecdf; }
+.screen .go { background-color: #dfeaf4; }
 .home .resume { font-size: 48rpx; }
 .home .history-link { background: transparent; margin-top: 16rpx; min-height: 44px; line-height: 44px; font-size: 40rpx; text-decoration: underline; text-underline-offset: 6rpx; }
 .home .history-link::after { border: 0; }

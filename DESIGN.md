@@ -5,7 +5,7 @@ colors:
   paper: "#fdfcf9"
   charcoal: "#262622"
   charcoal-border: "#30312a"
-  leaf-wash: "#e5ecdf"
+  runner-wash: "#dfeaf4"
   underline-green: "#75927b"
   trouser-blue: "#3d91d0"
   sole-yellow: "#f5ad22"
@@ -29,7 +29,7 @@ spacing:
   action-height: "144rpx"
 components:
   action-primary:
-    backgroundColor: "{colors.leaf-wash}"
+    backgroundColor: "{colors.runner-wash}"
     textColor: "{colors.charcoal}"
     typography: "{typography.display}"
     rounded: "{rounded.action}"
@@ -48,7 +48,7 @@ PAOXIA 使用纸张、炭笔和蜡笔的视觉语言，把跑步呈现为轻松�
 
 ## Colors
 
-**纸面规则。** 大面积背景只使用温暖纸白；浅绿只用于主要行动或短下划线。蓝色与黄色保留给人物，让角色始终是画面的视觉核心。
+**纸面规则。** 大面积背景只使用温暖纸白；从人物蓝裤子提取的浅蓝只用于主要行动、选中状态和记录底纹。黄色保留给鞋底点缀，让角色始终是画面的视觉核心。
 
 ## Typography
 
@@ -76,7 +76,7 @@ PAOXIA 使用纸张、炭笔和蜡笔的视觉语言，把跑步呈现为轻松�
 
 ## Components
 
-主要按钮使用浅绿纸色；次要按钮透明。按下态通过轻微缩放和透明度变化反馈。系统状态栏和微信胶囊由运行时提供，不在页面内仿造。
+主要按钮使用人物蓝裤子的浅蓝纸色；次要按钮透明。按下态通过轻微缩放和透明度变化反馈。系统状态栏和微信胶囊由运行时提供，不在页面内仿造。
 
 ## Motion
 
