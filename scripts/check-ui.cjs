@@ -14,6 +14,12 @@ const storageWx = {
 };
 function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns') || []; }
 const appConfig = JSON.parse(fs.readFileSync('miniprogram/app.json'));
+const appWxss = fs.readFileSync('miniprogram/app.wxss','utf8');
+assert(appWxss.includes('@import "styles/inter.wxss"'));
+assert(/\.lang-en[\s\S]*font-family:\s*'Inter',\s*sans-serif/.test(appWxss));
+assert(/\.lang-zh \.handwritten[\s\S]*font-family:\s*'PingFang SC'/.test(appWxss));
+assert(fs.readFileSync('miniprogram/styles/inter.wxss','utf8').includes("font-family: 'Inter'"));
+assert(fs.existsSync('miniprogram/assets/Inter-OFL.txt'));
 const pages = appConfig.pages;
 assert.equal(appConfig.requiredBackgroundModes, undefined);
 assert.equal(appConfig.permission, undefined);
@@ -181,6 +187,8 @@ assert.equal(blankHistory.data.selectedRecord.weather,'');
 assert.equal(blankHistory.data.selectedRecord.mood,'Not set');
 assert.equal(blankHistory.data.selectedRecord.note,'');
 const recapWxml = fs.readFileSync('miniprogram/pages/recap/recap.wxml','utf8');
+const recapWxss = fs.readFileSync('miniprogram/pages/recap/recap.wxss','utf8');
+assert(/\.recap \.continue-button[^}]*width:\s*100%[^}]*white-space:\s*nowrap/.test(recapWxss));
 const historyPoseWxml = fs.readFileSync('miniprogram/pages/history/history.wxml','utf8');
 assert(historyPoseWxml.includes('src="{{selectedRecord.runnerImage}}"'));
 for (let index = 1; index <= 10; index += 1) {

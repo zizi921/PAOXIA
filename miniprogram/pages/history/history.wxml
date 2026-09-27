@@ -35,8 +35,11 @@
       </view>
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="record-row" role="button" aria-label="{{copy.viewRecord}} {{item.day}}" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" data-id="{{item.id}}" bindtap="openDay" hover-class="row-pressed">
-          <view class="record-date"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><text class="handwritten record-duration">{{item.duration}}</text><text class="handwritten record-distance">{{item.distance}}</text></view>
-          <view class="record-story"><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row"><block wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label"><image wx:if="{{mark.image}}" class="notice-mark" src="{{mark.image}}" mode="aspectFit" aria-label="{{mark.label}}" /><text wx:else class="mark {{mark.className}}">{{mark.glyph}}</text></block></view></view>
+          <view class="record-main">
+            <view class="record-top-line"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view></view>
+            <text class="handwritten record-duration">{{item.duration}}</text>
+            <view class="record-bottom-line"><text class="handwritten record-distance">{{item.distance}}</text><view class="mark-row"><block wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label"><image wx:if="{{mark.image}}" class="notice-mark" src="{{mark.image}}" mode="aspectFit" aria-label="{{mark.label}}" /><text wx:else class="mark {{mark.className}}">{{mark.glyph}}</text></block></view></view>
+          </view>
           <text class="handwritten row-chevron">›</text>
         </view>
         <view wx:if="{{!monthRows.length}}" class="history-empty"><text class="handwritten empty-title">{{copy.noMonth}}</text><text class="handwritten empty-copy">{{copy.noMonthCopy}}</text></view>

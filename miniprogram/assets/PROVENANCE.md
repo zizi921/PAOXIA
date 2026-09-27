@@ -21,3 +21,5 @@ Caveat variable font, from https://github.com/google/fonts/tree/main/ofl/caveat.
 Kalam Regular and Bold Latin subsets, from https://github.com/google/fonts/tree/main/ofl/kalam. SIL Open Font License included as `Kalam-OFL.txt`. Embedded in `styles/typography.wxss` for the Home page.
 
 Both families are bundled as data URLs, so no runtime network access is required.
+
+Inter Latin subset, sourced from Google Fonts on 2026-09-27 under the SIL Open Font License. The license is included as `Inter-OFL.txt`, and the font is embedded in `styles/inter.wxss` as a data URL for the English interface.
