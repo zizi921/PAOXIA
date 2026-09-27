@@ -31,6 +31,30 @@ const HISTORY_RUNNER_POSES = Array.from({ length: 10 }, (_, index) => {
   const number = String(index + 1).padStart(2, '0');
   return { image: `/assets/history-runner-${number}.png`, className: `pose-${number}` };
 });
+const FILTER_START_YEAR = 2020;
+const FILTER_END_YEAR = 2035;
+
+function filterYears(language) {
+  return Array.from({ length: FILTER_END_YEAR - FILTER_START_YEAR + 1 }, (_, index) => {
+    const year = FILTER_START_YEAR + index;
+    return { value: String(year), label: language === 'zh' ? `${year}年` : String(year) };
+  });
+}
+
+function filterMonths(language) {
+  return MONTH_NAMES.map((name, index) => ({
+    value: String(index + 1).padStart(2, '0'),
+    label: language === 'zh' ? `${index + 1}月` : name
+  }));
+}
+
+function filterDays(year, month, language) {
+  const count = new Date(Number(year), Number(month), 0).getDate();
+  return Array.from({ length: count }, (_, index) => ({
+    value: String(index + 1).padStart(2, '0'),
+    label: language === 'zh' ? `${index + 1}日` : String(index + 1)
+  }));
+}
 
 function runnerPoseFor(record) {
   const key = String((record && (record.id || record.date)) || '');
@@ -154,7 +178,14 @@ Page({
     yearRows: [],
     yearSummary: { times: '', total: '' },
     monthSummary: { times: '', total: '' },
-    selectedRecord: null
+    selectedRecord: null,
+    filterOpen: false,
+    filterMode: 'month',
+    filterTitle: '',
+    filterYears: [],
+    filterMonths: [],
+    filterDays: [],
+    filterValue: [0, 0]
   },
 
   onLoad(options) {
@@ -227,6 +258,62 @@ Page({
   chooseDay(event) {
     this.applyDay(event.detail.value);
   },
+
+  openDateFilter(event) {
+    const mode = event.currentTarget.dataset.mode;
+    const sourceValue = mode === 'day' ? this.data.dayValue : `${this.data.monthValue}-01`;
+    const { year, monthIndex, day } = dateParts(sourceValue);
+    const years = filterYears(this.data.language);
+    const months = filterMonths(this.data.language);
+    const days = filterDays(year, monthIndex + 1, this.data.language);
+    const yearIndex = Math.min(years.length - 1, Math.max(0, year - FILTER_START_YEAR));
+    const value = mode === 'day'
+      ? [yearIndex, monthIndex, Math.min(days.length - 1, Math.max(0, day - 1))]
+      : [yearIndex, monthIndex];
+    this.setData({
+      filterOpen: true,
+      filterMode: mode,
+      filterTitle: mode === 'day' ? this.data.copy.dayFilter : this.data.copy.monthFilter,
+      filterYears: years,
+      filterMonths: months,
+      filterDays: days,
+      filterValue: value
+    });
+  },
+
+  changeDateFilter(event) {
+    const value = event.detail.value.slice();
+    const years = this.data.filterYears;
+    const months = this.data.filterMonths;
+    const year = years[value[0]] ? years[value[0]].value : String(FILTER_START_YEAR);
+    const month = months[value[1]] ? months[value[1]].value : '01';
+    if (this.data.filterMode === 'day') {
+      const days = filterDays(year, month, this.data.language);
+      value[2] = Math.min(value[2] || 0, days.length - 1);
+      this.setData({ filterDays: days, filterValue: value });
+      return;
+    }
+    this.setData({ filterValue: value });
+  },
+
+  cancelDateFilter() {
+    this.setData({ filterOpen: false });
+  },
+
+  confirmDateFilter() {
+    const [yearIndex, monthIndex, dayIndex] = this.data.filterValue;
+    const year = this.data.filterYears[yearIndex].value;
+    const month = this.data.filterMonths[monthIndex].value;
+    this.setData({ filterOpen: false });
+    if (this.data.filterMode === 'day') {
+      const day = this.data.filterDays[dayIndex].value;
+      this.applyDay(`${year}-${month}-${day}`);
+      return;
+    }
+    this.applyMonth(`${year}-${month}`);
+  },
+
+  preventTouch() {},
 
   applyYear(yearValue) {
     const year = String(yearValue || 2026);
