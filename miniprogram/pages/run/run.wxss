@@ -2,7 +2,15 @@
 .headline { font-size: 94rpx; line-height: 1.1; }
 .timer { margin-top: 44rpx; font-size: 140rpx; line-height: 1.05; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .run-art { flex: 1; width: 100%; min-height: 280rpx; display: flex; align-items: center; justify-content: center; padding: 22rpx 0 28rpx; }
-.run-runner { width: 360rpx; height: 375rpx; max-height: 29vh; }
+.run-runner { width: 360rpx; height: 375rpx; max-height: 29vh; transform-origin: 52% 78%; }
+.run-runner.is-running { animation: runner-stride 520ms cubic-bezier(.45, 0, .55, 1) infinite; will-change: transform; }
+.run-runner.is-paused { animation: none; transform: translate3d(0, 0, 0) rotate(0); }
+@keyframes runner-stride {
+  0%, 100% { transform: translate3d(-3rpx, 2rpx, 0) rotate(-1.2deg); }
+  25% { transform: translate3d(1rpx, -5rpx, 0) rotate(.5deg); }
+  50% { transform: translate3d(4rpx, 1rpx, 0) rotate(1.1deg); }
+  75% { transform: translate3d(0, -4rpx, 0) rotate(-.4deg); }
+}
 .run-actions .pill { font-size: 72rpx; }
 .return-link { position: relative; display: table; min-height: 52px; margin: 16rpx auto 0; padding: 0 20rpx 8rpx; background: transparent; border: none; border-radius: 0; font-size: 70rpx; line-height: 1.15; color: #262622; }
 .return-link::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: 9rpx; height: 2px; background: #75927b; transform: rotate(-3deg); border-radius: 50%; }

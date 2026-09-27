@@ -122,6 +122,11 @@ recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,
 recap.save();assert.equal(navigation,'/pages/history/history');assert.equal(savedRecords()[0].durationSeconds,8);assert.equal(savedRecords()[0].distance,'5.2 km');assert.equal(savedRecords()[0].mood,'Good');assert.equal(savedRecords()[0].notices.join(','),'tree,wind,cloud,cat,streetlight');
 const history=load('history',{reLaunch:x=>{navigation=x.url;}});
 history.onLoad();history.onShow();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'day');assert.equal(history.data.selectedRecord.duration,'8 sec');assert.equal(history.data.selectedRecord.note,'Quiet streets');assert.equal(history.data.selectedRecord.weatherClass,'rainy');
+assert.match(history.data.selectedRecord.runnerImage,/^\/assets\/history-runner-\d{2}\.png$/);
+assert.match(history.data.selectedRecord.runnerPoseClass,/^pose-\d{2}$/);
+const firstRunnerImage = history.data.selectedRecord.runnerImage;
+history.applyDay(history.data.dayValue, history.data.selectedRecord.id);
+assert.equal(history.data.selectedRecord.runnerImage,firstRunnerImage);
 assert.equal(history.data.records.length,1);
 assert.equal(history.data.selectedRecord.distance,'5.2 km');
 assert.equal(history.data.selectedRecord.mood,'Good');
@@ -174,6 +179,11 @@ assert.equal(blankHistory.data.selectedRecord.weather,'');
 assert.equal(blankHistory.data.selectedRecord.mood,'Not set');
 assert.equal(blankHistory.data.selectedRecord.note,'');
 const recapWxml = fs.readFileSync('miniprogram/pages/recap/recap.wxml','utf8');
+const historyPoseWxml = fs.readFileSync('miniprogram/pages/history/history.wxml','utf8');
+assert(historyPoseWxml.includes('src="{{selectedRecord.runnerImage}}"'));
+for (let index = 1; index <= 10; index += 1) {
+  assert(fs.existsSync(`miniprogram/assets/history-runner-${String(index).padStart(2,'0')}.png`));
+}
 assert(recapWxml.includes('class="distance-input handwritten"'));
 assert(!recapWxml.includes('自动记录的跑步距离'));
 assert(!recapWxml.includes('wx:if="{{editing}}" class="distance-input'));
@@ -287,6 +297,7 @@ assert(historyWxml.includes('wx:if="{{!records.length}}"'));
 assert(historyWxml.includes('{{copy.noRuns}}'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('bindtap="openHistory"'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('hasDraft ? copy.continueDraft : copy.go'));
+assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('src="/assets/history-runner-07.png"'));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
 assert(historyWxml.includes('{{copy.dayKicker}}'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));
@@ -618,4 +629,8 @@ assert.equal(zhHistory.data.selectedRecord.duration, '2分钟');assert.equal(zhH
 assert.equal(zhHistory.data.yearSummary.times, '1次跑步');assert.equal(zhHistory.data.monthSummary.total, '2分钟');
 const homeWxml = fs.readFileSync('miniprogram/pages/home/home.wxml','utf8');
 assert(homeWxml.includes('data-language="en"'));assert(homeWxml.includes('data-language="zh"'));
+const animatedRunWxml = fs.readFileSync('miniprogram/pages/run/run.wxml','utf8');
+const animatedRunWxss = fs.readFileSync('miniprogram/pages/run/run.wxss','utf8');
+assert(animatedRunWxml.includes("paused ? 'is-paused' : 'is-running'"));
+assert(animatedRunWxss.includes('@keyframes runner-stride'));assert(animatedRunWxss.includes('.run-runner.is-paused'));
 console.log('PASS: persistent EN / 中文 selection and localized home, run, recap, dates, summaries and saved-record presentation.');

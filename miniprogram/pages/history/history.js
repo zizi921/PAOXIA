@@ -26,6 +26,19 @@ const WEATHER_META = {
   rainy: { glyph: '☂', className: 'rainy' },
   windy: { glyph: '≋', className: 'windy' }
 };
+const HISTORY_RUNNER_POSES = Array.from({ length: 10 }, (_, index) => {
+  const number = String(index + 1).padStart(2, '0');
+  return { image: `/assets/history-runner-${number}.png`, className: `pose-${number}` };
+});
+
+function runnerPoseFor(record) {
+  const key = String((record && (record.id || record.date)) || '');
+  let hash = 0;
+  for (let index = 0; index < key.length; index += 1) {
+    hash = ((hash << 5) - hash + key.charCodeAt(index)) | 0;
+  }
+  return HISTORY_RUNNER_POSES[Math.abs(hash) % HISTORY_RUNNER_POSES.length];
+}
 
 function dateParts(value) {
   const [yearText, monthText, dayText] = String(value || '').split('-');
@@ -78,6 +91,7 @@ function decorateRecord(record, language, copy) {
   const { monthIndex, day } = dateParts(record.date);
   const date = new Date(`${record.date}T12:00:00`);
   const weather = WEATHER_META[record.weather] || { glyph: '☁', className: 'decorative' };
+  const runnerPose = runnerPoseFor(record);
   return {
     ...record,
     day: language === 'zh' ? `${monthIndex + 1}月${day}日` : `${MONTH_ABBR[monthIndex]} ${day}`,
@@ -94,6 +108,8 @@ function decorateRecord(record, language, copy) {
     }).filter(Boolean),
     weatherGlyph: weather.glyph,
     weatherClass: weather.className,
+    runnerImage: runnerPose.image,
+    runnerPoseClass: runnerPose.className,
     note: record.note || ''
   };
 }

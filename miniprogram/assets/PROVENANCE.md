@@ -8,6 +8,12 @@ Prompt: Extract only the large running character illustration from the LEFT phon
 
 `runner-rest.png` was generated with the built-in ImageGen tool on 2026-09-26 using `runner.png` as the exact character and style reference. It gives the Month summary a seated post-run pose while the Year summary keeps the original running pose. The full production prompt is stored in `runner-rest-prompt.txt`.
 
+## Days Out pose set
+
+`history-runner-01.png` through `history-runner-10.png` form the stable per-record pose set used on the Days Out detail page. The first two are optimized copies of the approved running and resting assets. The other eight were generated with the built-in ImageGen tool on 2026-09-27 using both approved assets as style and character references.
+
+Prompt set: draw the same round-headed runner with three hair strokes, white top, blue crayon trousers, yellow soles and thick black charcoal lines on a transparent background. The eight actions are sprinting, celebrating with raised arms, catching breath with hands on knees, stretching a calf, tying a shoelace, lying down tired, walking and waving, and jumping playfully. No text, scenery, border, UI or extra objects.
+
 # Typography
 
 Caveat variable font, from https://github.com/google/fonts/tree/main/ofl/caveat. SIL Open Font License included as `Caveat-OFL.txt`. Embedded in `styles/handwriting.wxss` for the Run, Recap and Days Out. pages.
