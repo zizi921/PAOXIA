@@ -11,15 +11,13 @@
       <text class="tab-divider">|</text>
       <button class="mode-tab handwritten {{mode === 'day' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'day'}}" data-mode="day" bindtap="switchMode" hover-class="choice-pressed">{{copy.day}}</button>
     </view>
-    <view class="period-nav">
+    <view class="period-nav mode-{{mode}}">
       <button class="period-arrow handwritten" data-direction="-1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="{{copy.previous}}">‹</button>
-      <button wx:if="{{mode === 'month'}}" class="month-picker filter-trigger" data-mode="month" bindtap="openDateFilter" aria-label="{{copy.monthFilter}}">
+      <view wx:if="{{mode === 'month'}}" class="month-picker filter-trigger" role="button" data-mode="month" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.monthFilter}}">
         <view class="period-copy month-period-copy"><text class="handwritten period-label">{{periodLabels.month}}</text><text class="handwritten month-filter-caret" aria-hidden="true">⌄</text></view>
-      </button>
-      <view wx:elif="{{mode === 'day'}}" class="period-copy day-date-stack">
-        <button class="day-picker filter-trigger" data-mode="day" bindtap="openDateFilter" aria-label="{{copy.dayFilter}}">
-          <view class="day-period-copy"><text class="handwritten period-label">{{periodLabels.day}}</text><text class="handwritten day-filter-caret" aria-hidden="true">⌄</text></view>
-        </button>
+      </view>
+      <view wx:elif="{{mode === 'day'}}" class="period-copy day-date-stack filter-trigger" role="button" data-mode="day" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.dayFilter}}">
+        <view class="day-period-copy"><text class="handwritten period-label">{{periodLabels.day}}</text><text class="handwritten day-filter-caret" aria-hidden="true">⌄</text></view>
       </view>
       <view wx:else class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text></view>
       <button class="period-arrow handwritten" data-direction="1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="{{copy.next}}">›</button>

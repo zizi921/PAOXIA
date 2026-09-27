@@ -325,6 +325,7 @@ assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('src=
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
 assert(historyWxml.includes('{{copy.dayKicker}}'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));
+const historyWxss=fs.readFileSync('miniprogram/pages/history/history.wxss','utf8');assert(/\.day-date-stack\s*\{[^}]*500rpx/.test(historyWxss));assert(/\.day-period-copy \.period-label\s*\{[^}]*font-size:\s*36rpx/.test(historyWxss));assert(!historyWxml.includes('class="day-picker filter-trigger"'));
 history.goAgain();assert.equal(navigation,'/pages/home/home');
 assert.equal(time.formatElapsed(3661),'01:01:01');
 assert.equal(time.formatDuration(3661),'1 hr 1 min');
