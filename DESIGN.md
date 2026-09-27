@@ -9,6 +9,7 @@ colors:
   runner-wash-soft: "#edf4fa"
   runner-blue-muted: "#8bb8d8"
   runner-blue-ink: "#7f9fb8"
+  label-blue: "#58758c"
   underline-green: "#75927b"
   trouser-blue: "#3d91d0"
   sole-yellow: "#f5ad22"

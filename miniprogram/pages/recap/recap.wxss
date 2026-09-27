@@ -1,6 +1,7 @@
 .recap { box-sizing: border-box; min-height: 100vh; padding: max(var(--safe-top, 96px), 88px) 42rpx calc(28rpx + env(safe-area-inset-bottom)); background: #fdfcf9; }
 .recap-inner { width: 100%; max-width: 650rpx; margin: 0 auto; }
 .recap-heading-row { position: relative; display: flex; align-items: center; justify-content: flex-start; min-height: 126rpx; }
+.recap.lang-en .recap-heading-row { top: 0; }
 .recap-title, .recap-duration { display: block; }
 .recap-title { font-size: 92rpx; line-height: .9; }
 .recap-duration { margin: 18rpx 0 0 12rpx; font-size: 54rpx; line-height: 1; }

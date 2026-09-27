@@ -69,6 +69,10 @@ const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.comple
 home.onLoad(); assert.equal(home.data.safeTop, 108);
 home.chooseLanguage({ currentTarget: { dataset: { language: 'zh' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'zh');assert.equal(home.data.copy.go, '出发');
+navigation = null;home.go();home.openHistory();assert.equal(navigation, null);
+const unavailableHome = load('home', { navigateTo: () => { throw new Error('Chinese entry must stay closed'); } });
+unavailableHome.onLoad();unavailableHome.onShow();unavailableHome.go();unavailableHome.openHistory();
+assert.equal(unavailableHome.data.language, 'zh');
 home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'GO');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
@@ -187,7 +191,7 @@ optionalRecap.chooseNotice({currentTarget:{dataset:{value:'nothing'}}});
 optionalRecap.save();
 const nothingHistory = load('history',{});nothingHistory.onLoad();
 assert.equal(nothingHistory.data.selectedRecord.noticeItems.length,1);
-assert.equal(nothingHistory.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
+assert.equal(nothingHistory.data.selectedRecord.noticeItems[0].label,'Nothing');
 const blankRecap = load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 blankRecap.onLoad({durationSeconds:'8'});
 blankRecap.save();
@@ -221,12 +225,12 @@ assert.equal(newSession.data.selectedRecord.distance,'— km');
 assert.equal(new Set(newSession.data.records.map(record=>record.id)).size,3);
 newSession.openDay({currentTarget:{dataset:{date:'2028-09-26',id:savedRecords()[1].id}}});
 newSession.onShow();
-assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
+assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Nothing');
 // Re-selecting Day or returning from another tab must keep the chosen run.
 for (const mode of ['day','month','day','year','day']) {
   newSession.switchMode({currentTarget:{dataset:{mode}}});
   assert.equal(newSession.data.selectedRecord.id,savedRecords()[1].id);
-  assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Didn’t notice');
+  assert.equal(newSession.data.selectedRecord.noticeItems[0].label,'Nothing');
 }
 newSession.openDay({currentTarget:{dataset:{date:'2028-09-26',id:savedRecords()[0].id}}});
 assert.equal(newSession.data.selectedRecord.noticeItems.length,0);

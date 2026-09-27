@@ -71,9 +71,9 @@
           <image class="pictogram" src="/assets/notice-flower.svg" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.flower}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.didnt}} {{copy.notice}}">
-          <view class="pictogram nothing-icon"><view class="dot dot-a"></view><view class="dot dot-b"></view><view class="dot dot-c"></view><view class="dot dot-d"></view><view class="dot dot-e"></view></view>
-          <view class="choice-label two-line handwritten"><text>{{copy.didnt}}</text><text>{{copy.notice}}</text></view>
+        <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.nothingLabel}}">
+          <image class="pictogram" src="/assets/notice-nothing.png" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{copy.nothingLabel}}</text>
         </button>
       </view>
     </view>

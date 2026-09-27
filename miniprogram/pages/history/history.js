@@ -19,7 +19,7 @@ const NOTICE_META = {
   sun: { labelKey: 'sun', glyph: '☀', className: 'sun' },
   moon: { labelKey: 'moon', glyph: '☾', className: 'moon' },
   streetlight: { labelKey: 'streetlight', glyph: '⌑', className: 'streetlight' },
-  nothing: { labelKey: 'didntNotice', glyph: '···', className: 'nothing' }
+  nothing: { labelKey: 'didntNotice', image: '/assets/notice-nothing.png', className: 'nothing' }
 };
 const WEATHER_META = {
   sunny: { glyph: '☀', className: 'sunny' },

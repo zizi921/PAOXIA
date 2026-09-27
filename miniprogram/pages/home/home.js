@@ -28,7 +28,7 @@ Page({
     }
   },
   openHistory() {
-    if (this.navigating) return;
+    if (this.data.language === 'zh' || this.navigating) return;
     this.navigating = true;
     wx.navigateTo({
       url: '/pages/history/history',
@@ -36,7 +36,7 @@ Page({
     });
   },
   go() {
-    if (this.navigating) return;
+    if (this.data.language === 'zh' || this.navigating) return;
     let activeRun;
     let draft;
     try {
