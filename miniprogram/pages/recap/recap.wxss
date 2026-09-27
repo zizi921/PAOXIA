@@ -66,7 +66,7 @@
 .optional { font-size: 31rpx; opacity: .72; }
 .distance-input { box-sizing: border-box; flex: 1; min-width: 90rpx; height: 62rpx; margin: 0 16rpx; padding: 0 12rpx; border: 3rpx solid #595a53; border-radius: 5rpx 2rpx 4rpx 3rpx; background: #fffefa; font-size: 38rpx; text-align: center; }
 .note-input { box-sizing: border-box; width: 100%; height: 92rpx; margin-top: 24rpx; padding: 0 26rpx 7rpx; border: 3rpx solid #595a53; border-radius: 8rpx 5rpx 7rpx 4rpx; background: #fffefa; color: #262622; font-size: 43rpx; }
-.note-placeholder { color: #77756d; font-family: inherit; font-size: 40rpx; font-weight: 500; }
+.note-placeholder { color: #77756d; font-family: inherit; font-size: 33rpx; font-weight: 500; }
 .recap .save-button { min-height: 108rpx; margin-top: 36rpx; background: #e5ecdf; font-size: 62rpx; }
 @media (max-height: 960px) {
   .recap { padding-top: max(var(--safe-top, 80px), 76px); }
