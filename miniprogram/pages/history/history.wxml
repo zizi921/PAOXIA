@@ -54,7 +54,8 @@
       </scroll-view>
     </block>
 
-    <view wx:elif="{{selectedRecord}}" class="day-detail">
+    <scroll-view wx:elif="{{selectedRecord}}" class="day-detail" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="day-detail-inner">
       <view class="day-feature">
         <view class="day-summary-copy">
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.dayKicker}}</text><text class="handwritten day-metric day-weekday-value">{{selectedRecord.weekdayLong}}</text></view>
@@ -66,7 +67,8 @@
       <view class="day-feeling"><text class="handwritten day-kicker">{{copy.felt}}</text><view class="mood-inline"><view class="mini-face {{selectedRecord.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{selectedRecord.mood}}</text></view></view>
       <view class="day-notice-block"><text class="handwritten day-section-title">{{copy.spotted}}</text><view wx:if="{{selectedRecord.noticeItems.length}}" class="day-notices"><view wx:for="{{selectedRecord.noticeItems}}" wx:key="label"><image wx:if="{{item.image}}" class="notice-big-mark" src="{{item.image}}" mode="aspectFit" aria-hidden="true" /><text wx:else class="big-mark {{item.className}}">{{item.glyph}}</text><text class="handwritten">{{item.label}}</text></view></view><text wx:else class="handwritten day-blank-copy">{{copy.nothing}}</text></view>
       <view class="day-note-card {{selectedRecord.note ? '' : 'empty-note'}}"><text class="handwritten quote-mark">“</text><text class="handwritten day-note">{{selectedRecord.note || copy.noNote}}</text><text class="handwritten quote-mark quote-end">”</text></view>
-    </view>
+      </view>
+    </scroll-view>
     <view wx:else class="day-empty"><image class="empty-runner" src="/assets/runner-rest.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">{{copy.noDay}}</text><text class="handwritten empty-copy">{{copy.noDayCopy}}</text></view>
   </view>
 

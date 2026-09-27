@@ -29,4 +29,11 @@ function clearDraft() {
   wx.removeStorageSync(STORAGE_KEY);
 }
 
-module.exports = { readDraft, saveDraft, clearDraft };
+function clearDraftForRecord(recordId) {
+  const draft = wx.getStorageSync(STORAGE_KEY);
+  if (!draft || draft.id !== recordId) return false;
+  wx.removeStorageSync(STORAGE_KEY);
+  return true;
+}
+
+module.exports = { readDraft, saveDraft, clearDraft, clearDraftForRecord };

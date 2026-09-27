@@ -11,11 +11,11 @@ colors:
   sole-yellow: "#f5ad22"
 typography:
   display:
-    fontFamily: "PaoxiaHand, cursive"
+    fontFamily: "Inter, sans-serif"
     fontWeight: 600
     lineHeight: 1.05
   homeDisplay:
-    fontFamily: "Kalam, cursive"
+    fontFamily: "Inter, sans-serif"
     fontWeight: 700
     lineHeight: 1.05
 rounded:

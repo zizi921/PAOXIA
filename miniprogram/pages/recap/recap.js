@@ -4,7 +4,13 @@ const { readRecords, saveRecord, updateRecord, deleteRecord } = require('../../u
 const { readLanguage, copyFor } = require('../../utils/i18n');
 const { shareAppMessage, showShareMenu } = require('../../utils/share');
 
-const { readDraft, saveDraft, clearDraft } = require('../../utils/recap-draft');
+const { readDraft, saveDraft, clearDraft, clearDraftForRecord } = require('../../utils/recap-draft');
+
+function localDateFor(timestamp) {
+  const value = Number(timestamp);
+  const date = new Date(Number.isFinite(value) && value > 0 ? value : Date.now());
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
 Page({
   onShareAppMessage: shareAppMessage,
   onShow() { showShareMenu(); },
@@ -243,6 +249,7 @@ Page({
       success: result => {
         if (!result.confirm) return;
         try {
+          clearDraftForRecord(this.editId);
           deleteRecord(this.editId);
         } catch (error) {
           wx.showToast({ title: this.data.copy.deleteError, icon: 'none' });
@@ -295,12 +302,15 @@ Page({
     if (!this.draftId || this.discarded) this.onLoad({ durationSeconds: this.data.durationSeconds });
     if (!this.draftId) return;
     this.navigating = true;
-    const now = new Date();
-    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const startedAt = this.run && Number.isFinite(this.run.startedAt) ? this.run.startedAt : 0;
+    const finishedAt = this.run && Number.isFinite(this.run.finishedAt) ? this.run.finishedAt : Date.now();
+    const date = localDateFor(finishedAt || startedAt);
     const moodLabels = { good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure' };
     const record = {
       id: this.draftId,
       date,
+      startedAt,
+      finishedAt,
       durationSeconds: this.data.durationSeconds,
       distance: this.data.distance ? `${this.data.distance} km` : '— km',
       mood: moodLabels[this.data.mood] || 'Not set',

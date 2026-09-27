@@ -16,10 +16,19 @@ function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns'
 const appConfig = JSON.parse(fs.readFileSync('miniprogram/app.json'));
 const appWxss = fs.readFileSync('miniprogram/app.wxss','utf8');
 assert(appWxss.includes('@import "styles/inter.wxss"'));
+assert(!appWxss.includes('styles/handwriting.wxss'));
+assert(!appWxss.includes('styles/typography.wxss'));
 assert(/\.lang-en[\s\S]*font-family:\s*'Inter',\s*sans-serif/.test(appWxss));
 assert(/\.lang-zh \.handwritten[\s\S]*font-family:\s*'PingFang SC'/.test(appWxss));
 assert(fs.readFileSync('miniprogram/styles/inter.wxss','utf8').includes("font-family: 'Inter'"));
 assert(fs.existsSync('miniprogram/assets/Inter-OFL.txt'));
+function directoryBytes(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).reduce((sum, entry) => {
+    const target = `${directory}/${entry.name}`;
+    return sum + (entry.isDirectory() ? directoryBytes(target) : fs.statSync(target).size);
+  }, 0);
+}
+assert(directoryBytes('miniprogram') < 2 * 1024 * 1024);
 const pages = appConfig.pages;
 assert.equal(appConfig.requiredBackgroundModes, undefined);
 assert.equal(appConfig.permission, undefined);
@@ -53,7 +62,8 @@ let layout;
 vm.runInNewContext(fs.readFileSync('miniprogram/utils/layout.js', 'utf8'), { module: layout = { exports: {} }, wx: { getMenuButtonBoundingClientRect: () => ({ bottom: 88 }) } });
 assert.equal(layout.exports.safeTop(), 108);
 let navigation, completed;
-let now = 1000;
+const initialRunStart = new TestDate(2028, 8, 26, 11, 59, 48).getTime();
+let now = initialRunStart;
 const clock = { now: () => now };
 const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, { Date: clock });
 home.onLoad(); assert.equal(home.data.safeTop, 108);
@@ -63,8 +73,8 @@ home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'GO');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
 navigation=null;home.openHistory();assert.equal(navigation,null);completed();
-home.go(); assert.equal(navigation, '/pages/run/run?startedAt=1000');
-navigation=null;home.go();assert.equal(navigation,null);completed();home.go();assert.equal(navigation,'/pages/run/run?startedAt=1000');
+home.go(); assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart}`);
+navigation=null;home.go();assert.equal(navigation,null);completed();home.go();assert.equal(navigation,`/pages/run/run?startedAt=${initialRunStart}`);
 const emptyHistory = load('history', {reLaunch:x=>{navigation=x.url;}});
 emptyHistory.onLoad();emptyHistory.onShow();
 assert.equal(emptyHistory.data.records.length,0);
@@ -84,13 +94,13 @@ const run=load('run',{redirectTo:x=>{navigation=x.url;x.complete();}}, {
   setInterval: fn => { tick = fn; return 1; },
   clearInterval: () => {}
 });
-run.onLoad({startedAt:'1000'});run.onShow();
+run.onLoad({startedAt:String(initialRunStart)});run.onShow();
 assert.equal(run.data.elapsedText,'00:00:00');
-now=6500;tick();assert.equal(run.data.elapsedText,'00:00:05');
+now=initialRunStart+5500;tick();assert.equal(run.data.elapsedText,'00:00:05');
 run.togglePause();assert.equal(run.data.paused,true);
-now=9500;run.updateClock();assert.equal(run.data.elapsedText,'00:00:05');
+now=initialRunStart+8500;run.updateClock();assert.equal(run.data.elapsedText,'00:00:05');
 run.togglePause();assert.equal(run.data.paused,false);
-now=12500;tick();assert.equal(run.data.elapsedText,'00:00:08');
+now=initialRunStart+11500;tick();assert.equal(run.data.elapsedText,'00:00:08');
 run.finish();assert.equal(navigation,'/pages/recap/recap?durationSeconds=8');
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
 assert.equal(storageWx.getStorageSync('paoxia.recapDraft').distance, '');
@@ -128,6 +138,7 @@ assert.equal(recap.data.mood,'good');
 recap.updateDistance({detail:{value:'5.2'}});assert.equal(recap.data.distance,'5.2');
 recap.updateNote({detail:{value:'Quiet streets'}});assert.equal(recap.data.note,'Quiet streets');
 recap.save();assert.equal(navigation,'/pages/history/history');assert.equal(savedRecords()[0].durationSeconds,8);assert.equal(savedRecords()[0].distance,'5.2 km');assert.equal(savedRecords()[0].mood,'Good');assert.equal(savedRecords()[0].notices.join(','),'tree,wind,cloud,cat,streetlight');
+assert.equal(savedRecords()[0].date,'2028-09-26');assert.equal(savedRecords()[0].startedAt,initialRunStart);assert.equal(savedRecords()[0].finishedAt,initialRunStart+11500);
 const history=load('history',{reLaunch:x=>{navigation=x.url;}});
 history.onLoad();history.onShow();assert.equal(history.data.safeTop,108);assert.equal(history.data.mode,'day');assert.equal(history.data.selectedRecord.duration,'8 sec');assert.equal(history.data.selectedRecord.note,'Quiet streets');assert.equal(history.data.selectedRecord.weatherClass,'rainy');
 assert.match(history.data.selectedRecord.runnerImage,/^\/assets\/history-runner-\d{2}\.png$/);
@@ -302,6 +313,8 @@ const historyWxml=fs.readFileSync('miniprogram/pages/history/history.wxml','utf8
 assert(!historyWxml.includes('day-share'));
 assert(historyWxml.includes('data-id="{{item.id}}"'));
 assert(historyWxml.includes('wx:for="{{selectedRecord.noticeItems}}"'));
+assert(historyWxml.includes('class="day-detail" scroll-y'));
+assert.equal(JSON.parse(fs.readFileSync('miniprogram/pages/recap/recap.json')).disableScroll, false);
 assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprogram/pages/history/history.wxss','utf8')));
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));
 assert(historyWxml.includes('{{copy.noRuns}}'));
@@ -546,6 +559,17 @@ assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
 assert(recapWxml.includes('wx:if="{{canContinue}}"'));
 assert(recapWxml.includes('bindtap="continueRun"'));
 console.log('PASS: routes, timer, manual distance entry, active-run recovery, persistent history, recap drafts, Done/continue round trips, paused state, updated duration, save lockout and storage/navigation failures.');
+// Saving a restored draft later must retain the run's completion date and timestamps.
+storage.clear();
+const archivedStart = new TestDate(2026, 8, 26, 21, 0, 0).getTime();
+const archivedFinish = new TestDate(2026, 8, 26, 21, 30, 0).getTime();
+storageWx.setStorageSync('paoxia.recapDraft', {
+  id: 'archived-date', durationSeconds: 1800, weather: '', mood: '', selectedNotices: {}, distance: '', note: '',
+  run: { startedAt: archivedStart, pausedAt: 0, totalPausedMs: 0, finishedAt: archivedFinish }
+});
+const laterSave = load('recap', draftRuntime);laterSave.onLoad({});laterSave.save();
+assert.equal(savedRecords()[0].date, '2026-09-26');
+assert.equal(savedRecords()[0].startedAt, archivedStart);assert.equal(savedRecords()[0].finishedAt, archivedFinish);
 // Slice 7: edit an older run on a day with multiple records, without touching drafts.
 storage.clear();
 const originalRecords = [
@@ -618,6 +642,15 @@ failedDelete.onLoad({ recordId: 'newer' });failedDelete.deleteRun();
 assert.equal(savedRecords().length, 1);assert.equal(failedDelete.discarded, false);
 assert.equal(toast, 'Could not delete this run. Try again.');
 assert.equal(storage.get('paoxia.recapDraft'), untouchedDraft);assert.equal(storage.get('paoxia.activeRun'), untouchedRun);
+const staleCompletedDraft = { id: 'newer', durationSeconds: 30, weather: '', mood: '', selectedNotices: {}, distance: '', note: 'stale' };
+storageWx.setStorageSync('paoxia.recapDraft', staleCompletedDraft);
+const cleanupFailureDelete = load('recap', { ...deleteRuntime,
+  removeStorageSync: key => { if (key === 'paoxia.recapDraft') throw new Error('unavailable'); storageWx.removeStorageSync(key); }
+});
+cleanupFailureDelete.onLoad({ recordId: 'newer' });cleanupFailureDelete.deleteRun();
+assert.equal(savedRecords().length, 1);assert.equal(storageWx.getStorageSync('paoxia.recapDraft').id, 'newer');
+const cleanupRetryDelete = load('recap', deleteRuntime);cleanupRetryDelete.onLoad({ recordId: 'newer' });cleanupRetryDelete.deleteRun();
+assert.equal(savedRecords().length, 0);assert.equal(storageWx.getStorageSync('paoxia.recapDraft'), '');
 assert(historyWxml.includes('bindtap="editRecord"'));assert(recapWxml.includes('bindtap="cancelEdit"'));assert(recapWxml.includes('bindtap="deleteRun"'));
 console.log('PASS: Slice 7 — original values, targeted update, deletion confirmation, immediate detail refresh, clearing, cancellation, no duplicates, timing preservation, draft isolation and failure handling.');
 
