@@ -207,10 +207,16 @@ Page({
     this.applyYear(dayValue.slice(0, 4));
     this.applyMonth(monthValue);
     this.applyDay(dayValue, latestRun && latestRun.id);
+    this.skipInitialShow = true;
   },
 
   onShow() {
     showShareMenu();
+    // onLoad already populated this page; refresh only when returning to it.
+    if (this.skipInitialShow) {
+      this.skipInitialShow = false;
+      return;
+    }
     try {
       this.setData({ records: readRecords() });
     } catch (error) {

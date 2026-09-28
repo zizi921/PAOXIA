@@ -6,16 +6,10 @@ const { shareAppMessage, shareTimeline, showShareMenu } = require('../../utils/s
 Page({
   onShareAppMessage: shareAppMessage,
   onShareTimeline: shareTimeline,
-  data: { safeTop: 96, hasActiveRun: false, hasDraft: false, countdown: '', language: 'en', copy: copyFor('en', 'home') },
+  data: { safeTop: 96, hasActiveRun: false, hasDraft: false, language: 'en', copy: copyFor('en', 'home') },
   onLoad() { this.setData({ safeTop: safeTop() }); },
-  onHide() {
-    // Keep GO on the outgoing page throughout the native page transition.
-    if (this.data.countdown === 'GO' && this.countdownTimer == null) return;
-    this.cancelCountdown();
-  },
-  onUnload() { this.cancelCountdown(); },
   onShow() {
-    this.cancelCountdown();
+    this.navigating = false;
     showShareMenu(true);
     try {
       const language = readLanguage();
@@ -25,7 +19,7 @@ Page({
     }
   },
   chooseLanguage(event) {
-    if (this.data.countdown) return;
+    if (this.navigating) return;
     const language = event.currentTarget.dataset.language;
     if (language === this.data.language) return;
     try {
@@ -36,15 +30,11 @@ Page({
     }
   },
   openHistory() {
-    if (this.data.language === 'zh' || this.navigating || this.data.countdown) return;
-    this.navigating = true;
-    wx.navigateTo({
-      url: '/pages/history/history',
-      complete: () => { this.navigating = false; }
-    });
+    if (this.data.language === 'zh' || this.navigating) return;
+    this.openPage('/pages/history/history');
   },
   go() {
-    if (this.data.language === 'zh' || this.navigating || this.data.countdown) return;
+    if (this.data.language === 'zh' || this.navigating) return;
     let activeRun;
     let draft;
     try {
@@ -54,52 +44,21 @@ Page({
       wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
       return;
     }
-    if (!activeRun && !draft) {
-      this.startCountdown();
-      return;
-    }
-    this.navigating = true;
-    wx.navigateTo({
-      url: !activeRun && draft ? '/pages/recap/recap' : `/pages/run/run?startedAt=${activeRun.startedAt}`,
-      complete: () => { this.navigating = false; }
-    });
+    const url = !activeRun && draft ? '/pages/recap/recap'
+      : activeRun ? `/pages/run/run?startedAt=${activeRun.startedAt}` : '/pages/run/run';
+    this.openPage(url);
   },
-  startCountdown() {
+  openPage(url) {
     this.navigating = true;
-    this.countdownEndsAt = Date.now() + 3000;
-    this.setData({ countdown: '3' });
-    const advance = () => {
-      const remaining = Math.ceil((this.countdownEndsAt - Date.now()) / 1000);
-      if (remaining > 0) {
-        this.setData({ countdown: String(remaining) });
-        this.countdownTimer = setTimeout(advance, 1000);
-        return;
-      }
-      this.setData({ countdown: 'GO' });
-      this.countdownTimer = setTimeout(() => {
-        this.countdownTimer = null;
-        // Retain GO until the destination replaces this page; onShow resets it on return.
-        try {
-          wx.navigateTo({
-            url: `/pages/run/run?startedAt=${Date.now()}`,
-            fail: () => {
-              this.cancelCountdown();
-              wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
-            },
-            complete: () => { this.navigating = false; }
-          });
-        } catch (error) {
-          this.cancelCountdown();
-          wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
-        }
-      }, 600);
+    const failed = () => {
+      this.navigating = false;
+      wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
     };
-    this.countdownTimer = setTimeout(advance, 1000);
-  },
-  cancelCountdown() {
-    if (this.countdownTimer != null) clearTimeout(this.countdownTimer);
-    this.countdownTimer = null;
-    this.navigating = false;
-    this.setData({ countdown: '' });
+    try {
+      wx.navigateTo({ url, fail: failed,
+        complete: () => { this.navigating = false; } });
+    } catch (error) {
+      failed();
+    }
   }
 });

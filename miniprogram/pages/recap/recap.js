@@ -48,19 +48,21 @@ Page({
     this.editRecord = null;
     const language = readLanguage();
     const copy = copyFor(language, 'recap');
-    this.setData({ editing: !!this.editId, language, copy,
+    const initialData = {};
+    const prepare = update => Object.assign(initialData, update);
+    prepare({ editing: !!this.editId, language, copy,
       weatherOptions: this.data.weatherOptions.map(option => ({ ...option, label: copy.weatherOptions[option.value] })) });
-    this.setData({ canContinue: false });
-    this.setData({ safeTop: safeTop() });
+    prepare({ canContinue: false });
+    prepare({ safeTop: safeTop() });
     if (this.editId) {
       try {
         const record = readRecords().find(item => item.id === this.editId);
         if (!record) throw new Error('Record not found');
         this.editRecord = record;
-        const selected = this.data.weatherOptions.find(option => option.value === record.weather);
+        const selected = initialData.weatherOptions.find(option => option.value === record.weather);
         const selectedNotices = {};
         (record.notices || []).forEach(value => { selectedNotices[value] = true; });
-        this.setData({ durationSeconds: record.durationSeconds,
+        prepare({ durationSeconds: record.durationSeconds,
           durationText: formatDuration(record.durationSeconds, language),
           weather: record.weather || '', weatherOpen: false,
           weatherLabel: selected ? selected.label : copy.notSelected,
@@ -71,6 +73,7 @@ Page({
       } catch (error) {
         wx.showToast({ title: copy.loadRecordError, icon: 'none' });
       }
+      this.setData(initialData);
       return;
     }
     let draft;
@@ -78,22 +81,24 @@ Page({
       draft = readDraft();
     } catch (error) {
       wx.showToast({ title: copy.loadDraftError, icon: 'none' });
+      this.setData(initialData);
       return;
     }
     this.run = draft && draft.run || null;
-    this.setData({ canContinue: !!this.run });
+    prepare({ canContinue: !!this.run });
     this.draftId = draft ? draft.id : `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const durationSeconds = draft ? draft.durationSeconds : Number(options && options.durationSeconds) || 0;
-    this.setData({ weather: '', weatherLabel: copy.notSelected, weatherGlyph: '＋',
+    prepare({ weather: '', weatherLabel: copy.notSelected, weatherGlyph: '＋',
       weatherOpen: false, mood: '', selectedNotices: {}, distance: '', note: '' });
     if (draft) {
       const { weather, mood, selectedNotices, distance, note } = draft;
-      const selected = this.data.weatherOptions.find(option => option.value === weather);
-      this.setData({ weather, mood, selectedNotices, distance, note,
+      const selected = initialData.weatherOptions.find(option => option.value === weather);
+      prepare({ weather, mood, selectedNotices, distance, note,
         weatherLabel: selected ? selected.label : copy.notSelected,
         weatherGlyph: selected ? selected.glyph : '＋' });
     }
-    this.setData({ durationSeconds, durationText: formatDuration(durationSeconds, language) });
+    prepare({ durationSeconds, durationText: formatDuration(durationSeconds, language) });
+    this.setData(initialData);
     this.persistDraft();
   },
 

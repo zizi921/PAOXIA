@@ -65,23 +65,7 @@ let navigation, completed;
 const initialRunStart = new TestDate(2028, 8, 26, 11, 59, 48).getTime();
 let now = initialRunStart;
 const clock = { now: () => now };
-let countdownTask;
-const countdownRuntime = {
-  Date: clock,
-  setTimeout: (fn, delay) => { countdownTask = { fn, due: now + delay }; return 1; },
-  clearTimeout: () => { countdownTask = null; }
-};
-function advanceCountdown(ms) {
-  const target = now + ms;
-  while (countdownTask && countdownTask.due <= target) {
-    now = countdownTask.due;
-    const fn = countdownTask.fn;
-    countdownTask = null;
-    fn();
-  }
-  now = target;
-}
-const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, countdownRuntime);
+const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, { Date: clock });
 home.onLoad(); assert.equal(home.data.safeTop, 108);
 home.chooseLanguage({ currentTarget: { dataset: { language: 'zh' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'zh');assert.equal(home.data.copy.go, '出发');
@@ -90,42 +74,25 @@ const unavailableHome = load('home', { navigateTo: () => { throw new Error('Chin
 unavailableHome.onLoad();unavailableHome.onShow();unavailableHome.go();unavailableHome.openHistory();
 assert.equal(unavailableHome.data.language, 'zh');
 home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
-assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'READY');
+assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'START');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
 navigation=null;home.openHistory();assert.equal(navigation,null);completed();
-let countdownRenders = 0;
-const originalHomeSetData = home.setData;
-home.setData = update => { if (update.countdown) countdownRenders++; originalHomeSetData(update); };
-home.go();assert.equal(home.data.countdown, '3');assert.equal(navigation, null);
-home.go();home.openHistory();assert.equal(navigation, null);
-advanceCountdown(1000);assert.equal(home.data.countdown, '2');
-advanceCountdown(1000);assert.equal(home.data.countdown, '1');
-advanceCountdown(1000);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, null);assert.equal(countdownRenders, 4);
+home.go();assert.equal(navigation, '/pages/run/run');
+navigation=null;home.go();home.openHistory();assert.equal(navigation,null);completed();
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
-advanceCountdown(600);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
-navigation=null;home.go();assert.equal(navigation,null);completed();
-assert.equal(home.data.countdown, 'GO');
-home.go();home.openHistory();assert.equal(navigation, null);
-home.onHide();assert.equal(home.data.countdown, 'GO');
-home.onShow();assert.equal(home.data.countdown, '');
-for (const lifecycle of ['onHide', 'onUnload']) {
-  home.go();advanceCountdown(1000);home[lifecycle]();advanceCountdown(5000);
-  assert.equal(navigation, null);assert.equal(home.data.countdown, '');assert.equal(home.navigating, false);
-}
-let countdownFailure = false;
+let startFailure = false;
 const failedStart = load('home', {
   navigateTo: options => { options.fail();options.complete(); },
-  showToast: () => { countdownFailure = true; }
-}, countdownRuntime);
-failedStart.go();advanceCountdown(3600);
-assert.equal(countdownFailure, true);assert.equal(failedStart.data.countdown, '');assert.equal(failedStart.navigating, false);
+  showToast: () => { startFailure = true; }
+});
+failedStart.go();assert.equal(startFailure, true);assert.equal(failedStart.navigating, false);
+startFailure = false;
+failedStart.openHistory();assert.equal(startFailure, true);assert.equal(failedStart.navigating, false);
 const thrownStart = load('home', {
   navigateTo: () => { throw new Error('page loading failed'); }, showToast: () => {}
-}, countdownRuntime);
-thrownStart.go();advanceCountdown(3600);
-assert.equal(thrownStart.data.countdown, '');assert.equal(thrownStart.navigating, false);
-home.setData({ countdown: 'GO' });home.navigating = true;home.countdownTimer = null;
-home.onShow();assert.equal(home.data.countdown, '');assert.equal(home.navigating, false);
+});
+thrownStart.go();assert.equal(thrownStart.navigating, false);
+home.navigating = true;home.onShow();assert.equal(home.navigating, false);
 now = initialRunStart;
 const emptyHistory = load('history', {reLaunch:x=>{navigation=x.url;}});
 emptyHistory.onLoad();emptyHistory.onShow();

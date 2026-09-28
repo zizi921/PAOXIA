@@ -10,7 +10,3 @@
   <view class="actions home-actions"><button class="pill handwritten go {{hasActiveRun || hasDraft ? 'resume' : ''}}" hover-class="pressed" bindtap="go" aria-label="{{hasActiveRun ? copy.continueRunAria : (hasDraft ? copy.continueDraftAria : copy.goAria)}}">{{hasActiveRun ? copy.continueRun : (hasDraft ? copy.continueDraft : copy.go)}}</button><button class="history-link handwritten" hover-class="pressed" bindtap="openHistory" aria-label="{{copy.historyAria}}">{{copy.history}}</button></view>
   </block>
 </view>
-
-<view wx:if="{{countdown}}" class="start-countdown lang-en" role="alert" aria-label="{{countdown}}">
-  <text class="countdown-word {{countdown === 'GO' ? 'countdown-go' : ''}}">{{countdown}}</text>
-</view>
