@@ -177,7 +177,7 @@ Page({
     monthRows: [],
     yearRows: [],
     yearSummary: { times: '', total: '' },
-    monthSummary: { times: '', total: '' },
+    monthSummary: { times: '', total: '', distance: '' },
     selectedRecord: null,
     filterOpen: false,
     filterMode: 'month',
@@ -336,14 +336,21 @@ Page({
     const aggregate = yearRowsFor(this.data.records, value.slice(0, 4), this.data.language).find(row => row.value === value);
     const times = aggregate ? aggregate.times : records.length;
     const seconds = aggregate ? aggregate.totalSeconds : records.reduce((sum, record) => sum + record.durationSeconds, 0);
+    const distances = records.map(record => {
+      const match = String(record.distance || '').match(/^(\d+(?:\.\d+)?)\s*km$/);
+      return match ? Number(match[1]) : null;
+    }).filter(distance => distance !== null && Number.isFinite(distance));
+    const distance = distances.length
+      ? `${Number(distances.reduce((sum, km) => sum + km, 0).toFixed(2))} km`
+      : '— km';
     const periodLabels = { ...this.data.periodLabels, month: label };
     this.setData({
       monthValue: value,
       periodLabels,
       monthRows: records,
       monthSummary: this.data.language === 'zh'
-        ? { times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyMonthHint }
-        : { times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyMonthHint }
+        ? { distance, times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyMonthHint }
+        : { distance, times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyMonthHint }
     });
   },
 

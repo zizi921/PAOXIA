@@ -29,7 +29,7 @@ const COPY = {
       title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
       noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Your saved runs stay on this device.',
       noMonth: 'No days out this month.', noMonthCopy: 'Pick another month or go again.', noYear: 'No days out this year.', noYearCopy: 'Try another year or start a new run.',
-      dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', felt: 'FELT', spotted: 'Spotted out there', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
+      dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', felt: 'FELT', spotted: 'SEEN', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
       noDay: 'No day out here yet.', noDayCopy: 'Choose another date or go again.', goAgain: 'One More Time',
       notSet: 'Not set', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
       tree: 'Tree', wind: 'Wind', cloud: 'Cloud', cat: 'Cat', dog: 'Dog', flower: 'Flower', sun: 'Sun', moon: 'Moon', streetlight: 'Streetlight', didntNotice: 'Nothing',

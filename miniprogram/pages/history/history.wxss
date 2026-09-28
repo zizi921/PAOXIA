@@ -43,3 +43,16 @@
 .history .period-nav .period-label { display: block; font-size: 34rpx; line-height: 1.2; white-space: nowrap; }
 .history .period-nav .month-filter-caret, .history .period-nav .day-filter-caret { right: 0; top: 50%; bottom: auto; transform: translateY(-50%); font-size: 28rpx; line-height: 1; }
 .history .period-nav .day-date-stack { padding: 0; }
+
+.history.lang-en .day-metric { font-size: 25rpx; color: #65665f; }
+.history.lang-en .day-note { font-size: 34rpx; color: #65665f; }
+
+.history.lang-en .record-day, .history.lang-en .record-duration, .history.lang-en .record-weekday, .history.lang-en .record-distance { font-size: 26rpx; font-weight: 400; color: #74746c; }
+
+/* Keep list moods quiet and aligned independently of date text length. */
+.history.lang-en .record-date-line { flex: 0 0 190rpx; width: 190rpx; }
+.history.lang-en .record-top-line .mood-inline { margin-left: 20rpx; }
+.history.lang-en .record-top-line .mini-face { flex: 0 0 49rpx; transform: scale(.75); transform-origin: left center; margin-right: -12rpx; opacity: .64; }
+.history.lang-en .record-top-line .mood-name { color: #74746c; font-size: 26rpx; font-weight: 400; }
+
+.history.lang-en .day-kicker { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 700; letter-spacing: 2rpx; color: #58758c; }

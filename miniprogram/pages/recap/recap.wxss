@@ -51,7 +51,7 @@
 .tree-branch { position: absolute; left: 44rpx; top: 49rpx; width: 27rpx; height: 20rpx; border-left: 5rpx solid #6c4d33; border-bottom: 5rpx solid #6c4d33; transform: rotate(-18deg); }
 .wind-line { position: absolute; left: 9rpx; width: 88rpx; height: 18rpx; border-top: 5rpx solid #262622; border-radius: 50%; transform: rotate(-5deg); }
 .wind-a { top: 13rpx; }.wind-b { top: 38rpx; left: 2rpx; width: 80rpx; transform: rotate(3deg); }.wind-c { top: 63rpx; left: 25rpx; width: 71rpx; transform: rotate(-7deg); }
-.cloud-puff, .cloud-base { position: absolute; border: 5rpx solid #4f8fc9; background: #dfeaf4; }
+.cloud-puff, .cloud-base { position: absolute; border: 5rpx solid #4f8fc9; background: #fdfcf9; }
 .puff-a { left: 10rpx; top: 34rpx; width: 41rpx; height: 33rpx; border-radius: 50%; }.puff-b { left: 34rpx; top: 16rpx; width: 45rpx; height: 47rpx; border-radius: 50%; }.puff-c { left: 66rpx; top: 32rpx; width: 34rpx; height: 34rpx; border-radius: 50%; }.cloud-base { left: 16rpx; top: 46rpx; width: 78rpx; height: 24rpx; border-radius: 48%; }
 .cat-head { position: absolute; left: 16rpx; top: 14rpx; width: 42rpx; height: 40rpx; border: 5rpx solid #b97838; border-radius: 48%; background: #fdfcf9; }
 .cat-ear { position: absolute; top: -12rpx; width: 16rpx; height: 18rpx; border: 5rpx solid #b97838; border-bottom: 0; background: #fdfcf9; transform: rotate(40deg); }.cat-ear-a { left: 0; }.cat-ear-b { right: 0; transform: rotate(-40deg); }

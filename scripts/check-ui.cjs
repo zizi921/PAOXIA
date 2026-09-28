@@ -726,3 +726,19 @@ for (const route of ['home', 'run', 'recap', 'history']) {
   }
 }
 console.log('PASS: localized app shares open home, use a static image and never include local records; timeline is home-only.');
+
+// Monthly distance includes only entered values and stays within the selected month.
+const distanceSummaryPage = load('history', {});
+distanceSummaryPage.onLoad();
+distanceSummaryPage.data.records = [
+  { id: 'distance-a', date: '2028-09-26', durationSeconds: 10, distance: '0.1 km' },
+  { id: 'distance-b', date: '2028-09-27', durationSeconds: 10, distance: '0.2 km' },
+  { id: 'distance-c', date: '2028-09-28', durationSeconds: 10, distance: '— km' },
+  { id: 'distance-d', date: '2028-10-01', durationSeconds: 10, distance: '5 km' }
+];
+distanceSummaryPage.applyMonth('2028-09');
+assert.equal(distanceSummaryPage.data.monthSummary.distance, '0.3 km');
+distanceSummaryPage.data.records = [distanceSummaryPage.data.records[2]];
+distanceSummaryPage.applyMonth('2028-09');
+assert.equal(distanceSummaryPage.data.monthSummary.distance, '— km');
+console.log('PASS: monthly distance totals and missing distances.');
