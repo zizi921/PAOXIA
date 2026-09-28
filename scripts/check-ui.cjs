@@ -65,7 +65,23 @@ let navigation, completed;
 const initialRunStart = new TestDate(2028, 8, 26, 11, 59, 48).getTime();
 let now = initialRunStart;
 const clock = { now: () => now };
-const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, { Date: clock });
+let countdownTask;
+const countdownRuntime = {
+  Date: clock,
+  setTimeout: (fn, delay) => { countdownTask = { fn, due: now + delay }; return 1; },
+  clearTimeout: () => { countdownTask = null; }
+};
+function advanceCountdown(ms) {
+  const target = now + ms;
+  while (countdownTask && countdownTask.due <= target) {
+    now = countdownTask.due;
+    const fn = countdownTask.fn;
+    countdownTask = null;
+    fn();
+  }
+  now = target;
+}
+const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.complete;}}, countdownRuntime);
 home.onLoad(); assert.equal(home.data.safeTop, 108);
 home.chooseLanguage({ currentTarget: { dataset: { language: 'zh' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'zh');assert.equal(home.data.copy.go, '出发');
@@ -74,11 +90,30 @@ const unavailableHome = load('home', { navigateTo: () => { throw new Error('Chin
 unavailableHome.onLoad();unavailableHome.onShow();unavailableHome.go();unavailableHome.openHistory();
 assert.equal(unavailableHome.data.language, 'zh');
 home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
-assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'GO');
+assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'READY');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
 navigation=null;home.openHistory();assert.equal(navigation,null);completed();
-home.go(); assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart}`);
-navigation=null;home.go();assert.equal(navigation,null);completed();home.go();assert.equal(navigation,`/pages/run/run?startedAt=${initialRunStart}`);
+home.go();assert.equal(home.data.countdown, '3');assert.equal(navigation, null);
+home.go();home.openHistory();assert.equal(navigation, null);
+advanceCountdown(1000);assert.equal(home.data.countdown, '2');
+advanceCountdown(1000);assert.equal(home.data.countdown, '1');
+advanceCountdown(1000);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, null);
+assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
+advanceCountdown(600);assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
+navigation=null;home.go();assert.equal(navigation,null);completed();
+assert.equal(home.data.countdown, '');
+for (const lifecycle of ['onHide', 'onUnload']) {
+  home.go();advanceCountdown(1000);home[lifecycle]();advanceCountdown(5000);
+  assert.equal(navigation, null);assert.equal(home.data.countdown, '');assert.equal(home.navigating, false);
+}
+let countdownFailure = false;
+const failedStart = load('home', {
+  navigateTo: options => { options.fail();options.complete(); },
+  showToast: () => { countdownFailure = true; }
+}, countdownRuntime);
+failedStart.go();advanceCountdown(3600);
+assert.equal(countdownFailure, true);assert.equal(failedStart.data.countdown, '');assert.equal(failedStart.navigating, false);
+now = initialRunStart;
 const emptyHistory = load('history', {reLaunch:x=>{navigation=x.url;}});
 emptyHistory.onLoad();emptyHistory.onShow();
 assert.equal(emptyHistory.data.records.length,0);
@@ -325,7 +360,7 @@ assert(historyWxml.includes('wx:if="{{!records.length}}"'));
 assert(historyWxml.includes('{{copy.noRuns}}'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('bindtap="openHistory"'));
 assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('hasDraft ? copy.continueDraft : copy.go'));
-assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('src="/assets/history-runner-07.png"'));
+assert(fs.readFileSync('miniprogram/pages/home/home.wxml','utf8').includes('src="/assets/home-shoelaces.png"'));
 assert(!historyWxml.includes('day-sun'));assert(!historyWxml.includes('day-tree'));assert(historyWxml.includes('day-summary-illustration'));
 assert(historyWxml.includes('{{copy.dayKicker}}'));assert(historyWxml.includes('day-feeling'));
 assert(!historyWxml.includes('one day at a time'));

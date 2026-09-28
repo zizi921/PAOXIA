@@ -3,8 +3,8 @@ const STORAGE_KEY = 'paoxia.language';
 const COPY = {
   en: {
     home: {
-      go: 'GO', continueRun: 'Continue run', continueDraft: 'Continue draft', history: 'Days Out.',
-      goAria: 'Start run timer', continueRunAria: 'Continue this run', continueDraftAria: 'Continue your draft', historyAria: 'View running history',
+      go: 'READY', continueRun: 'Continue run', continueDraft: 'Continue draft', history: 'Days Out.',
+      goAria: 'Ready: start a three-second countdown', continueRunAria: 'Continue this run', continueDraftAria: 'Continue your draft', historyAria: 'View running history',
       loadError: 'Could not load your run or draft.'
     },
     run: {

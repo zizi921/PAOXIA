@@ -130,3 +130,9 @@
 .recap.lang-en .recap-heading-row { top: -32rpx; align-items: flex-start; }
 .recap.lang-en .recap-title { display: flex; align-items: center; min-height: 62rpx; font-family: 'Inter', sans-serif; font-size: 54rpx; font-weight: 600; line-height: 1; }
 @media (max-height: 700px) { .recap.lang-en { padding-top: max(var(--safe-top, 80px), 76px); } }
+
+.mood-face-image { position: relative; z-index: 2; width: 70rpx; height: 64rpx; }
+
+.weather-image { width: 82rpx; height: 66rpx; flex-shrink: 0; }
+.weather-option-image { position: relative; z-index: 1; width: 60rpx; height: 48rpx; flex-shrink: 0; }
+@media (max-height: 740px) { .weather-image { width: 62rpx; height: 48rpx; } }
