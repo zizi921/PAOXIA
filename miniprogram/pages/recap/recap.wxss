@@ -111,3 +111,22 @@
 }
 
 .recap.lang-en .cancel-edit-button { margin-top: 32rpx; }
+
+.recap.lang-en .save-button { margin-top: 68rpx; }
+@media (max-height: 960px) { .recap.lang-en .save-button { margin-top: 96rpx; } }
+@media (max-height: 740px) { .recap.lang-en .save-button { margin-top: 44rpx; } }
+
+.recap.lang-en .mood-section { position: relative; top: -32rpx; }
+
+.recap.lang-en .mood-choice .choice-label,
+.recap.lang-en .notice-choice .choice-label { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 600; color: #65665f; line-height: 1.05; }
+
+.recap.lang-en .notice-section { margin-top: 6rpx; }
+@media (max-height: 960px) { .recap.lang-en .notice-section { margin-top: 30rpx; } }
+@media (max-height: 740px) { .recap.lang-en .notice-section { margin-top: 0; } }
+
+/* Match the English history title's safe-area position and 62rpx title row. */
+.recap.lang-en { padding-top: max(var(--safe-top, 96px), 88px); padding-left: 44rpx; padding-right: 44rpx; }
+.recap.lang-en .recap-heading-row { top: -32rpx; align-items: flex-start; }
+.recap.lang-en .recap-title { display: flex; align-items: center; min-height: 62rpx; font-family: 'Inter', sans-serif; font-size: 54rpx; font-weight: 600; line-height: 1; }
+@media (max-height: 700px) { .recap.lang-en { padding-top: max(var(--safe-top, 80px), 76px); } }
