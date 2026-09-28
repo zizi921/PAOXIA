@@ -11,6 +11,7 @@ Page({
   onHide() { this.cancelCountdown(); },
   onUnload() { this.cancelCountdown(); },
   onShow() {
+    this.cancelCountdown();
     showShareMenu(true);
     try {
       const language = readLanguage();
@@ -67,27 +68,33 @@ Page({
       const remaining = Math.ceil((this.countdownEndsAt - Date.now()) / 1000);
       if (remaining > 0) {
         this.setData({ countdown: String(remaining) });
-        this.countdownTimer = setTimeout(advance, 100);
+        this.countdownTimer = setTimeout(advance, 1000);
         return;
       }
       this.setData({ countdown: 'GO' });
       this.countdownTimer = setTimeout(() => {
         this.countdownTimer = null;
-        wx.navigateTo({
-          url: `/pages/run/run?startedAt=${Date.now()}`,
-          fail: () => wx.showToast({ title: this.data.copy.loadError, icon: 'none' }),
-          complete: () => {
-            this.setData({ countdown: '' });
-            this.navigating = false;
-          }
-        });
+        // Clear the overlay before navigation: completion can be delayed by page loading.
+        this.setData({ countdown: '' });
+        try {
+          wx.navigateTo({
+            url: `/pages/run/run?startedAt=${Date.now()}`,
+            fail: () => wx.showToast({ title: this.data.copy.loadError, icon: 'none' }),
+            complete: () => {
+              this.setData({ countdown: '' });
+              this.navigating = false;
+            }
+          });
+        } catch (error) {
+          this.navigating = false;
+          wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
+        }
       }, 600);
     };
-    this.countdownTimer = setTimeout(advance, 100);
+    this.countdownTimer = setTimeout(advance, 1000);
   },
   cancelCountdown() {
-    if (this.countdownTimer == null) return;
-    clearTimeout(this.countdownTimer);
+    if (this.countdownTimer != null) clearTimeout(this.countdownTimer);
     this.countdownTimer = null;
     this.navigating = false;
     this.setData({ countdown: '' });

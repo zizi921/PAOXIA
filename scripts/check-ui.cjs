@@ -93,13 +93,16 @@ home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'READY');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
 navigation=null;home.openHistory();assert.equal(navigation,null);completed();
+let countdownRenders = 0;
+const originalHomeSetData = home.setData;
+home.setData = update => { if (update.countdown) countdownRenders++; originalHomeSetData(update); };
 home.go();assert.equal(home.data.countdown, '3');assert.equal(navigation, null);
 home.go();home.openHistory();assert.equal(navigation, null);
 advanceCountdown(1000);assert.equal(home.data.countdown, '2');
 advanceCountdown(1000);assert.equal(home.data.countdown, '1');
-advanceCountdown(1000);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, null);
+advanceCountdown(1000);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, null);assert.equal(countdownRenders, 4);
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
-advanceCountdown(600);assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
+advanceCountdown(600);assert.equal(home.data.countdown, '');assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
 navigation=null;home.go();assert.equal(navigation,null);completed();
 assert.equal(home.data.countdown, '');
 for (const lifecycle of ['onHide', 'onUnload']) {
@@ -113,6 +116,13 @@ const failedStart = load('home', {
 }, countdownRuntime);
 failedStart.go();advanceCountdown(3600);
 assert.equal(countdownFailure, true);assert.equal(failedStart.data.countdown, '');assert.equal(failedStart.navigating, false);
+const thrownStart = load('home', {
+  navigateTo: () => { throw new Error('page loading failed'); }, showToast: () => {}
+}, countdownRuntime);
+thrownStart.go();advanceCountdown(3600);
+assert.equal(thrownStart.data.countdown, '');assert.equal(thrownStart.navigating, false);
+home.setData({ countdown: 'GO' });home.navigating = true;home.countdownTimer = null;
+home.onShow();assert.equal(home.data.countdown, '');assert.equal(home.navigating, false);
 now = initialRunStart;
 const emptyHistory = load('history', {reLaunch:x=>{navigation=x.url;}});
 emptyHistory.onLoad();emptyHistory.onShow();
@@ -133,7 +143,12 @@ const run=load('run',{redirectTo:x=>{navigation=x.url;x.complete();}}, {
   setInterval: fn => { tick = fn; return 1; },
   clearInterval: () => {}
 });
+let runRenders = 0;
+const originalRunSetData = run.setData;
+run.setData = update => { runRenders++; originalRunSetData(update); };
 run.onLoad({startedAt:String(initialRunStart)});run.onShow();
+assert.equal(runRenders, 1);
+run.updateClock();assert.equal(runRenders, 1);
 assert.equal(run.data.elapsedText,'00:00:00');
 now=initialRunStart+5500;tick();assert.equal(run.data.elapsedText,'00:00:05');
 run.togglePause();assert.equal(run.data.paused,true);

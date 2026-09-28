@@ -18,13 +18,13 @@ Page({
 
   onLoad(options) {
     const language = readLanguage();
-    this.setData({ safeTop: safeTop(), language, copy: copyFor(language, 'run') });
+    const initialData = { safeTop: safeTop(), language, copy: copyFor(language, 'run') };
     this.ended = true;
     try {
       let run = readActiveRun();
       if (!run && options && options.continue === '1') {
         const draft = readDraft();
-        if (!draft || !draft.run) return;
+        if (!draft || !draft.run) { this.setData(initialData); return; }
         const { startedAt, pausedAt, totalPausedMs, finishedAt } = draft.run;
         // Restore at page entry so all time spent in the form stays excluded.
         run = { startedAt, pausedAt,
@@ -38,9 +38,10 @@ Page({
       saveActiveRun(run);
       Object.assign(this, run);
       this.ended = false;
-      this.setData({ paused: !!this.pausedAt });
-      this.updateClock();
+      const elapsedSeconds = this.elapsedAt(Date.now());
+      this.setData({ ...initialData, paused: !!this.pausedAt, elapsedSeconds, elapsedText: formatElapsed(elapsedSeconds) });
     } catch (error) {
+      this.setData(initialData);
       wx.showToast({ title: this.data.copy.restoreError, icon: 'none' });
     }
   },
@@ -68,7 +69,9 @@ Page({
 
   updateClock() {
     const elapsedSeconds = this.elapsedAt(Date.now());
-    this.setData({ elapsedSeconds, elapsedText: formatElapsed(elapsedSeconds) });
+    if (elapsedSeconds !== this.data.elapsedSeconds) {
+      this.setData({ elapsedSeconds, elapsedText: formatElapsed(elapsedSeconds) });
+    }
     return elapsedSeconds;
   },
 
