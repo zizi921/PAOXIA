@@ -102,9 +102,12 @@ advanceCountdown(1000);assert.equal(home.data.countdown, '2');
 advanceCountdown(1000);assert.equal(home.data.countdown, '1');
 advanceCountdown(1000);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, null);assert.equal(countdownRenders, 4);
 assert.equal(storageWx.getStorageSync('paoxia.activeRun'), '');
-advanceCountdown(600);assert.equal(home.data.countdown, '');assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
+advanceCountdown(600);assert.equal(home.data.countdown, 'GO');assert.equal(navigation, `/pages/run/run?startedAt=${initialRunStart + 3600}`);
 navigation=null;home.go();assert.equal(navigation,null);completed();
-assert.equal(home.data.countdown, '');
+assert.equal(home.data.countdown, 'GO');
+home.go();home.openHistory();assert.equal(navigation, null);
+home.onHide();assert.equal(home.data.countdown, 'GO');
+home.onShow();assert.equal(home.data.countdown, '');
 for (const lifecycle of ['onHide', 'onUnload']) {
   home.go();advanceCountdown(1000);home[lifecycle]();advanceCountdown(5000);
   assert.equal(navigation, null);assert.equal(home.data.countdown, '');assert.equal(home.navigating, false);

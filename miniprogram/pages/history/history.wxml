@@ -34,7 +34,7 @@
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="record-row" role="button" aria-label="{{copy.viewRecord}} {{item.day}}" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" data-id="{{item.id}}" bindtap="openDay" hover-class="row-pressed">
           <view class="record-main">
-            <view class="record-top-line"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><view class="mood-inline"><view class="mini-face {{item.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{item.mood}}</text></view></view>
+            <view class="record-top-line"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><view class="mood-inline"><image class="mini-face" src="{{item.moodImage}}" mode="aspectFit" aria-hidden="true" /><text class="handwritten mood-name">{{item.mood}}</text></view></view>
             <text class="handwritten record-duration">{{item.duration}}</text>
             <view class="record-bottom-line"><text class="handwritten record-distance">{{item.distance}}</text><view class="mark-row"><block wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label"><image wx:if="{{mark.image}}" class="notice-mark" src="{{mark.image}}" mode="aspectFit" aria-label="{{mark.label}}" /><text wx:else class="mark {{mark.className}}">{{mark.glyph}}</text></block></view></view>
           </view>
@@ -62,7 +62,7 @@
         </view>
         <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud {{selectedRecord.weatherClass}}">{{selectedRecord.weatherGlyph}}</text><image class="day-runner {{selectedRecord.runnerPoseClass}}" src="{{selectedRecord.runnerImage}}" mode="aspectFit" /></view>
       </view>
-      <view class="day-feeling"><text class="handwritten day-kicker">{{copy.felt}}</text><view class="mood-inline"><view class="mini-face {{selectedRecord.moodType}}"><view class="mini-eyes"></view><view class="mini-mouth"></view></view><text class="handwritten mood-name">{{selectedRecord.mood}}</text></view></view>
+      <view class="day-feeling"><text class="handwritten day-kicker">{{copy.felt}}</text><view class="mood-inline"><image class="mini-face" src="{{selectedRecord.moodImage}}" mode="aspectFit" aria-hidden="true" /><text class="handwritten mood-name">{{selectedRecord.mood}}</text></view></view>
       <view class="day-notice-block"><text class="handwritten day-kicker">{{copy.spotted}}</text><view wx:if="{{selectedRecord.noticeItems.length}}" class="day-notices"><view wx:for="{{selectedRecord.noticeItems}}" wx:key="label"><image wx:if="{{item.image}}" class="notice-big-mark" src="{{item.image}}" mode="aspectFit" aria-hidden="true" /><text wx:else class="big-mark {{item.className}}">{{item.glyph}}</text><text class="handwritten">{{item.label}}</text></view></view><text wx:else class="handwritten day-blank-copy">{{copy.nothing}}</text></view>
       <view class="day-note-card {{selectedRecord.note ? '' : 'empty-note'}}"><text class="handwritten quote-mark">“</text><text class="handwritten day-note">{{selectedRecord.note || copy.noNote}}</text><text class="handwritten quote-mark quote-end">”</text></view>
       </view>

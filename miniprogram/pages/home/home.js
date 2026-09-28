@@ -8,7 +8,11 @@ Page({
   onShareTimeline: shareTimeline,
   data: { safeTop: 96, hasActiveRun: false, hasDraft: false, countdown: '', language: 'en', copy: copyFor('en', 'home') },
   onLoad() { this.setData({ safeTop: safeTop() }); },
-  onHide() { this.cancelCountdown(); },
+  onHide() {
+    // Keep GO on the outgoing page throughout the native page transition.
+    if (this.data.countdown === 'GO' && this.countdownTimer == null) return;
+    this.cancelCountdown();
+  },
   onUnload() { this.cancelCountdown(); },
   onShow() {
     this.cancelCountdown();
@@ -32,7 +36,7 @@ Page({
     }
   },
   openHistory() {
-    if (this.data.language === 'zh' || this.navigating) return;
+    if (this.data.language === 'zh' || this.navigating || this.data.countdown) return;
     this.navigating = true;
     wx.navigateTo({
       url: '/pages/history/history',
@@ -40,7 +44,7 @@ Page({
     });
   },
   go() {
-    if (this.data.language === 'zh' || this.navigating) return;
+    if (this.data.language === 'zh' || this.navigating || this.data.countdown) return;
     let activeRun;
     let draft;
     try {
@@ -74,19 +78,18 @@ Page({
       this.setData({ countdown: 'GO' });
       this.countdownTimer = setTimeout(() => {
         this.countdownTimer = null;
-        // Clear the overlay before navigation: completion can be delayed by page loading.
-        this.setData({ countdown: '' });
+        // Retain GO until the destination replaces this page; onShow resets it on return.
         try {
           wx.navigateTo({
             url: `/pages/run/run?startedAt=${Date.now()}`,
-            fail: () => wx.showToast({ title: this.data.copy.loadError, icon: 'none' }),
-            complete: () => {
-              this.setData({ countdown: '' });
-              this.navigating = false;
-            }
+            fail: () => {
+              this.cancelCountdown();
+              wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
+            },
+            complete: () => { this.navigating = false; }
           });
         } catch (error) {
-          this.navigating = false;
+          this.cancelCountdown();
           wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
         }
       }, 600);

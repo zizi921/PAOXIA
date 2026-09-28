@@ -10,16 +10,16 @@ const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
 const WEEKDAY_NAMES_ZH = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 const WEEKDAY_SHORT_ZH = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 const NOTICE_META = {
-  tree: { labelKey: 'tree', glyph: '♧', className: 'tree' },
-  wind: { labelKey: 'wind', glyph: '≋', className: 'wind' },
-  cloud: { labelKey: 'cloud', glyph: '☁', className: 'cloud' },
-  cat: { labelKey: 'cat', glyph: '⌁', className: 'cat' },
-  dog: { labelKey: 'dog', image: '/assets/notice-dog.svg', className: 'dog' },
-  flower: { labelKey: 'flower', image: '/assets/notice-flower.svg', className: 'flower' },
+  tree: { labelKey: 'tree', image: '/assets/notice-outline-tree.png', className: 'tree' },
+  wind: { labelKey: 'wind', image: '/assets/notice-outline-wind.png', className: 'wind' },
+  cloud: { labelKey: 'cloud', image: '/assets/notice-outline-cloud.png', className: 'cloud' },
+  cat: { labelKey: 'cat', image: '/assets/notice-outline-cat.png', className: 'cat' },
+  dog: { labelKey: 'dog', image: '/assets/notice-outline-dog.png', className: 'dog' },
+  flower: { labelKey: 'flower', image: '/assets/notice-outline-flower.png', className: 'flower' },
   sun: { labelKey: 'sun', glyph: '☀', className: 'sun' },
   moon: { labelKey: 'moon', glyph: '☾', className: 'moon' },
-  streetlight: { labelKey: 'streetlight', glyph: '⌑', className: 'streetlight' },
-  nothing: { labelKey: 'didntNotice', image: '/assets/notice-nothing.png', className: 'nothing' }
+  streetlight: { labelKey: 'streetlight', image: '/assets/notice-outline-streetlight.png', className: 'streetlight' },
+  nothing: { labelKey: 'didntNotice', image: '/assets/notice-outline-nothing.png', className: 'nothing' }
 };
 const WEATHER_META = {
   sunny: { glyph: '☀', className: 'sunny' },
@@ -126,6 +126,7 @@ function decorateRecord(record, language, copy) {
     distance: record.distance || '— km',
     mood: record.mood === 'Not set' || !record.mood ? copy.notSet : copy[record.moodType] || record.mood,
     moodType: record.moodType || 'unsure',
+    moodImage: `/assets/mood-outline-${['good', 'calm', 'tired', 'unsure'].includes(record.moodType) ? record.moodType : 'unsure'}.png`,
     marks: record.notices || [],
     noticeItems: (record.notices || []).map(value => {
       const meta = NOTICE_META[value];
