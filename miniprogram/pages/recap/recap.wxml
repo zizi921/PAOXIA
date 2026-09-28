@@ -87,7 +87,7 @@
 
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="save">{{editing ? copy.saveChanges : copy.save}}</button>
     <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun">{{copy.continueRun}}</button>
-    <button wx:if="{{editing}}" class="discard-button handwritten" hover-class="pressed" bindtap="cancelEdit">{{copy.cancel}}</button>
+    <button wx:if="{{editing}}" class="discard-button cancel-edit-button handwritten" hover-class="pressed" bindtap="cancelEdit">{{copy.cancel}}</button>
     <button wx:else class="discard-button handwritten" hover-class="pressed" bindtap="discard">{{copy.discardDraft}}</button>
     <button wx:if="{{editing}}" class="delete-button handwritten" hover-class="pressed" bindtap="deleteRun">{{copy.deleteRun}}</button>
   </view>

@@ -109,3 +109,5 @@
   .recap .save-button { margin-top: 12rpx; min-height: 44px; }
   .recap .continue-button, .recap .discard-button, .recap .delete-button { margin-bottom: 0; font-size: 32rpx; }
 }
+
+.recap.lang-en .cancel-edit-button { margin-top: 32rpx; }

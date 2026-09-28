@@ -5,21 +5,21 @@
       <button wx:if="{{mode === 'day' && selectedRecord}}" class="edit-button handwritten" bindtap="editRecord" hover-class="choice-pressed">{{copy.edit}}</button>
     </view>
     <view class="mode-tabs" role="tablist">
-      <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'year'}}" data-mode="year" bindtap="switchMode" hover-class="choice-pressed">{{copy.year}}</button>
+      <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'year'}}" data-mode="year" bindtap="switchMode" hover-class="choice-pressed"><text class="mode-tab-label">{{copy.year}}</text></button>
       <text class="tab-divider">|</text>
-      <button class="mode-tab handwritten {{mode === 'month' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'month'}}" data-mode="month" bindtap="switchMode" hover-class="choice-pressed">{{copy.month}}</button>
+      <button class="mode-tab handwritten {{mode === 'month' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'month'}}" data-mode="month" bindtap="switchMode" hover-class="choice-pressed"><text class="mode-tab-label">{{copy.month}}</text></button>
       <text class="tab-divider">|</text>
-      <button class="mode-tab handwritten {{mode === 'day' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'day'}}" data-mode="day" bindtap="switchMode" hover-class="choice-pressed">{{copy.day}}</button>
+      <button class="mode-tab handwritten {{mode === 'day' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'day'}}" data-mode="day" bindtap="switchMode" hover-class="choice-pressed"><text class="mode-tab-label">{{copy.day}}</text></button>
     </view>
     <view class="period-nav mode-{{mode}}">
       <button class="period-arrow handwritten" data-direction="-1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="{{copy.previous}}">‹</button>
-      <view wx:if="{{mode === 'month'}}" class="month-picker filter-trigger" role="button" data-mode="month" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.monthFilter}}">
+      <view wx:if="{{mode === 'month'}}" class="period-slot month-picker filter-trigger" role="button" data-mode="month" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.monthFilter}}">
         <view class="period-copy month-period-copy"><text class="handwritten period-label">{{periodLabels.month}}</text><text class="handwritten month-filter-caret" aria-hidden="true">⌄</text></view>
       </view>
-      <view wx:elif="{{mode === 'day'}}" class="period-copy day-date-stack filter-trigger" role="button" data-mode="day" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.dayFilter}}">
+      <view wx:elif="{{mode === 'day'}}" class="period-slot period-copy day-date-stack filter-trigger" role="button" data-mode="day" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.dayFilter}}">
         <view class="day-period-copy"><text class="handwritten period-label">{{periodLabels.day}}</text><text class="handwritten day-filter-caret" aria-hidden="true">⌄</text></view>
       </view>
-      <view wx:else class="period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text></view>
+      <view wx:else class="period-slot"><view class="period-copy year-period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text></view></view>
       <button class="period-arrow handwritten" data-direction="1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="{{copy.next}}">›</button>
     </view>
   </view>
