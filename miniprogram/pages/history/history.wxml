@@ -19,7 +19,7 @@
       <view wx:elif="{{mode === 'day'}}" class="period-slot period-copy day-date-stack filter-trigger" role="button" data-mode="day" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.dayFilter}}">
         <view class="day-period-copy"><text class="handwritten period-label">{{periodLabels.day}}</text><text class="handwritten day-filter-caret" aria-hidden="true">⌄</text></view>
       </view>
-      <view wx:else class="period-slot"><view class="period-copy year-period-copy"><text class="handwritten period-label">{{periodLabels[mode]}}</text></view></view>
+      <view wx:else class="period-slot filter-trigger" role="button" data-mode="year" bindtap="openDateFilter" hover-class="choice-pressed" aria-label="{{copy.yearFilter}}"><view class="period-copy year-period-copy"><text class="handwritten period-label">{{periodLabels.year}}</text><text class="handwritten month-filter-caret" aria-hidden="true">⌄</text></view></view>
       <button class="period-arrow handwritten" data-direction="1" bindtap="stepPeriod" hover-class="choice-pressed" aria-label="{{copy.next}}">›</button>
     </view>
   </view>
@@ -73,17 +73,17 @@
   <button wx:if="{{language === 'en'}}" class="history-action handwritten" bindtap="goAgain" hover-class="pressed">{{copy.goAgain}}</button>
   <button wx:else class="history-action handwritten" bindtap="goAgain" hover-class="pressed"><text class="plus">＋</text><text>{{copy.goAgain}}</text><text class="action-arrow">→</text></button>
 
-  <view wx:if="{{filterOpen}}" class="filter-overlay" catchtouchmove="preventTouch">
-    <view class="filter-mask" bindtap="cancelDateFilter"></view>
+  <view wx:if="{{filterOpen}}" class="filter-overlay">
+    <view class="filter-mask" bindtap="cancelDateFilter" catchtouchmove="preventTouch"></view>
     <view class="filter-sheet" role="dialog" aria-label="{{filterTitle}}">
-      <view class="filter-toolbar">
+      <view class="filter-toolbar" catchtouchmove="preventTouch">
         <button class="filter-toolbar-button cancel" bindtap="cancelDateFilter">{{copy.cancelFilter}}</button>
         <text class="filter-toolbar-title">{{filterTitle}}</text>
         <button class="filter-toolbar-button confirm" bindtap="confirmDateFilter">{{copy.confirmFilter}}</button>
       </view>
       <picker-view class="filter-picker" value="{{filterValue}}" indicator-style="height: 52px;" bindchange="changeDateFilter">
         <picker-view-column><view class="filter-option" wx:for="{{filterYears}}" wx:key="value">{{item.label}}</view></picker-view-column>
-        <picker-view-column><view class="filter-option" wx:for="{{filterMonths}}" wx:key="value">{{item.label}}</view></picker-view-column>
+        <picker-view-column wx:if="{{filterMode !== 'year'}}"><view class="filter-option" wx:for="{{filterMonths}}" wx:key="value">{{item.label}}</view></picker-view-column>
         <picker-view-column wx:if="{{filterMode === 'day'}}"><view class="filter-option" wx:for="{{filterDays}}" wx:key="value">{{item.label}}</view></picker-view-column>
       </picker-view>
     </view>

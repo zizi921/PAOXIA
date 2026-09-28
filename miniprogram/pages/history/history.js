@@ -77,7 +77,7 @@ function dateParts(value) {
 function monthPresentation(value, language) {
   const { year, monthIndex } = dateParts(`${value}-01`);
   if (language === 'zh') return { label: `${year}年${monthIndex + 1}月`, abbr: `${monthIndex + 1}月` };
-  return { label: `${MONTH_NAMES[monthIndex]} ${year}`, abbr: MONTH_ABBR[monthIndex] };
+  return { label: `${MONTH_NAMES[monthIndex].slice(0, 3)} ${year}`, abbr: MONTH_ABBR[monthIndex] };
 }
 
 function shiftMonth(value, direction) {
@@ -90,7 +90,7 @@ function dayPresentation(value, language) {
   const { year, monthIndex, day } = dateParts(value);
   const date = new Date(year, monthIndex, day);
   if (language === 'zh') return { label: `${year}年${monthIndex + 1}月${day}日`, weekday: WEEKDAY_NAMES_ZH[date.getDay()] };
-  return { label: `${MONTH_NAMES[monthIndex]} ${day}, ${year}`, weekday: WEEKDAY_NAMES[date.getDay()] };
+  return { label: `${MONTH_NAMES[monthIndex].slice(0, 3)} ${day}, ${year}`, weekday: WEEKDAY_NAMES[date.getDay()] };
 }
 
 function shiftDay(value, direction) {
@@ -261,19 +261,20 @@ Page({
 
   openDateFilter(event) {
     const mode = event.currentTarget.dataset.mode;
-    const sourceValue = mode === 'day' ? this.data.dayValue : `${this.data.monthValue}-01`;
+    const sourceValue = mode === 'year' ? `${this.data.periodLabels.year}-01-01`
+      : mode === 'day' ? this.data.dayValue : `${this.data.monthValue}-01`;
     const { year, monthIndex, day } = dateParts(sourceValue);
     const years = filterYears(this.data.language);
     const months = filterMonths(this.data.language);
     const days = filterDays(year, monthIndex + 1, this.data.language);
     const yearIndex = Math.min(years.length - 1, Math.max(0, year - FILTER_START_YEAR));
-    const value = mode === 'day'
+    const value = mode === 'year' ? [yearIndex] : mode === 'day'
       ? [yearIndex, monthIndex, Math.min(days.length - 1, Math.max(0, day - 1))]
       : [yearIndex, monthIndex];
     this.setData({
       filterOpen: true,
       filterMode: mode,
-      filterTitle: mode === 'day' ? this.data.copy.dayFilter : this.data.copy.monthFilter,
+      filterTitle: this.data.copy[`${mode}Filter`],
       filterYears: years,
       filterMonths: months,
       filterDays: days,
@@ -303,8 +304,12 @@ Page({
   confirmDateFilter() {
     const [yearIndex, monthIndex, dayIndex] = this.data.filterValue;
     const year = this.data.filterYears[yearIndex].value;
-    const month = this.data.filterMonths[monthIndex].value;
     this.setData({ filterOpen: false });
+    if (this.data.filterMode === 'year') {
+      this.applyYear(year);
+      return;
+    }
+    const month = this.data.filterMonths[monthIndex].value;
     if (this.data.filterMode === 'day') {
       const day = this.data.filterDays[dayIndex].value;
       this.applyDay(`${year}-${month}-${day}`);

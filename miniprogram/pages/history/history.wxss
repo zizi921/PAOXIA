@@ -56,3 +56,5 @@
 .history.lang-en .record-top-line .mood-name { color: #74746c; font-size: 26rpx; font-weight: 400; }
 
 .history.lang-en .day-kicker { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 700; letter-spacing: 2rpx; color: #58758c; }
+
+.history.lang-en .record-main .handwritten, .history.lang-en .record-top-line .mood-name { font-weight: 600; }

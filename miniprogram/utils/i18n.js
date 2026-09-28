@@ -26,7 +26,7 @@ const COPY = {
       deleteError: 'Could not delete this run. Try again.', deleteNavError: 'Run deleted. Could not open history.', saveChangesError: 'Could not save changes. Try again.', saveError: 'Could not save this run. Try again.', cleanupError: 'Run saved. Draft cleanup failed.', savedNavError: 'Run saved. Tap Save to open history.'
     },
     history: {
-      title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
+      title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', yearFilter: 'Filter year', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
       noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Your saved runs stay on this device.',
       noMonth: 'No days out this month.', noMonthCopy: 'Pick another month or go again.', noYear: 'No days out this year.', noYearCopy: 'Try another year or start a new run.',
       dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', felt: 'FELT', spotted: 'SEEN', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
@@ -61,7 +61,7 @@ const COPY = {
       deleteError: '无法删除这条记录，请重试', deleteNavError: '记录已删除，但无法打开跑步记录', saveChangesError: '无法保存修改，请重试', saveError: '无法保存这次记录，请重试', cleanupError: '记录已保存，但草稿清理失败', savedNavError: '记录已保存，请再次点击保存进入跑步记录'
     },
     history: {
-      title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
+      title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', yearFilter: '筛选年份', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
       noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '记录会保存在这台设备上。',
       noMonth: '这个月还没有跑步记录', noMonthCopy: '换一个月份，或再跑一次。', noYear: '这一年还没有跑步记录', noYearCopy: '换一个年份，或开始一次跑步。',
       dayKicker: '日期', timeKicker: '跑步时长', distanceKicker: '距离', felt: '感受', spotted: '沿途看到', nothing: '这次没有特别记录', noNote: '这次没有备注',
