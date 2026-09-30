@@ -770,7 +770,13 @@ distanceSummaryPage.data.records = [
 ];
 distanceSummaryPage.applyMonth('2028-09');
 assert.equal(distanceSummaryPage.data.monthSummary.distance, '0.3 km');
+distanceSummaryPage.applyYear('2028');
+assert.equal(distanceSummaryPage.data.yearSummary.distance, '5.3 km');
+distanceSummaryPage.applyYear('2027');
+assert.equal(distanceSummaryPage.data.yearSummary.distance, '— km');
 distanceSummaryPage.data.records = [distanceSummaryPage.data.records[2]];
+distanceSummaryPage.applyYear('2028');
+assert.equal(distanceSummaryPage.data.yearSummary.distance, '— km');
 distanceSummaryPage.applyMonth('2028-09');
 assert.equal(distanceSummaryPage.data.monthSummary.distance, '— km');
 console.log('PASS: monthly distance totals and missing distances.');

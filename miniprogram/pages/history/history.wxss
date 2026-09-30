@@ -82,3 +82,12 @@
 
 .history.lang-zh .day-blank-copy { font-size: 30rpx; }
 .history.lang-zh .day-note { font-size: 30rpx; }
+
+.history.lang-zh .year-month,
+.history.lang-zh .year-times { font-weight: 600; }
+
+.history.lang-zh .record-row .record-day,
+.history.lang-zh .record-row .record-weekday,
+.history.lang-zh .record-row .record-duration,
+.history.lang-zh .record-row .record-distance,
+.history.lang-zh .record-row .mood-name { font-weight: 600; }

@@ -55,7 +55,7 @@ const COPY = {
       howWasIt: '还好吗你？', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
       whatNotice: '路上有什么小发现？', tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', streetlight: '路灯', dog: '狗', flower: '花', nothingLabel: '没特别留意', didnt: '没特别', notice: '留意',
       distance: '跑了多远', optional: '（可选）', distanceInputAria: '填写跑步距离，单位公里', notePlaceholder: '写两句，画两笔…',
-      save: '记下啦 →', saveChanges: '保存修改 →', continueRun: '继续', cancel: '取消', discardDraft: '放弃', deleteRun: '删除这次记录',
+      save: '记下啦 →', saveChanges: '保存修改 →', continueRun: '接着跑', cancel: '取消', discardDraft: '算了', deleteRun: '删除这次记录',
       discardTitle: '放弃草稿？', discardContent: '本次时长和填写内容将被删除，且不会保存为跑步记录。', discardConfirm: '放弃', keep: '保留',
       deleteTitle: '删除这次记录？', deleteContent: '这条跑步记录及其内容将被永久删除。', deleteConfirm: '删除',
       loadRecordError: '无法读取这条记录，请重新打开', loadDraftError: '无法读取草稿，请重新打开页面', draftError: '无法保存草稿，请重试',

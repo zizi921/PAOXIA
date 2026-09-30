@@ -344,6 +344,11 @@ Page({
   applyYear(yearValue) {
     const year = String(yearValue || 2026);
     const rawRows = yearRowsFor(this.data.records, year, this.data.language);
+    const distances = this.data.records.filter(record => record.date.startsWith(`${year}-`)).map(record => {
+      const match = String(record.distance || '').match(/^(\d+(?:\.\d+)?)\s*km$/);
+      return match ? Number(match[1]) : null;
+    }).filter(distance => distance !== null && Number.isFinite(distance));
+    const distance = distances.length ? `${Number(distances.reduce((sum, km) => sum + km, 0).toFixed(2))} km` : '— km';
     const times = rawRows.reduce((sum, row) => sum + row.times, 0);
     const seconds = rawRows.reduce((sum, row) => sum + row.totalSeconds, 0);
     const periodLabels = { ...this.data.periodLabels, year };
@@ -351,8 +356,8 @@ Page({
       periodLabels,
       yearRows: presentYearRows(rawRows, this.data.language),
       yearSummary: this.data.language === 'zh'
-        ? { times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyYearHint }
-        : { times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyYearHint }
+        ? { distance, times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyYearHint }
+        : { distance, times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyYearHint }
     });
   },
 
