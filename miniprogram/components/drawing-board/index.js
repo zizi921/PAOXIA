@@ -16,7 +16,7 @@ Component({
         this.canvas = item.node;
         this.width = item.width;
         this.height = item.width * 0.75;
-        this.setData({ boardHeight: this.height });
+        this.setData({ boardHeight: this.height }, () => this.triggerEvent('layoutready'));
         const ratio = wx.getSystemInfoSync().pixelRatio || 1;
         this.canvas.width = item.width * ratio;
         this.canvas.height = this.height * ratio;

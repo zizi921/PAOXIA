@@ -857,3 +857,27 @@ leanHistory.applyDay('2026-09-29', 'ink-two');
 assert.equal(JSON.stringify(leanHistory.data.selectedRecord.noteDrawing), JSON.stringify(ink));
 assert.equal(storageWx.getStorageSync('paoxia.completedRuns')[0].noteDrawing.length, 1);
 console.log('PASS: drawing payload limited to visible history detail; stored artwork retained.');
+
+// Complete day details fit above the action even after a drawing gains height.
+const fittedDay = load('history', {});
+fittedDay.data.mode = 'day';
+fittedDay.data.selectedRecord = { id: 'layout-check' };
+fittedDay.setData = (update, callback) => { Object.assign(fittedDay.data, update); if (callback) callback(); };
+let detailHeight = 900;
+fittedDay.createSelectorQuery = () => {
+  const query = {
+    select() { return query; },
+    boundingClientRect() { return query; },
+    exec(callback) { callback([{ height: 600 }, { height: detailHeight }]); }
+  };
+  return query;
+};
+fittedDay.fitDayDetail();
+assert(fittedDay.data.dayScale * detailHeight <= 596);
+detailHeight = 1200;
+fittedDay.fitDayDetail();
+assert(fittedDay.data.dayScale * detailHeight <= 596);
+detailHeight = 400;
+fittedDay.fitDayDetail();
+assert.equal(fittedDay.data.dayScale, 1);
+console.log('PASS: day detail fits available height and keeps short records at original size.');

@@ -168,6 +168,7 @@ Page({
   onShareAppMessage: shareAppMessage,
   data: {
     safeTop: 96,
+    dayScale: 1,
     language: 'en',
     copy: copyFor('en', 'history'),
     mode: 'year',
@@ -240,6 +241,25 @@ Page({
     this.applyYear(this.data.periodLabels.year);
     this.applyMonth(this.data.monthValue);
     if (this.data.mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
+  },
+
+  onReady() { this.fitDayDetail(); },
+  onResize() { this.fitDayDetail(); },
+
+  // Fit the complete detail into the space above the fixed action button.
+  fitDayDetail() {
+    if (this.data.mode !== 'day' || !this.data.selectedRecord || !this.createSelectorQuery) return;
+    this.setData({ dayScale: 1 }, () => {
+      const query = this.createSelectorQuery();
+      query.select('.day-detail').boundingClientRect();
+      query.select('.day-detail-inner').boundingClientRect();
+      query.exec(rects => {
+        const available = rects && rects[0];
+        const content = rects && rects[1];
+        if (!available || !content || !content.height) return;
+        this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 4) / content.height) });
+      });
+    });
   },
 
   editRecord() {
@@ -391,7 +411,7 @@ Page({
     const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
     const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)), this.data.language, this.data.copy);
     if (selectedRecord) selectedRecord.noteDrawing = this.drawings && this.drawings.get(selectedRecord.id) || [];
-    this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels });
+    this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels, dayScale: 1 }, () => this.fitDayDetail());
   },
 
   stepPeriod(event) {

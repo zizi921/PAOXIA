@@ -53,7 +53,7 @@
     </block>
 
     <view wx:elif="{{selectedRecord}}" class="day-detail">
-      <view class="day-detail-inner">
+      <view class="day-detail-inner" style="transform: scale({{dayScale}}); transform-origin: top center;">
       <view class="day-feature">
         <view class="day-summary-copy">
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.dayKicker}}</text><text class="handwritten day-metric day-weekday-value">{{selectedRecord.weekdayLong}}</text></view>
@@ -63,8 +63,8 @@
         <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud {{selectedRecord.weatherClass}}">{{selectedRecord.weatherGlyph}}</text><image class="day-runner {{selectedRecord.runnerPoseClass}}" src="{{selectedRecord.runnerImage}}" mode="aspectFit" /></view>
       </view>
       <view class="day-feeling"><text class="handwritten day-kicker">{{copy.felt}}</text><view class="mood-inline"><image class="mini-face" src="{{selectedRecord.moodImage}}" mode="aspectFit" aria-hidden="true" /><text class="handwritten mood-name">{{selectedRecord.mood}}</text></view></view>
-      <view class="day-notice-block"><text class="handwritten day-kicker">{{copy.spotted}}</text><view wx:if="{{selectedRecord.noticeItems.length}}" class="day-notices"><view class="day-notice-item" wx:for="{{selectedRecord.noticeItems}}" wx:key="label"><image wx:if="{{item.image}}" class="notice-big-mark" src="{{item.image}}" mode="aspectFit" aria-hidden="true" /><text wx:else class="big-mark {{item.className}}">{{item.glyph}}</text><text class="handwritten">{{item.label}}</text></view></view><text wx:else class="handwritten day-blank-copy">{{copy.nothing}}</text></view>
-      <view class="day-note-card {{selectedRecord.note || selectedRecord.noteDrawing.length ? '' : 'empty-note'}}"><text class="handwritten quote-mark">“</text><view class="note-content"><text wx:if="{{selectedRecord.note || !selectedRecord.noteDrawing.length}}" class="handwritten day-note">{{selectedRecord.note || copy.noNote}}</text><drawing-board wx:if="{{selectedRecord.noteDrawing.length}}" strokes="{{selectedRecord.noteDrawing}}" /></view><text class="handwritten quote-mark quote-end">”</text></view>
+      <view class="day-notice-block"><text class="handwritten day-kicker">{{copy.spotted}}</text><view wx:if="{{selectedRecord.noticeItems.length}}" class="day-notices"><view class="day-notice-item" wx:for="{{selectedRecord.noticeItems}}" wx:key="label" aria-label="{{item.label}}"><image wx:if="{{item.image}}" class="notice-big-mark" src="{{item.image}}" mode="aspectFit" aria-hidden="true" /><text wx:else class="big-mark {{item.className}}">{{item.glyph}}</text></view></view><text wx:else class="handwritten day-blank-copy">{{copy.nothing}}</text></view>
+      <view class="day-note-card {{selectedRecord.note || selectedRecord.noteDrawing.length ? '' : 'empty-note'}}"><text class="handwritten quote-mark">“</text><view class="note-content"><text wx:if="{{selectedRecord.note || !selectedRecord.noteDrawing.length}}" class="handwritten day-note">{{selectedRecord.note || copy.noNote}}</text><drawing-board wx:if="{{selectedRecord.noteDrawing.length}}" strokes="{{selectedRecord.noteDrawing}}" bind:layoutready="fitDayDetail" /></view><text class="handwritten quote-mark quote-end">”</text></view>
       </view>
     </view>
     <view wx:else class="day-empty"><image class="empty-runner" src="/assets/history-runner-02.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">{{copy.noDay}}</text><text class="handwritten empty-copy">{{copy.noDayCopy}}</text></view>
