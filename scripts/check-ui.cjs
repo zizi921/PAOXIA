@@ -867,7 +867,7 @@ let detailHeight = 900;
 fittedDay.createSelectorQuery = () => {
   const query = {
     select() { return query; },
-    boundingClientRect() { return query; },
+    fields() { return query; },
     exec(callback) { callback([{ height: 600 }, { height: detailHeight }]); }
   };
   return query;
@@ -917,3 +917,16 @@ for (const language of ['en', 'zh']) {
   assert.equal(storageWx.getStorageSync('paoxia.language'), language);
 }
 console.log('PASS: clear all runs confirms, handles failure, refreshes history and preserves drafts/settings in both languages.');
+
+// A delayed measurement must not overwrite a newer canvas layout measurement.
+const pendingFits = [];
+fittedDay.createSelectorQuery = () => {
+  const query = { select() { return query; }, fields() { return query; }, exec(callback) { pendingFits.push(callback); } };
+  return query;
+};
+fittedDay.fitDayDetail(); fittedDay.fitDayDetail();
+pendingFits[1]([{ height: 600 }, { height: 1200 }]);
+const latestScale = fittedDay.data.dayScale;
+pendingFits[0]([{ height: 600 }, { height: 400 }]);
+assert.equal(fittedDay.data.dayScale, latestScale);
+console.log('PASS: stale day measurements cannot restore an overflowing scale.');

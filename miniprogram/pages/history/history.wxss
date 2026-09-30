@@ -44,7 +44,7 @@
 .history .period-nav .day-date-stack { padding: 0; }
 
 .history .day-metric { font-size: 25rpx; color: #65665f; }
-.history .day-note { font-size: 34rpx; color: #65665f; }
+.history .day-note { font-size: 30rpx; color: #65665f; }
 
 .history .record-day, .history .record-duration, .history .record-weekday, .history .record-distance { font-size: 26rpx; font-weight: 400; color: #74746c; }
 

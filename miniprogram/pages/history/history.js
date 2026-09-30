@@ -249,16 +249,17 @@ Page({
   // Fit the complete detail into the space above the fixed action button.
   fitDayDetail() {
     if (this.data.mode !== 'day' || !this.data.selectedRecord || !this.createSelectorQuery) return;
-    this.setData({ dayScale: 1 }, () => {
-      const query = this.createSelectorQuery();
-      query.select('.day-detail').boundingClientRect();
-      query.select('.day-detail-inner').boundingClientRect();
-      query.exec(rects => {
-        const available = rects && rects[0];
-        const content = rects && rects[1];
-        if (!available || !content || !content.height) return;
-        this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 4) / content.height) });
-      });
+    const revision = this.dayFitRevision = (this.dayFitRevision || 0) + 1;
+    const query = this.createSelectorQuery();
+    // Layout sizes exclude the previous transform, avoiding repeated scaling feedback.
+    query.select('.day-detail').fields({ size: true });
+    query.select('.day-detail-inner').fields({ size: true });
+    query.exec(rects => {
+      if (revision !== this.dayFitRevision || this.data.mode !== 'day') return;
+      const available = rects && rects[0];
+      const content = rects && rects[1];
+      if (!available || !content || !content.height) return;
+      this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 4) / content.height) });
     });
   },
 
