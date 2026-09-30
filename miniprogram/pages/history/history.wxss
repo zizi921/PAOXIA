@@ -100,6 +100,7 @@
 .history .history-content,
 .history .history-action { position: relative; top: -60rpx; }
 .history .mode-tabs { top: -40rpx; }
+.history .history-action { top: -52rpx; }
 
 /* Put discoveries below their label, with each caption below its icon. */
 .history .day-notice-block { display: block; }

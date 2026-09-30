@@ -214,3 +214,9 @@
 @media (max-height: 740px) { .recap.lang-zh .save-button { margin-top: 28rpx; } }
 
 .recap .distance-row { position: relative; top: -20rpx; }
+
+.recap .note-entry { position: relative; top: -8rpx; }
+
+/* Lift all form sections below the recap heading together. */
+.recap-heading-row ~ view,
+.recap-heading-row ~ button { transform: translateY(-8rpx); }
