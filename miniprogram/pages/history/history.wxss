@@ -108,3 +108,7 @@
 .history .day-notices { display: flex; flex-wrap: wrap; justify-content: flex-start; min-width: 0; padding: 9rpx 0 0; gap: 16rpx 18rpx; }
 .history .day-notice-item { flex: 0 0 auto; min-width: 86rpx; flex-direction: column; gap: 6rpx; text-align: center; }
 .history .day-blank-copy { margin: 18rpx 0 4rpx 30rpx; }
+
+.history-tools { display: flex; flex: 0 0 auto; align-items: center; margin-left: auto; gap: 8rpx; }
+.history .history-tools .edit-button { position: relative; top: auto; right: auto; transform: none; flex: 0 0 auto; width: auto; margin: 0; padding: 0 8rpx; white-space: nowrap; }
+.history .history-tools .clear-button { color: #74746c; }

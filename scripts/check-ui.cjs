@@ -881,3 +881,39 @@ detailHeight = 400;
 fittedDay.fitDayDetail();
 assert.equal(fittedDay.data.dayScale, 1);
 console.log('PASS: day detail fits available height and keeps short records at original size.');
+
+for (const language of ['en', 'zh']) {
+  storage.clear();
+  storageWx.setStorageSync('paoxia.language', language);
+  storageWx.setStorageSync('paoxia.completedRuns', [{ id: 'clear-test', date: '2028-09-26', durationSeconds: 10, note: 'test', noteDrawing: [] }]);
+  storageWx.setStorageSync('paoxia.recapDraft', { note: 'keep draft' });
+  storageWx.setStorageSync('paoxia.activeRun', { elapsedSeconds: 12 });
+  let modal;
+  let toast;
+  let failDelete = false;
+  const clearPage = load('history', {
+    showModal: options => { modal = options; },
+    showToast: options => { toast = options; },
+    removeStorageSync: key => { if (failDelete) throw new Error('storage failure'); storageWx.removeStorageSync(key); }
+  });
+  clearPage.onLoad();
+  clearPage.clearAllRecords();
+  modal.success({ confirm: false }); modal.complete();
+  assert.equal(savedRecords().length, 1);
+  failDelete = true;
+  clearPage.clearAllRecords();
+  modal.success({ confirm: true }); modal.complete();
+  assert(toast); assert.equal(savedRecords().length, 1); assert.equal(clearPage.data.records.length, 1);
+  failDelete = false;
+  clearPage.clearAllRecords();
+  modal.success({ confirm: true }); modal.complete();
+  assert.equal(savedRecords().length, 0);
+  assert.equal(clearPage.data.records.length, 0);
+  assert.equal(clearPage.data.selectedRecord, null);
+  assert.equal(clearPage.data.monthRows.length, 0);
+  assert.equal(clearPage.data.yearRows.length, 0);
+  assert.equal(storageWx.getStorageSync('paoxia.recapDraft').note, 'keep draft');
+  assert.equal(storageWx.getStorageSync('paoxia.activeRun').elapsedSeconds, 12);
+  assert.equal(storageWx.getStorageSync('paoxia.language'), language);
+}
+console.log('PASS: clear all runs confirms, handles failure, refreshes history and preserves drafts/settings in both languages.');

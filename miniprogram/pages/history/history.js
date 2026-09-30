@@ -1,6 +1,6 @@
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
-const { readRecords } = require('../../utils/records');
+const { readRecords, clearRecords } = require('../../utils/records');
 const { readLanguage, copyFor } = require('../../utils/i18n');
 const { shareAppMessage, showShareMenu } = require('../../utils/share');
 
@@ -259,6 +259,32 @@ Page({
         if (!available || !content || !content.height) return;
         this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 4) / content.height) });
       });
+    });
+  },
+
+  clearAllRecords() {
+    if (this.clearingRecords || this.data.mode !== 'day' || !this.data.records.length) return;
+    this.clearingRecords = true;
+    wx.showModal({
+      title: this.data.copy.clearTitle,
+      content: this.data.copy.clearContent,
+      confirmText: this.data.copy.clearConfirm,
+      cancelText: this.data.copy.clearCancel,
+      success: result => {
+        if (!result.confirm) return;
+        try {
+          clearRecords();
+        } catch (error) {
+          wx.showToast({ title: this.data.copy.clearError, icon: 'none' });
+          return;
+        }
+        this.setData({ records: this.prepareRecords([]) });
+        this.applyYear(this.data.periodLabels.year);
+        this.applyMonth(this.data.monthValue);
+        this.applyDay(this.data.dayValue);
+      },
+      fail: () => wx.showToast({ title: this.data.copy.clearError, icon: 'none' }),
+      complete: () => { this.clearingRecords = false; }
     });
   },
 

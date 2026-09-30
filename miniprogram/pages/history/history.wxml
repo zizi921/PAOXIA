@@ -2,7 +2,10 @@
   <view class="history-header">
     <view class="title-row">
       <text class="handwritten history-title">{{copy.title}}</text>
-      <button wx:if="{{mode === 'day' && selectedRecord}}" class="edit-button handwritten" bindtap="editRecord" hover-class="choice-pressed">{{copy.edit}}</button>
+      <view wx:if="{{mode === 'day' && records.length}}" class="history-tools">
+        <button wx:if="{{selectedRecord}}" class="edit-button handwritten" bindtap="editRecord" hover-class="choice-pressed">{{copy.edit}}</button>
+        <button class="edit-button clear-button handwritten" bindtap="clearAllRecords" hover-class="choice-pressed">{{copy.clearAll}}</button>
+      </view>
     </view>
     <view class="mode-tabs" role="tablist">
       <button class="mode-tab handwritten {{mode === 'year' ? 'active' : ''}}" role="tab" aria-selected="{{mode === 'year'}}" data-mode="year" bindtap="switchMode" hover-class="choice-pressed"><text class="mode-tab-label">{{copy.year}}</text></button>

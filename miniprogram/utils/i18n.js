@@ -34,6 +34,7 @@ const COPY = {
       noDay: 'No day out here yet.', noDayCopy: 'Choose another date or go again.', goAgain: 'One More Time',
       notSet: 'Not set', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
       tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', dog: 'Dog', flower: 'Flower', sun: 'Sun', moon: 'Moon', streetlight: 'Streetlight', didntNotice: 'Nothing',
+      clearAll: 'Clear', clearTitle: 'Clear all runs?', clearContent: 'All saved runs, notes and drawings on this device will be permanently deleted. Drafts and settings will stay.', clearConfirm: 'Clear all', clearCancel: 'Cancel', clearError: 'Could not clear runs. Try again.',
       emptyYearHint: 'Try another year.', emptyMonthHint: 'Pick another month.', readError: 'Could not read saved runs.', editError: 'Could not open edit. Try again.'
     }
   },
@@ -70,6 +71,7 @@ const COPY = {
       noDay: '这一天还没有跑步记录', noDayCopy: '选择其他日期，或再跑一次。', goAgain: '再跑一次',
       notSet: '未填写', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
       tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', dog: '狗', flower: '花', sun: '太阳', moon: '月亮', streetlight: '路灯', didntNotice: '没特别留意',
+      clearAll: '清空', clearTitle: '清空所有跑步记录？', clearContent: '将永久删除这台设备上的全部已完成记录、备注和画图，无法恢复。草稿和设置会保留。', clearConfirm: '全部清空', clearCancel: '取消', clearError: '清空失败，请重试',
       emptyYearHint: '换一个年份看看', emptyMonthHint: '换一个月份看看', readError: '无法读取本机记录', editError: '无法打开编辑页面，请重试'
     }
   }

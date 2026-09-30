@@ -33,4 +33,8 @@ function deleteRecord(id) {
   wx.setStorageSync(STORAGE_KEY, records);
 }
 
-module.exports = { readRecords, saveRecord, updateRecord, deleteRecord };
+function clearRecords() {
+  wx.removeStorageSync(STORAGE_KEY);
+}
+
+module.exports = { readRecords, saveRecord, updateRecord, deleteRecord, clearRecords };
