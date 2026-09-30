@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "跑后记录",
-  "disableScroll": true
+  "disableScroll": true,
+  "usingComponents": {
+    "drawing-board": "/components/drawing-board/index"
+  }
 }

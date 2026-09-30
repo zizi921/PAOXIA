@@ -1,0 +1,2 @@
+<canvas wx:if="{{editable}}" class="board" style="height: {{boardHeight}}px;" type="2d" disable-scroll="{{true}}" bindtouchstart="start" catchtouchmove="move" bindtouchend="finish" bindtouchcancel="finish" aria-label="Drawing" />
+<canvas wx:else class="board" style="height: {{boardHeight}}px;" type="2d" aria-label="Saved drawing" />

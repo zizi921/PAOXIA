@@ -35,7 +35,16 @@ Page({
     mood: '',
     selectedNotices: {},
     distance: '',
-    note: ''
+    penColor: '#262622',
+    penColors: [
+      { value: '#262622', label: 'Black' },
+      { value: '#3d91d0', label: 'Blue' },
+      { value: '#75927b', label: 'Green' },
+      { value: '#f5ad22', label: 'Yellow' },
+      { value: '#c96358', label: 'Red' },
+      { value: '#8b72a5', label: 'Purple' }
+    ],
+    note: '', noteDrawing: [], noteEditor: false, noteMode: 'text', penTool: 'pen'
   },
 
   onLoad(options) {
@@ -69,7 +78,7 @@ Page({
           weatherGlyph: selected ? selected.glyph : '＋',
           mood: record.mood && record.mood !== 'Not set' ? record.moodType : '',
           selectedNotices, distance: record.distance && record.distance !== '— km' ? String(record.distance).replace(/\s*km$/, '') : '',
-          note: record.note || '' });
+          note: record.note || '', noteDrawing: record.noteDrawing || [] });
       } catch (error) {
         wx.showToast({ title: copy.loadRecordError, icon: 'none' });
       }
@@ -89,11 +98,11 @@ Page({
     this.draftId = draft ? draft.id : `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const durationSeconds = draft ? draft.durationSeconds : Number(options && options.durationSeconds) || 0;
     prepare({ weather: '', weatherLabel: copy.notSelected, weatherGlyph: '＋',
-      weatherOpen: false, mood: '', selectedNotices: {}, distance: '', note: '' });
+      weatherOpen: false, mood: '', selectedNotices: {}, distance: '', note: '', noteDrawing: [], noteEditor: false, noteMode: 'text', penTool: 'pen' });
     if (draft) {
       const { weather, mood, selectedNotices, distance, note } = draft;
       const selected = initialData.weatherOptions.find(option => option.value === weather);
-      prepare({ weather, mood, selectedNotices, distance, note,
+      prepare({ weather, mood, selectedNotices, distance, note, noteDrawing: draft.noteDrawing || [],
         weatherLabel: selected ? selected.label : copy.notSelected,
         weatherGlyph: selected ? selected.glyph : '＋' });
     }
@@ -105,9 +114,9 @@ Page({
   persistDraft() {
     if (this.editId) return false;
     if (!this.draftId || this.saved || this.discarded) return false;
-    const { durationSeconds, weather, mood, selectedNotices, distance, note } = this.data;
+    const { durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing } = this.data;
     try {
-      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, run: this.run });
+      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing, run: this.run });
       return true;
     } catch (error) {
       wx.showToast({ title: this.data.copy.draftError, icon: 'none' });
@@ -174,6 +183,18 @@ Page({
     this.updateForm({ note: event.detail.value });
   },
 
+  openNote() { this.setData({ noteEditor: true, weatherOpen: false }); },
+  closeNote() { this.setData({ noteEditor: false }); this.persistDraft(); },
+  noteMode(event) { this.setData({ noteMode: event.currentTarget.dataset.mode }); },
+  selectPen(event) { this.setData({ penTool: event.currentTarget.dataset.tool }); },
+  selectColor(event) {
+    const color = event.currentTarget.dataset.color;
+    if (this.data.penColors.some(item => item.value === color)) this.setData({ penColor: color, penTool: 'pen' });
+  },
+  updateDrawing(event) { this.updateForm({ noteDrawing: event.detail.strokes }); },
+  undoDrawing() { this.updateForm({ noteDrawing: this.data.noteDrawing.slice(0, -1) }); },
+  stopScroll() {},
+
   continueRun() {
     if (this.navigating || this.saved || this.discarded || !this.run) return;
     if (!this.persistDraft()) return;
@@ -208,7 +229,7 @@ Page({
         this.setData({ canContinue: false });
         this.setData({ durationSeconds: 0, durationText: '0 sec', weather: '',
           weatherLabel: this.data.copy.notSelected, weatherGlyph: '＋', weatherOpen: false,
-          mood: '', selectedNotices: {}, distance: '', note: '' });
+          mood: '', selectedNotices: {}, distance: '', note: '', noteDrawing: [], noteEditor: false, noteMode: 'text', penTool: 'pen' });
         wx.reLaunch({
           url: '/pages/home/home',
           fail: () => {
@@ -289,7 +310,7 @@ Page({
           distance: this.data.distance ? `${this.data.distance} km` : '— km',
           mood: moodLabels[this.data.mood] || 'Not set',
           moodType: this.data.mood || 'unsure',
-          notices: Object.keys(this.data.selectedNotices), note: this.data.note
+          notices: Object.keys(this.data.selectedNotices), note: this.data.note, noteDrawing: this.data.noteDrawing
         });
         this.saved = true;
       }
@@ -321,7 +342,7 @@ Page({
       mood: moodLabels[this.data.mood] || 'Not set',
       moodType: this.data.mood || 'unsure',
       notices: Object.keys(this.data.selectedNotices),
-      note: this.data.note,
+      note: this.data.note, noteDrawing: this.data.noteDrawing,
       weather: this.data.weather
     };
     try {

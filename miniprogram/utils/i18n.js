@@ -17,7 +17,7 @@ const COPY = {
       weatherOptions: { sunny: 'Sunny', cloudy: 'Cloudy', rainy: 'Rainy', windy: 'Windy' },
       howWasIt: 'How was it?', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
       whatNotice: 'What did you notice?', tree: 'Tree', wind: 'Wind', cloud: 'Cloud', cat: 'Cat', streetlight: 'Streetlight', dog: 'Dog', flower: 'Flower', nothingLabel: 'Nothing', didnt: 'Didn’t', notice: 'notice',
-      distance: 'Distance', optional: '(optional)', distanceInputAria: 'Enter run distance in kilometers', notePlaceholder: 'A little note, if you like',
+      distance: 'Distance', optional: '(optional)', distanceInputAria: 'Enter run distance in kilometers', notePlaceholder: 'Leave a little something...',
       save: 'Save →', saveChanges: 'Save changes →', continueRun: 'Continue', cancel: 'Cancel', discardDraft: 'Discard', deleteRun: 'Delete',
       discardTitle: 'Discard draft?', discardContent: 'Your time and notes will be deleted. This run will not be saved.', discardConfirm: 'Discard', keep: 'Keep',
       deleteTitle: 'Delete this run?', deleteContent: 'This saved run and its details will be permanently deleted.', deleteConfirm: 'Delete',

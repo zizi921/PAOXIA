@@ -59,3 +59,4 @@
 .history.lang-en .record-main .handwritten, .history.lang-en .record-top-line .mood-name { font-weight: 600; }
 
 .history.lang-en .mode-tab { font-family: 'Arial Rounded MT Bold', ui-rounded, 'Inter', sans-serif; font-weight: 400; }
+.note-content { width: 100%; min-width: 0; }

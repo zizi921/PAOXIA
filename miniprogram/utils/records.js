@@ -21,7 +21,7 @@ function updateRecord(id, changes) {
   const index = records.findIndex(record => record.id === id);
   if (index < 0) throw new Error('Record not found');
   const { distance, mood, moodType, notices, note } = changes;
-  records[index] = { ...records[index], distance, mood, moodType, notices, note };
+  records[index] = { ...records[index], distance, mood, moodType, notices, note, noteDrawing: changes.noteDrawing === undefined ? records[index].noteDrawing : changes.noteDrawing };
   wx.setStorageSync(STORAGE_KEY, records);
 }
 
