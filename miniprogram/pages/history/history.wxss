@@ -91,3 +91,5 @@
 .history.lang-zh .record-row .record-duration,
 .history.lang-zh .record-row .record-distance,
 .history.lang-zh .record-row .mood-name { font-weight: 600; }
+
+.history.lang-zh .year-total { font-weight: 600; }
