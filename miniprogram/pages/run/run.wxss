@@ -11,6 +11,7 @@
   50% { transform: translate3d(4rpx, 1rpx, 0) rotate(1.1deg); }
   75% { transform: translate3d(0, -4rpx, 0) rotate(-.4deg); }
 }
+.run-actions { position: relative; top: -60rpx; }
 .run-actions .pill { font-size: 72rpx; }
 .return-link { position: relative; display: table; min-height: 52px; margin: 16rpx auto 0; padding: 0 20rpx 8rpx; background: transparent; border: none; border-radius: 0; font-size: 70rpx; line-height: 1.15; color: #262622; }
 .return-link::before { content: ''; position: absolute; left: 12%; right: 12%; bottom: 9rpx; height: 2px; background: #3d91d0; transform: rotate(-3deg); border-radius: 50%; }
