@@ -2,7 +2,7 @@
 .history-header, .history-content, .history-action { width: 100%; max-width: 650rpx; margin-right: auto; margin-left: auto; }
 .history-header, .history-action, .summary { flex-shrink: 0; }
 .title-row { position: relative; display: flex; align-items: center; justify-content: flex-start; }
-.history .title-row { position: relative; top: -32rpx; min-height: 62rpx; }
+.history .title-row { position: relative; top: -32rpx; height: 62rpx; min-height: 62rpx; }
 .history-title { font-size: 78rpx; line-height: 1; }.history .history-title { flex-shrink: 0; font-size: 54rpx; white-space: nowrap; }
 .mode-tabs { display: flex; align-items: center; justify-content: center; margin-top: 42rpx; }
 .mode-tab { position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 132rpx; height: 88rpx; margin: 0 8rpx; padding: 0 22rpx; border: 0; border-radius: 50%; background: transparent; color: #262622; font-size: 36rpx; line-height: 1; }.mode-tab::after, .period-arrow::after, .record-row::after, .year-row::after, .history-action::after { border: 0; }.mode-tab.active::before { content: ''; position: absolute; left: 50%; top: 50%; width: 174rpx; max-width: 94%; height: 60rpx; transform: translate(-50%, -50%); border-radius: 50%; background: #dfeaf4; }.mode-tab-label { position: relative; z-index: 1; }.tab-divider { color: #8d8d84; font-size: 35rpx; }
