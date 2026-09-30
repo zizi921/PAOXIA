@@ -4,6 +4,7 @@ Component({
   properties: {
     strokes: { type: Array, value: [], observer() { if (!this.active) this.redraw(); } },
     editable: { type: Boolean, value: false },
+    fullMessage: { type: String, value: 'Drawing full. Undo to continue.' },
     tool: { type: String, value: 'pen' },
     color: { type: String, value: '#262622' }
   },
@@ -62,7 +63,7 @@ Component({
       if (!this.properties.editable || !this.ctx) return;
       this.remaining = 6000 - this.properties.strokes.reduce((sum, stroke) => sum + stroke.points.length, 0);
       if (this.properties.strokes.length >= 120 || this.remaining <= 0) {
-        wx.showToast({ title: 'Drawing full. Undo a stroke to continue.', icon: 'none' });
+        wx.showToast({ title: this.properties.fullMessage, icon: 'none' });
         return;
       }
       const point = this.point(event);
@@ -76,7 +77,7 @@ Component({
       if (!point) return;
       if (this.active.points.length >= this.remaining) {
         this.finish();
-        wx.showToast({ title: 'Drawing full. Undo to continue.', icon: 'none' });
+        wx.showToast({ title: this.properties.fullMessage, icon: 'none' });
         return;
       }
       const previous = this.active.points[this.active.points.length - 1];

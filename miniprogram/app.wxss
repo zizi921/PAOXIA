@@ -6,9 +6,9 @@ page { background: #fdfcf9; color: #262622; font-family: sans-serif; }
 .lang-en .handwritten,
 .home.lang-en .handwritten,
 .lang-en .note-placeholder { font-family: 'Inter', sans-serif; }
-.lang-zh .handwritten { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-weight: 400; }
+.lang-zh .handwritten { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 400; }
 .home.lang-zh .go,
-.home.lang-zh .history-link { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-weight: 400; }
+.home.lang-zh .history-link { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 400; }
 .lang-zh .timer,
 .lang-zh .recap-duration,
 .lang-zh .distance-input,
@@ -17,15 +17,18 @@ page { background: #fdfcf9; color: #262622; font-family: sans-serif; }
 .lang-zh .year-month,
 .lang-zh .year-copy,
 .lang-zh .year-total,
-.lang-zh .day-metric { font-family: sans-serif; font-weight: 500; }
+.lang-zh .day-metric { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 500; }
 .lang-zh .summary-line,
 .lang-zh .record-day,
 .lang-zh .record-weekday,
 .lang-zh .record-duration,
-.lang-zh .record-distance { font-family: sans-serif; font-weight: 400; }
-.history.lang-zh .handwritten { font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; font-weight: 400; }
+.lang-zh .record-distance { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 400; }
+.history.lang-zh .handwritten { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 400; }
 .runner { display: block; }
 .screen .pill, .recap .pill { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 144rpx; min-height: max(48px, 144rpx); flex-shrink: 0; margin: 0; padding: 0 24rpx 6rpx; border: 2px solid #30312a; border-radius: 76rpx 72rpx 78rpx 70rpx; background: transparent; color: #262622; font-size: 86rpx; line-height: 1; }
 .pill::after, .return-link::after { border: 0; }
 .pressed { opacity: .65; transform: scale(.985); }
 .actions { width: 100%; max-width: 570rpx; }
+
+/* SF Pro supplies Latin digits; Chinese glyphs fall through to PingFang. */
+.lang-zh { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; }

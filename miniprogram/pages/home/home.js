@@ -30,11 +30,11 @@ Page({
     }
   },
   openHistory() {
-    if (this.data.language === 'zh' || this.navigating) return;
+    if (this.navigating) return;
     this.openPage('/pages/history/history');
   },
   go() {
-    if (this.data.language === 'zh' || this.navigating) return;
+    if (this.navigating) return;
     let activeRun;
     let draft;
     try {

@@ -11,6 +11,7 @@ const WEEKDAY_NAMES_ZH = ['星期日', '星期一', '星期二', '星期三', '�
 const WEEKDAY_SHORT_ZH = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 const NOTICE_META = {
   tree: { labelKey: 'tree', image: '/assets/notice-outline-tree.png', className: 'tree' },
+  people: { labelKey: 'people', image: '/assets/notice-outline-people-bold.png', className: 'people' },
   wind: { labelKey: 'wind', image: '/assets/notice-outline-wind.png', className: 'wind' },
   cloud: { labelKey: 'cloud', image: '/assets/notice-outline-cloud.png', className: 'cloud' },
   cat: { labelKey: 'cat', image: '/assets/notice-outline-cat.png', className: 'cat' },
@@ -189,12 +190,24 @@ Page({
     filterValue: [0, 0]
   },
 
+  // Keep vector payloads in the logic layer; only the visible detail needs them.
+  prepareRecords(records) {
+    this.drawings = new Map();
+    return records.map(record => {
+      const noteDrawing = record.noteDrawing;
+      const summary = Object.assign({}, record);
+      delete summary.noteDrawing;
+      if (noteDrawing && noteDrawing.length) this.drawings.set(record.id, noteDrawing);
+      return summary;
+    });
+  },
+
   onLoad(options) {
     const language = readLanguage();
     const copy = copyFor(language, 'history');
     let records = [];
     try {
-      records = readRecords();
+      records = this.prepareRecords(readRecords());
     } catch (error) {
       wx.showToast({ title: copy.readError, icon: 'none' });
     }
@@ -218,7 +231,8 @@ Page({
       return;
     }
     try {
-      this.setData({ records: readRecords() });
+      const language = readLanguage();
+      this.setData({ language, copy: copyFor(language, 'history'), records: this.prepareRecords(readRecords()) });
     } catch (error) {
       wx.showToast({ title: this.data.copy.readError, icon: 'none' });
       return;
@@ -371,6 +385,7 @@ Page({
     const periodLabels = { ...this.data.periodLabels, day: label };
     const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
     const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)), this.data.language, this.data.copy);
+    if (selectedRecord) selectedRecord.noteDrawing = this.drawings && this.drawings.get(selectedRecord.id) || [];
     this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels });
   },
 

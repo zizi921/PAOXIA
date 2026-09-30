@@ -19,7 +19,7 @@ assert(appWxss.includes('@import "styles/inter.wxss"'));
 assert(!appWxss.includes('styles/handwriting.wxss'));
 assert(!appWxss.includes('styles/typography.wxss'));
 assert(/\.lang-en[\s\S]*font-family:\s*'Inter',\s*sans-serif/.test(appWxss));
-assert(/\.lang-zh \.handwritten[\s\S]*font-family:\s*'PingFang SC'/.test(appWxss));
+assert(/\.lang-zh \.handwritten[\s\S]*font-family:[^;]*'PingFang SC'/.test(appWxss));
 assert(fs.readFileSync('miniprogram/styles/inter.wxss','utf8').includes("font-family: 'Inter'"));
 assert(fs.existsSync('miniprogram/assets/Inter-OFL.txt'));
 function directoryBytes(directory) {
@@ -69,10 +69,8 @@ const home = load('home', {navigateTo: x => {navigation=x.url;completed=x.comple
 home.onLoad(); assert.equal(home.data.safeTop, 108);
 home.chooseLanguage({ currentTarget: { dataset: { language: 'zh' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'zh');assert.equal(home.data.copy.go, '出发');
-navigation = null;home.go();home.openHistory();assert.equal(navigation, null);
-const unavailableHome = load('home', { navigateTo: () => { throw new Error('Chinese entry must stay closed'); } });
-unavailableHome.onLoad();unavailableHome.onShow();unavailableHome.go();unavailableHome.openHistory();
-assert.equal(unavailableHome.data.language, 'zh');
+navigation = null;home.go();assert.equal(navigation, '/pages/run/run');completed();
+home.openHistory();assert.equal(navigation, '/pages/history/history');completed();
 home.chooseLanguage({ currentTarget: { dataset: { language: 'en' } } });
 assert.equal(storageWx.getStorageSync('paoxia.language'), 'en');assert.equal(home.data.copy.go, 'START');
 home.openHistory(); assert.equal(navigation, '/pages/history/history');
@@ -233,7 +231,7 @@ for (let index = 1; index <= 10; index += 1) {
 assert(recapWxml.includes('class="distance-input handwritten"'));
 assert(!recapWxml.includes('自动记录的跑步距离'));
 assert(!recapWxml.includes('wx:if="{{editing}}" class="distance-input'));
-for (const value of ['tree','wind','cloud','cat','streetlight','dog','flower','nothing']) {
+for (const value of ['tree','people','cloud','cat','streetlight','dog','flower','nothing']) {
   assert(recapWxml.includes("selectedNotices." + value + " ? 'selected notice-red'"));
 }
 // A new page/module context reads persistent storage without app globals.
@@ -691,7 +689,7 @@ assert.equal(zhHome.data.language, 'zh');assert.equal(zhHome.data.copy.go, '出�
 const zhRun = load('run', {}, { Date: clock, setInterval: () => 1, clearInterval: () => {} });zhRun.onLoad({ startedAt: String(now) });
 assert.equal(zhRun.data.copy.moving, '跑下');assert.equal(zhRun.data.copy.pause, '暂停');
 const zhRecap = load('recap', {});zhRecap.onLoad({ recordId: 'zh-run' });
-assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.so, '跑完啦');assert.equal(zhRecap.data.copy.howWasIt, '感觉怎么样？');assert.equal(zhRecap.data.weatherLabel, '下雨');
+assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.so, '跑完啦');assert.equal(zhRecap.data.copy.howWasIt, '还好吗你？');assert.equal(zhRecap.data.weatherLabel, '下雨');
 const zhHistory = load('history', {});zhHistory.onLoad({ recordId: 'zh-run' });
 assert.equal(zhHistory.data.periodLabels.month, '2026年9月');assert.equal(zhHistory.data.periodLabels.day, '2026年9月26日');
 assert.equal(zhHistory.data.copy.title, '跑跑记记');
@@ -837,3 +835,18 @@ const colorRestore = load('recap', noteWx);
 colorRestore.onLoad({});
 assert.equal(colorRestore.data.noteDrawing[0].color, '#3d91d0');
 console.log('PASS: pen palette selection and colored stroke persistence.');
+// History bridges only the current record's drawing, never all drawings twice.
+storage.clear();
+storageWx.setStorageSync('paoxia.completedRuns', [
+  { id: 'ink-one', date: '2026-09-30', durationSeconds: 3, noteDrawing: ink },
+  { id: 'ink-two', date: '2026-09-29', durationSeconds: 4, noteDrawing: ink }
+]);
+const leanHistory = load('history', {});
+leanHistory.onLoad({ recordId: 'ink-one' });
+assert(leanHistory.data.records.every(record => record.noteDrawing === undefined));
+assert(leanHistory.data.monthRows.every(record => record.noteDrawing === undefined));
+assert.equal(JSON.stringify(leanHistory.data.selectedRecord.noteDrawing), JSON.stringify(ink));
+leanHistory.applyDay('2026-09-29', 'ink-two');
+assert.equal(JSON.stringify(leanHistory.data.selectedRecord.noteDrawing), JSON.stringify(ink));
+assert.equal(storageWx.getStorageSync('paoxia.completedRuns')[0].noteDrawing.length, 1);
+console.log('PASS: drawing payload limited to visible history detail; stored artwork retained.');

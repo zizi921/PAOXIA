@@ -70,8 +70,7 @@
     <view wx:else class="day-empty"><image class="empty-runner" src="/assets/history-runner-02.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">{{copy.noDay}}</text><text class="handwritten empty-copy">{{copy.noDayCopy}}</text></view>
   </view>
 
-  <button wx:if="{{language === 'en'}}" class="history-action handwritten" bindtap="goAgain" hover-class="pressed">{{copy.goAgain}}</button>
-  <button wx:else class="history-action handwritten" bindtap="goAgain" hover-class="pressed"><text class="plus">＋</text><text>{{copy.goAgain}}</text><text class="action-arrow">→</text></button>
+  <button class="history-action handwritten" bindtap="goAgain" hover-class="pressed">{{copy.goAgain}}</button>
 
   <view wx:if="{{filterOpen}}" class="filter-overlay">
     <view class="filter-mask" bindtap="cancelDateFilter" catchtouchmove="preventTouch"></view>

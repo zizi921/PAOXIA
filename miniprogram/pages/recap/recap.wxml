@@ -48,9 +48,9 @@
           <image class="pictogram" src="/assets/notice-outline-tree.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.tree}}</text>
         </button>
-        <button class="choice notice-choice {{selectedNotices.wind ? 'selected notice-red' : ''}}" data-value="wind" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.wind}}">
-          <image class="pictogram" src="/assets/notice-outline-wind.png" mode="aspectFit" aria-hidden="true" />
-          <text class="choice-label handwritten">{{copy.wind}}</text>
+        <button class="choice notice-choice {{selectedNotices.people ? 'selected notice-red' : ''}}" data-value="people" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.people}}">
+          <image class="pictogram people-pictogram" src="/assets/notice-outline-people-bold.png" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten people-label">{{copy.people}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.cloud ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.cloud}}">
           <image class="pictogram" src="/assets/notice-outline-cloud.png" mode="aspectFit" aria-hidden="true" />
@@ -84,7 +84,7 @@
       <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" placeholder="0.00" bindinput="updateDistance" aria-label="{{copy.distanceInputAria}}" />
       <text class="handwritten unit">km</text>
     </view>
-    <view role="button" class="note-input note-entry handwritten" bindtap="openNote" aria-label="Edit note or drawing" hover-class="pressed"><image class="note-entry-pen" src="/assets/tools/pen.svg" mode="aspectFit" /><text class="note-entry-text">{{note || (noteDrawing.length ? 'Your drawing' : copy.notePlaceholder)}}</text><view wx:if="{{noteDrawing.length}}" class="drawing-badge"><drawing-board strokes="{{noteDrawing}}" /></view></view>
+    <view role="button" class="note-input note-entry handwritten" bindtap="openNote" aria-label="{{copy.editNote}}" hover-class="pressed"><image class="note-entry-pen" src="/assets/tools/pen.svg" mode="aspectFit" /><text class="note-entry-text">{{note || (noteDrawing.length ? copy.yourDrawing : copy.notePlaceholder)}}</text><view wx:if="{{noteDrawing.length}}" class="drawing-badge"><drawing-board strokes="{{noteDrawing}}" /></view></view>
 
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="save">{{editing ? copy.saveChanges : copy.save}}</button>
     <view class="recap-secondary-actions">
@@ -96,16 +96,16 @@
   </view>
 </view>
 
-<view wx:if="{{noteEditor}}" class="note-editor" style="padding-top: {{safeTop}}px;" catchtouchmove="stopScroll">
-  <view class="note-editor-header"><text class="note-editor-title">A little note</text><button class="note-done" bindtap="closeNote">Done</button></view>
-  <view class="note-tabs"><button class="note-tab {{noteMode === 'text' ? 'note-active' : ''}}" data-mode="text" bindtap="noteMode">Text</button><button class="note-tab {{noteMode === 'draw' ? 'note-active' : ''}}" data-mode="draw" bindtap="noteMode">Draw</button></view>
+<view wx:if="{{noteEditor}}" class="note-editor lang-{{language}}" style="padding-top: {{safeTop}}px;" catchtouchmove="stopScroll">
+  <view class="note-editor-header"><text class="note-editor-title">{{copy.noteTitle}}</text><button class="note-done" bindtap="closeNote">{{copy.noteDone}}</button></view>
+  <view class="note-tabs"><button class="note-tab {{noteMode === 'text' ? 'note-active' : ''}}" data-mode="text" bindtap="noteMode">{{copy.noteText}}</button><button class="note-tab {{noteMode === 'draw' ? 'note-active' : ''}}" data-mode="draw" bindtap="noteMode">{{copy.noteDraw}}</button></view>
   <view wx:if="{{noteMode === 'text'}}" class="note-text-panel"><textarea class="note-textarea" value="{{note}}" maxlength="80" bindinput="updateNote" placeholder="{{copy.notePlaceholder}}" adjust-position="{{true}}" cursor-spacing="24" /><text class="note-count">{{note.length}} / 80</text></view>
   <view wx:else class="note-draw-panel">
-    <view class="note-tools"><button class="note-tool {{penTool === 'pen' ? 'note-active' : ''}}" data-tool="pen" bindtap="selectPen" aria-label="Pen{{penTool === 'pen' ? ', selected' : ''}}"><image class="note-tool-icon" src="/assets/tools/pen.svg" mode="aspectFit" /></button><button class="note-tool {{penTool === 'eraser' ? 'note-active' : ''}}" data-tool="eraser" bindtap="selectPen" aria-label="Eraser{{penTool === 'eraser' ? ', selected' : ''}}"><image class="note-tool-icon" src="/assets/tools/eraser.svg" mode="aspectFit" /></button><button class="note-tool" disabled="{{!noteDrawing.length}}" bindtap="undoDrawing" aria-label="Undo last stroke"><image class="note-tool-icon {{!noteDrawing.length ? 'note-tool-disabled' : ''}}" src="/assets/tools/undo.svg" mode="aspectFit" /></button></view>
-    <view class="pen-palette" aria-label="Pen colors">
-      <button wx:for="{{penColors}}" wx:key="value" class="pen-color {{penColor === item.value ? 'pen-color-selected' : ''}}" data-color="{{item.value}}" bindtap="selectColor" aria-label="{{item.label}}{{penColor === item.value ? ', selected' : ''}}"><view class="pen-swatch" style="background-color: {{item.value}};"></view></button>
+    <view class="note-tools"><button class="note-tool {{penTool === 'pen' ? 'note-active' : ''}}" data-tool="pen" bindtap="selectPen" aria-label="{{copy.pen}}{{penTool === 'pen' ? copy.selected : ''}}"><image class="note-tool-icon" src="/assets/tools/pen.svg" mode="aspectFit" /></button><button class="note-tool {{penTool === 'eraser' ? 'note-active' : ''}}" data-tool="eraser" bindtap="selectPen" aria-label="{{copy.eraser}}{{penTool === 'eraser' ? copy.selected : ''}}"><image class="note-tool-icon" src="/assets/tools/eraser.svg" mode="aspectFit" /></button><button class="note-tool" disabled="{{!noteDrawing.length}}" bindtap="undoDrawing" aria-label="{{copy.undo}}"><image class="note-tool-icon {{!noteDrawing.length ? 'note-tool-disabled' : ''}}" src="/assets/tools/undo.svg" mode="aspectFit" /></button></view>
+    <view class="pen-palette" aria-label="{{copy.colorsLabel}}">
+      <button wx:for="{{penColors}}" wx:key="value" class="pen-color {{penColor === item.value ? 'pen-color-selected' : ''}}" data-color="{{item.value}}" bindtap="selectColor" aria-label="{{copy.colors[index]}}{{penColor === item.value ? copy.selected : ''}}"><view class="pen-swatch" style="background-color: {{item.value}};"></view></button>
     </view>
-    <view class="note-paper"><drawing-board strokes="{{noteDrawing}}" editable="{{true}}" tool="{{penTool}}" color="{{penColor}}" bindchange="updateDrawing" /></view>
-    <text class="note-hint">Write or draw with your finger.</text>
+    <view class="note-paper"><drawing-board strokes="{{noteDrawing}}" editable="{{true}}" full-message="{{copy.drawingFull}}" tool="{{penTool}}" color="{{penColor}}" bindchange="updateDrawing" /></view>
+    <text class="note-hint">{{copy.drawingHint}}</text>
   </view>
 </view>
