@@ -336,7 +336,8 @@ const historyWxml=fs.readFileSync('miniprogram/pages/history/history.wxml','utf8
 assert(!historyWxml.includes('day-share'));
 assert(historyWxml.includes('data-id="{{item.id}}"'));
 assert(historyWxml.includes('wx:for="{{selectedRecord.noticeItems}}"'));
-assert(historyWxml.includes('class="day-detail" scroll-y'));
+assert(historyWxml.includes('<view wx:elif="{{selectedRecord}}" class="day-detail">'));
+assert.equal(JSON.parse(fs.readFileSync('miniprogram/pages/history/history.json')).disableScroll, true);
 assert.equal(JSON.parse(fs.readFileSync('miniprogram/pages/recap/recap.json')).disableScroll, true);
 assert(/\.day-notices\s*\{[^}]*flex-wrap:\s*wrap/.test(fs.readFileSync('miniprogram/pages/history/history.wxss','utf8')));
 assert(historyWxml.includes('wx:if="{{!records.length}}"'));

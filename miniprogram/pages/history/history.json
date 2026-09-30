@@ -1,6 +1,6 @@
 {
   "navigationStyle": "custom",
-  "disableScroll": false,
+  "disableScroll": true,
   "usingComponents": {
     "drawing-board": "/components/drawing-board/index"
   }

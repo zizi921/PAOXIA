@@ -121,9 +121,9 @@
 .recap .mood-choice .choice-label,
 .recap .notice-choice .choice-label { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 600; color: #65665f; line-height: 1.05; }
 
-.recap .notice-section { margin-top: 6rpx; }
-@media (max-height: 960px) { .recap .notice-section { margin-top: 30rpx; } }
-@media (max-height: 740px) { .recap .notice-section { margin-top: 0; } }
+.recap .notice-section { margin-top: -14rpx; }
+@media (max-height: 960px) { .recap .notice-section { margin-top: 10rpx; } }
+@media (max-height: 740px) { .recap .notice-section { margin-top: -20rpx; } }
 
 /* Match the English history title's safe-area position and 62rpx title row. */
 .recap { padding-top: max(var(--safe-top, 96px), 88px); padding-left: 44rpx; padding-right: 44rpx; }
@@ -212,3 +212,5 @@
 .recap.lang-zh .save-button { margin-top: 28rpx; }
 @media (max-height: 960px) { .recap.lang-zh .save-button { margin-top: 36rpx; } }
 @media (max-height: 740px) { .recap.lang-zh .save-button { margin-top: 28rpx; } }
+
+.recap .distance-row { position: relative; top: -20rpx; }
