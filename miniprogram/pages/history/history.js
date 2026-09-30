@@ -250,17 +250,26 @@ Page({
   fitDayDetail() {
     if (this.data.mode !== 'day' || !this.data.selectedRecord || !this.createSelectorQuery) return;
     const revision = this.dayFitRevision = (this.dayFitRevision || 0) + 1;
-    const query = this.createSelectorQuery();
-    // Layout sizes exclude the previous transform, avoiding repeated scaling feedback.
-    query.select('.day-detail').fields({ size: true });
-    query.select('.day-detail-inner').fields({ size: true });
-    query.exec(rects => {
-      if (revision !== this.dayFitRevision || this.data.mode !== 'day') return;
-      const available = rects && rects[0];
-      const content = rects && rects[1];
-      if (!available || !content || !content.height) return;
-      this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 4) / content.height) });
-    });
+    const measure = () => {
+      const query = this.createSelectorQuery();
+      query.select('.day-detail').boundingClientRect();
+      query.select('.day-detail-inner').boundingClientRect();
+      query.select('.day-note-card').boundingClientRect();
+      query.exec(rects => {
+        if (revision !== this.dayFitRevision || this.data.mode !== 'day') return;
+        const available = rects && rects[0];
+        const content = rects && rects[1];
+        const card = rects && rects[2];
+        if (!available || !content || !content.height) return;
+        const scale = this.data.dayScale || 1;
+        // Include overflowing children; use rendered bounds, then undo our transform.
+        const renderedHeight = Math.max(content.height, card ? card.bottom - content.top + 12 * scale : 0);
+        const naturalHeight = renderedHeight / scale;
+        this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 12) / naturalHeight) });
+      });
+    };
+    if (wx.nextTick) wx.nextTick(measure);
+    else measure();
   },
 
   clearAllRecords() {

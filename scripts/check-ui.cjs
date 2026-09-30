@@ -867,8 +867,8 @@ let detailHeight = 900;
 fittedDay.createSelectorQuery = () => {
   const query = {
     select() { return query; },
-    fields() { return query; },
-    exec(callback) { callback([{ height: 600 }, { height: detailHeight }]); }
+    boundingClientRect() { return query; },
+    exec(callback) { callback([{ height: 600 }, { top: 0, height: detailHeight * fittedDay.data.dayScale }]); }
   };
   return query;
 };
@@ -921,7 +921,7 @@ console.log('PASS: clear all runs confirms, handles failure, refreshes history a
 // A delayed measurement must not overwrite a newer canvas layout measurement.
 const pendingFits = [];
 fittedDay.createSelectorQuery = () => {
-  const query = { select() { return query; }, fields() { return query; }, exec(callback) { pendingFits.push(callback); } };
+  const query = { select() { return query; }, boundingClientRect() { return query; }, exec(callback) { pendingFits.push(callback); } };
   return query;
 };
 fittedDay.fitDayDetail(); fittedDay.fitDayDetail();
@@ -930,3 +930,9 @@ const latestScale = fittedDay.data.dayScale;
 pendingFits[0]([{ height: 600 }, { height: 400 }]);
 assert.equal(fittedDay.data.dayScale, latestScale);
 console.log('PASS: stale day measurements cannot restore an overflowing scale.');
+
+fittedDay.data.dayScale = 1;
+fittedDay.fitDayDetail();
+pendingFits[2]([{ height: 600 }, { top: 100, height: 500 }, { bottom: 900 }]);
+assert(fittedDay.data.dayScale * 812 <= 588);
+console.log('PASS: overflowing note-card bottom is included in fit measurement.');

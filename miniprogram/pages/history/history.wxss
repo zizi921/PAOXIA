@@ -112,3 +112,5 @@
 .history-tools { display: flex; flex: 0 0 auto; align-items: center; margin-left: auto; gap: 8rpx; }
 .history .history-tools .edit-button { position: relative; top: auto; right: auto; transform: none; flex: 0 0 auto; width: auto; margin: 0; padding: 0 8rpx; white-space: nowrap; }
 .history .history-tools .clear-button { color: #74746c; }
+
+.day-detail-inner > view { flex-shrink: 0; }
