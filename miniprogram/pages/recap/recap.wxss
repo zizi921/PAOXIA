@@ -168,7 +168,7 @@
 .note-tool-disabled { opacity: .28; }
 
 .recap-secondary-actions { display: flex; align-items: center; justify-content: center; gap: 32rpx; margin-top: 20rpx; }
-.recap .recap-secondary-actions .continue-button, .recap .recap-secondary-actions .discard-button { width: auto; flex: 1; margin: 0; }
+.recap .recap-secondary-actions .continue-button, .recap .recap-secondary-actions .discard-button, .recap .recap-secondary-actions .delete-button { width: auto; flex: 1; margin: 0; }
 
 .recap.lang-zh .handwritten, .recap.lang-zh .choice-label, .recap.lang-zh .mode-tab { font-family: 'SF Pro Text', 'SF Pro Display', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif; font-weight: 400; }
 
