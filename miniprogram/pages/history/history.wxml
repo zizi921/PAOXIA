@@ -28,7 +28,7 @@
   </view>
 
   <view class="history-content">
-    <view wx:if="{{!records.length}}" class="day-empty"><image class="empty-runner" src="/assets/history-runner-02.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">{{copy.noRuns}}</text><text class="handwritten empty-copy">{{copy.noRunsCopy}}</text><text class="handwritten empty-copy">{{copy.localCopy}}</text></view>
+    <view wx:if="{{!records.length}}" class="day-empty"><image class="empty-runner" src="/assets/history-runner-02.png" mode="aspectFit" aria-hidden="true" /><text class="handwritten empty-title">{{copy.noRuns}}</text><text class="handwritten empty-copy">{{copy.noRunsCopy}}</text><text class="handwritten empty-copy empty-sync-copy">{{copy.localCopy}}</text></view>
     <block wx:elif="{{mode === 'month'}}">
       <view class="summary month-summary">
         <view><text class="handwritten summary-line">{{monthSummary.times}}</text><text class="handwritten summary-line">{{monthSummary.total}}</text><text wx:if="{{monthRows.length}}" class="handwritten summary-line">{{monthSummary.distance}}</text></view>
