@@ -20,6 +20,10 @@ const NOTICE_META = {
   sun: { labelKey: 'sun', glyph: '☀', className: 'sun' },
   moon: { labelKey: 'moon', glyph: '☾', className: 'moon' },
   streetlight: { labelKey: 'streetlight', image: '/assets/notice-outline-streetlight.png', className: 'streetlight' },
+  car: { labelKey: 'car', image: '/assets/notice-outline-car.svg', className: 'car' },
+  bicycle: { labelKey: 'bicycle', image: '/assets/notice-outline-bicycle.svg', className: 'bicycle' },
+  bird: { labelKey: 'bird', image: '/assets/notice-outline-bird.svg', className: 'bird' },
+  house: { labelKey: 'house', image: '/assets/notice-outline-house.svg', className: 'house' },
   nothing: { labelKey: 'didntNotice', image: '/assets/notice-outline-nothing.png', className: 'nothing' }
 };
 const WEATHER_META = {

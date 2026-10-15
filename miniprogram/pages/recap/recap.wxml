@@ -1,19 +1,18 @@
-<view class="recap lang-{{language}}" style="--safe-top: {{safeTop}}px;">
-  <view class="recap-inner">
+<view wx:if="{{!noteEditor}}" class="recap lang-{{language}}" style="--safe-top: {{safeTop}}px;">
+  <view class="recap-inner" style="transform: scale({{formScale}});">
     <view class="recap-heading-row">
-      <view>
+      <view class="recap-heading-inline">
         <text class="handwritten recap-title">{{editing ? copy.edit : copy.so}}</text>
         <text class="handwritten recap-duration">{{durationText}}</text>
       </view>
-      <button class="weather-trigger weather-{{weather || 'none'}} {{weatherOpen ? 'open' : ''}}" disabled="{{editing}}" bindtap="toggleWeather" hover-class="choice-pressed" aria-label="{{copy.weather}}：{{weatherLabel}}">
-        <image wx:if="{{weather}}" class="weather-image" src="/assets/weather-outline-{{weather}}.png" mode="aspectFit" aria-hidden="true" />
-        <text wx:else class="weather-glyph" aria-hidden="true">{{weatherGlyph}}</text>
-        <text class="handwritten weather-caption">{{copy.weather}}</text>
-      </button>
-      <view wx:if="{{weatherOpen}}" class="weather-menu" aria-label="{{copy.weatherMenuAria}}">
-        <button class="weather-option {{weather === item.value ? 'selected' : ''}}" wx:for="{{weatherOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="chooseWeather" hover-class="choice-pressed" aria-label="{{item.label}}">
-          <image class="weather-option-image" src="/assets/weather-outline-{{item.value}}.png" mode="aspectFit" aria-hidden="true" />
-          <text class="handwritten weather-option-label">{{item.label}}</text>
+    </view>
+
+    <view class="section weather-section">
+      <text class="handwritten section-title">{{copy.weather}}</text>
+      <view class="mood-grid weather-grid">
+        <button class="choice mood-choice weather-choice {{weather === item.value ? 'selected mood-green' : ''}}" wx:for="{{weatherOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="chooseWeather" hover-class="choice-pressed" aria-label="{{item.label}}">
+          <image class="mood-face-image" src="/assets/weather-outline-{{item.value}}.png" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{item.label}}</text>
         </button>
       </view>
     </view>
@@ -72,6 +71,22 @@
           <image class="pictogram" src="/assets/notice-outline-flower.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.flower}}</text>
         </button>
+        <button class="choice notice-choice {{selectedNotices.car ? 'selected notice-red' : ''}}" data-value="car" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.car}}">
+          <image class="pictogram" src="/assets/notice-outline-car.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{copy.car}}</text>
+        </button>
+        <button class="choice notice-choice {{selectedNotices.bicycle ? 'selected notice-red' : ''}}" data-value="bicycle" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.bicycle}}">
+          <image class="pictogram" src="/assets/notice-outline-bicycle.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{copy.bicycle}}</text>
+        </button>
+        <button class="choice notice-choice {{selectedNotices.bird ? 'selected notice-red' : ''}}" data-value="bird" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.bird}}">
+          <image class="pictogram" src="/assets/notice-outline-bird.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{copy.bird}}</text>
+        </button>
+        <button class="choice notice-choice {{selectedNotices.house ? 'selected notice-red' : ''}}" data-value="house" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.house}}">
+          <image class="pictogram" src="/assets/notice-outline-house.svg" mode="aspectFit" aria-hidden="true" />
+          <text class="choice-label handwritten">{{copy.house}}</text>
+        </button>
         <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.nothingLabel}}">
           <image class="pictogram" src="/assets/notice-outline-nothing.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.nothingLabel}}</text>
@@ -84,9 +99,8 @@
       <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" placeholder="0.00" bindinput="updateDistance" aria-label="{{copy.distanceInputAria}}" />
       <text class="handwritten unit">km</text>
     </view>
-    <view role="button" class="note-input note-entry handwritten" bindtap="openNote" aria-label="{{copy.editNote}}" hover-class="pressed"><image class="note-entry-pen" src="/assets/tools/pen.svg" mode="aspectFit" /><text class="note-entry-text">{{note || (noteDrawing.length ? copy.yourDrawing : copy.notePlaceholder)}}</text><view wx:if="{{noteDrawing.length}}" class="drawing-badge"><drawing-board strokes="{{noteDrawing}}" /></view></view>
 
-    <button class="pill handwritten save-button" hover-class="pressed" bindtap="save">{{editing ? copy.saveChanges : copy.save}}</button>
+    <button class="pill handwritten save-button" hover-class="pressed" bindtap="openNote">{{editing ? copy.saveChanges : copy.save}}</button>
     <view class="recap-secondary-actions">
     <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun">{{copy.continueRun}}</button>
     <button wx:if="{{editing}}" class="discard-button cancel-edit-button handwritten" hover-class="pressed" bindtap="cancelEdit">{{copy.cancel}}</button>
@@ -96,14 +110,22 @@
   </view>
 </view>
 
-<view wx:if="{{noteEditor}}" class="note-editor lang-{{language}}" style="padding-top: {{safeTop}}px;" catchtouchmove="stopScroll">
-  <view class="note-editor-header"><text class="note-editor-title">{{copy.noteTitle}}</text><button class="note-done" bindtap="closeNote">{{copy.noteDone}}</button></view>
+<view wx:if="{{noteEditor}}" class="note-editor lang-{{language}}" style="padding-top: {{safeTop}}px;">
+  <view class="note-editor-header"><button class="note-done" bindtap="closeNote">{{copy.noteBack}}</button><button class="note-done" bindtap="save">{{copy.noteDone}}</button></view>
+  <text class="note-editor-title">{{copy.noteTitle}}</text>
   <view class="note-tabs"><button class="note-tab {{noteMode === 'text' ? 'note-active' : ''}}" data-mode="text" bindtap="noteMode">{{copy.noteText}}</button><button class="note-tab {{noteMode === 'draw' ? 'note-active' : ''}}" data-mode="draw" bindtap="noteMode">{{copy.noteDraw}}</button></view>
   <view wx:if="{{noteMode === 'text'}}" class="note-text-panel"><textarea class="note-textarea" value="{{note}}" maxlength="80" bindinput="updateNote" placeholder="{{copy.notePlaceholder}}" adjust-position="{{true}}" cursor-spacing="24" /><text class="note-count">{{note.length}} / 80</text></view>
   <view wx:else class="note-draw-panel">
     <view class="note-tools"><button class="note-tool {{penTool === 'pen' ? 'note-active' : ''}}" data-tool="pen" bindtap="selectPen" aria-label="{{copy.pen}}{{penTool === 'pen' ? copy.selected : ''}}"><image class="note-tool-icon" src="/assets/tools/pen.svg" mode="aspectFit" /></button><button class="note-tool {{penTool === 'eraser' ? 'note-active' : ''}}" data-tool="eraser" bindtap="selectPen" aria-label="{{copy.eraser}}{{penTool === 'eraser' ? copy.selected : ''}}"><image class="note-tool-icon" src="/assets/tools/eraser.svg" mode="aspectFit" /></button><button class="note-tool" disabled="{{!noteDrawing.length}}" bindtap="undoDrawing" aria-label="{{copy.undo}}"><image class="note-tool-icon {{!noteDrawing.length ? 'note-tool-disabled' : ''}}" src="/assets/tools/undo.svg" mode="aspectFit" /></button></view>
     <view class="pen-palette" aria-label="{{copy.colorsLabel}}">
       <button wx:for="{{penColors}}" wx:key="value" class="pen-color {{penColor === item.value ? 'pen-color-selected' : ''}}" data-color="{{item.value}}" bindtap="selectColor" aria-label="{{copy.colors[index]}}{{penColor === item.value ? copy.selected : ''}}"><view class="pen-swatch" style="background-color: {{item.value}};"></view></button>
+    </view>
+    <button class="custom-color-toggle" bindtap="toggleColorPicker" aria-label="{{copy.customColor}}"><view class="custom-color-preview" style="background-color: {{penColor}};"></view><text>{{colorPickerOpen ? copy.closePalette : copy.customColor}}</text></button>
+    <view wx:if="{{colorPickerOpen}}" class="custom-color-panel">
+      <view class="custom-color-heading"><text>{{copy.colorPreview}}</text><text>{{penColor}}</text></view>
+      <view class="color-channel"><text>{{copy.redChannel}}</text><slider min="0" max="255" step="1" value="{{colorRed}}" data-channel="colorRed" bindchanging="changeColorChannel" bindchange="changeColorChannel" activeColor="#c96358" backgroundColor="#e8e8e5" block-size="24" aria-label="{{copy.redChannel}}" /><text class="color-value">{{colorRed}}</text></view>
+      <view class="color-channel"><text>{{copy.greenChannel}}</text><slider min="0" max="255" step="1" value="{{colorGreen}}" data-channel="colorGreen" bindchanging="changeColorChannel" bindchange="changeColorChannel" activeColor="#75927b" backgroundColor="#e8e8e5" block-size="24" aria-label="{{copy.greenChannel}}" /><text class="color-value">{{colorGreen}}</text></view>
+      <view class="color-channel"><text>{{copy.blueChannel}}</text><slider min="0" max="255" step="1" value="{{colorBlue}}" data-channel="colorBlue" bindchanging="changeColorChannel" bindchange="changeColorChannel" activeColor="#3d91d0" backgroundColor="#e8e8e5" block-size="24" aria-label="{{copy.blueChannel}}" /><text class="color-value">{{colorBlue}}</text></view>
     </view>
     <view class="note-paper"><drawing-board strokes="{{noteDrawing}}" editable="{{true}}" full-message="{{copy.drawingFull}}" tool="{{penTool}}" color="{{penColor}}" bindchange="updateDrawing" /></view>
     <text class="note-hint">{{copy.drawingHint}}</text>

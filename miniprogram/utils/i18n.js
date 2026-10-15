@@ -13,13 +13,13 @@ const COPY = {
       restoreError: 'Could not save or restore this run.', stateError: 'Could not save run state.', finishError: 'Could not finish this run.'
     },
     recap: {
-      noteTitle: 'A little note', noteDone: 'Done', noteText: 'Text', noteDraw: 'Draw', yourDrawing: 'Your drawing', editNote: 'Edit note or drawing', pen: 'Pen', eraser: 'Eraser', undo: 'Undo last stroke', selected: ', selected', colorsLabel: 'Pen colors', colors: ['Black', 'Blue', 'Green', 'Yellow', 'Red', 'Purple'], drawingHint: 'Write or draw with your finger.', drawingFull: 'Drawing full. Undo to continue.',
+      customColor: 'Mix a color', closePalette: 'Close palette', colorPreview: 'Selected color', redChannel: 'Red', greenChannel: 'Green', blueChannel: 'Blue', noteBack: 'Back', noteTitle: 'Note', noteDone: 'Done', noteText: 'Text', noteDraw: 'Draw', yourDrawing: 'Your drawing', editNote: 'Edit note or drawing', pen: 'Pen', eraser: 'Eraser', undo: 'Undo last stroke', selected: ', selected', colorsLabel: 'Pen colors', colors: ['Black', 'Blue', 'Green', 'Yellow', 'Red', 'Purple'], drawingHint: 'Write or draw with your finger.', drawingFull: 'Drawing full. Undo to continue.',
       edit: 'Edit', so: 'So?', weather: 'Weather', notSelected: 'Not selected', weatherMenuAria: 'Weather options',
       weatherOptions: { sunny: 'Sunny', cloudy: 'Cloudy', rainy: 'Rainy', windy: 'Windy' },
       howWasIt: 'How was it?', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
-      whatNotice: 'What did you notice?', tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', streetlight: 'Streetlight', dog: 'Dog', flower: 'Flower', nothingLabel: 'Nothing', didnt: 'Didn’t', notice: 'notice',
+      whatNotice: 'What did you notice?', tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', streetlight: 'Streetlight', car: 'Car', bicycle: 'Bicycle', bird: 'Bird', house: 'House', dog: 'Dog', flower: 'Flower', nothingLabel: 'Nothing', didnt: 'Didn’t', notice: 'notice',
       distance: 'Distance', optional: '(optional)', distanceInputAria: 'Enter run distance in kilometers', notePlaceholder: 'Leave a little something...',
-      save: 'Save →', saveChanges: 'Save changes →', continueRun: 'Continue', cancel: 'Cancel', discardDraft: 'Discard', deleteRun: 'Delete',
+      save: 'Save', saveChanges: 'Save changes', continueRun: 'Continue', cancel: 'Cancel', discardDraft: 'Discard', deleteRun: 'Delete',
       discardTitle: 'Discard draft?', discardContent: 'Your time and notes will be deleted. This run will not be saved.', discardConfirm: 'Discard', keep: 'Keep',
       deleteTitle: 'Delete this run?', deleteContent: 'This saved run and its details will be permanently deleted.', deleteConfirm: 'Delete',
       loadRecordError: 'Could not load this run. Reopen it.', loadDraftError: 'Could not load draft. Reopen this page.', draftError: 'Could not save draft. Try again.',
@@ -33,7 +33,7 @@ const COPY = {
       dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', felt: 'FELT', spotted: 'SEEN', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
       noDay: 'No day out here yet.', noDayCopy: 'Choose another date or go again.', goAgain: 'One More Time',
       notSet: 'Not set', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
-      tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', dog: 'Dog', flower: 'Flower', sun: 'Sun', moon: 'Moon', streetlight: 'Streetlight', didntNotice: 'Nothing',
+      tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', dog: 'Dog', flower: 'Flower', sun: 'Sun', moon: 'Moon', streetlight: 'Streetlight', car: 'Car', bicycle: 'Bicycle', bird: 'Bird', house: 'House', didntNotice: 'Nothing',
       clearAll: 'Clear', clearTitle: 'Clear all runs?', clearContent: 'All saved runs, notes and drawings on this device will be permanently deleted. Drafts and settings will stay.', clearConfirm: 'Clear all', clearCancel: 'Cancel', clearError: 'Could not clear runs. Try again.',
       emptyYearHint: 'Try another year.', emptyMonthHint: 'Pick another month.', readError: 'Could not read saved runs.', editError: 'Could not open edit. Try again.'
     }
@@ -50,13 +50,13 @@ const COPY = {
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
     },
     recap: {
-      noteTitle: '留下一点什么', noteDone: '完成', noteText: '文字', noteDraw: '画画', yourDrawing: '你的涂鸦', editNote: '编辑文字或涂鸦', pen: '钢笔', eraser: '橡皮擦', undo: '撤销上一笔', selected: '，已选中', colorsLabel: '画笔颜色', colors: ['黑色', '蓝色', '绿色', '黄色', '红色', '紫色'], drawingHint: '用手指写写画画。', drawingFull: '画板已满，请撤销后继续',
+      customColor: '自由调色', closePalette: '收起调色盘', colorPreview: '当前颜色', redChannel: '红', greenChannel: '绿', blueChannel: '蓝', noteBack: '返回', noteTitle: '留下一点什么', noteDone: '完成', noteText: '文字', noteDraw: '画画', yourDrawing: '你的涂鸦', editNote: '编辑文字或涂鸦', pen: '钢笔', eraser: '橡皮擦', undo: '撤销上一笔', selected: '，已选中', colorsLabel: '画笔颜色', colors: ['黑色', '蓝色', '绿色', '黄色', '红色', '紫色'], drawingHint: '用手指写写画画。', drawingFull: '画板已满，请撤销后继续',
       edit: '编辑', so: '跑完啦', weather: '天气', notSelected: '未选择', weatherMenuAria: '天气选项',
       weatherOptions: { sunny: '晴天', cloudy: '多云', rainy: '下雨', windy: '有风' },
       howWasIt: '还好吗你？', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
-      whatNotice: '路上有什么小发现？', tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', streetlight: '路灯', dog: '狗', flower: '花', nothingLabel: '没特别留意', didnt: '没特别', notice: '留意',
+      whatNotice: '路上有什么小发现？', tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', streetlight: '路灯', car: '汽车', bicycle: '自行车', bird: '鸟', house: '房子', dog: '狗', flower: '花', nothingLabel: '没特别留意', didnt: '没特别', notice: '留意',
       distance: '跑了多远', optional: '（可选）', distanceInputAria: '填写跑步距离，单位公里', notePlaceholder: '写两句，画两笔…',
-      save: '记下啦 →', saveChanges: '保存修改 →', continueRun: '接着跑', cancel: '取消', discardDraft: '算了', deleteRun: '删除这次记录',
+      save: '记下啦', saveChanges: '保存修改', continueRun: '接着跑', cancel: '取消', discardDraft: '算了', deleteRun: '删除这次记录',
       discardTitle: '放弃草稿？', discardContent: '本次时长和填写内容将被删除，且不会保存为跑步记录。', discardConfirm: '放弃', keep: '保留',
       deleteTitle: '删除这次记录？', deleteContent: '这条跑步记录及其内容将被永久删除。', deleteConfirm: '删除',
       loadRecordError: '无法读取这条记录，请重新打开', loadDraftError: '无法读取草稿，请重新打开页面', draftError: '无法保存草稿，请重试',
@@ -70,7 +70,7 @@ const COPY = {
       dayKicker: '日期', timeKicker: '跑步时长', distanceKicker: '距离', felt: '感受', spotted: '沿途看到', nothing: '这次没有特别记录', noNote: '这次没有备注',
       noDay: '这一天还没有跑步记录', noDayCopy: '选择其他日期，或再跑一次。', goAgain: '再跑一次',
       notSet: '未填写', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
-      tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', dog: '狗', flower: '花', sun: '太阳', moon: '月亮', streetlight: '路灯', didntNotice: '没特别留意',
+      tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', dog: '狗', flower: '花', sun: '太阳', moon: '月亮', streetlight: '路灯', car: '汽车', bicycle: '自行车', bird: '鸟', house: '房子', didntNotice: '没特别留意',
       clearAll: '清空', clearTitle: '清空所有跑步记录？', clearContent: '将永久删除这台设备上的全部已完成记录、备注和画图，无法恢复。草稿和设置会保留。', clearConfirm: '全部清空', clearCancel: '取消', clearError: '清空失败，请重试',
       emptyYearHint: '换一个年份看看', emptyMonthHint: '换一个月份看看', readError: '无法读取本机记录', editError: '无法打开编辑页面，请重试'
     }

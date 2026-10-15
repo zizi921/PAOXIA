@@ -619,7 +619,7 @@ assert.equal(editor.data.editing, true);assert.equal(editor.data.canContinue, fa
 assert.equal(editor.data.durationSeconds, 125);assert.equal(editor.data.weather, 'rainy');
 assert.equal(editor.data.mood, 'calm');assert.equal(editor.data.distance, '2.4');
 assert.equal(editor.data.note, 'Original note');assert.equal(Object.keys(editor.data.selectedNotices).join(','), 'tree,wind');
-editor.chooseWeather(pick('sunny'));assert.equal(editor.data.weather, 'rainy');
+editor.chooseWeather(pick('sunny'));assert.equal(editor.data.weather, 'sunny');
 editor.updateDistance(input('3.5'));editor.chooseMood(pick('good'));editor.chooseNotice(pick('flower'));
 editor.updateNote(input('Updated note'));editor.onHide();editor.onUnload();
 assert.equal(savedRecords()[1].note, 'Original note');
@@ -631,7 +631,9 @@ assert.equal(editHistory.data.selectedRecord.noticeItems.length, 3);
 assert.equal(editHistory.data.monthRows.find(item => item.id === 'older').note, 'Updated note');
 assert.equal(editHistory.data.yearSummary.total, '2 min.');
 assert.deepEqual(savedRecords()[0], originalRecords[0]);
-for (const field of ['id', 'date', 'durationSeconds', 'weather', 'startedAt']) assert.equal(savedRecords()[1][field], originalRecords[1][field]);
+for (const field of ['id', 'date', 'durationSeconds', 'startedAt']) assert.equal(savedRecords()[1][field], originalRecords[1][field]);
+assert.equal(savedRecords()[1].weather, 'sunny');
+assert.equal(editHistory.data.selectedRecord.weatherClass, 'sunny');
 const clearing = load('recap', editRuntime);clearing.onLoad({ recordId: 'older' });
 clearing.chooseMood(pick('good'));for (const notice of ['tree','wind','flower']) clearing.chooseNotice(pick(notice));
 clearing.updateDistance(input(''));clearing.updateNote(input(''));clearing.save();
@@ -936,3 +938,95 @@ fittedDay.fitDayDetail();
 pendingFits[2]([{ height: 600 }, { top: 100, height: 500 }, { bottom: 900 }]);
 assert(fittedDay.data.dayScale * 812 <= 588);
 console.log('PASS: overflowing note-card bottom is included in fit measurement.');
+
+// Save opens the note step; only Done commits, and Back/relaunch retain both media.
+storage.clear();
+let noteDestination = '';
+const stepWx = { showToast() {}, redirectTo(options) { noteDestination = options.url; if (options.complete) options.complete(); } };
+const stepPage = load('recap', stepWx);
+stepPage.onLoad({ durationSeconds: 12 });
+stepPage.chooseMood(pick('calm'));
+stepPage.updateDistance(input('2.5'));
+stepPage.openNote();
+assert.equal(stepPage.data.noteEditor, true);
+assert.equal(savedRecords().length, 0);
+assert.equal(noteDestination, '');
+stepPage.updateNote(input('Afternoon light'));
+stepPage.updateDrawing({ detail: { strokes: ink } });
+stepPage.noteMode({ currentTarget: { dataset: { mode: 'draw' } } });
+const resumedStep = load('recap', stepWx);
+resumedStep.onLoad({});
+assert.equal(resumedStep.data.noteEditor, true);
+assert.equal(resumedStep.data.noteMode, 'draw');
+resumedStep.closeNote();
+assert.equal(resumedStep.data.noteEditor, false);
+assert.equal(resumedStep.data.note, 'Afternoon light');
+assert.equal(resumedStep.data.distance, '2.5');
+resumedStep.openNote();
+resumedStep.save();
+resumedStep.save();
+assert.equal(savedRecords().length, 1);
+assert.equal(savedRecords()[0].note, 'Afternoon light');
+assert.equal(JSON.stringify(savedRecords()[0].noteDrawing), JSON.stringify(ink));
+assert.equal(noteDestination, '/pages/history/history');
+assert.equal(storage.has('paoxia.recapDraft'), false);
+const stepMarkup = fs.readFileSync('miniprogram/pages/recap/recap.wxml', 'utf8');
+assert(!stepMarkup.includes('class="note-input note-entry'));
+assert(stepMarkup.includes('bindtap="openNote">{{editing ? copy.saveChanges : copy.save}}'));
+assert(stepMarkup.includes('bindtap="save">{{copy.noteDone}}'));
+console.log('PASS: two-step recap keeps draft media, resumes the note step and commits only on Done.');
+
+// New notice choices survive drafts, saving and localized history; Nothing stays exclusive.
+storage.clear();
+const extraChoices = ['car', 'bicycle', 'bird', 'house'];
+const extraRecap = load('recap', { showToast() {}, redirectTo() {} });
+extraRecap.onLoad({ durationSeconds: 10 });
+extraChoices.forEach(value => extraRecap.chooseNotice(pick(value)));
+const extraRestored = load('recap', { showToast() {}, redirectTo() {} });
+extraRestored.onLoad({});
+assert.equal(Object.keys(extraRestored.data.selectedNotices).join(','), extraChoices.join(','));
+extraRestored.save();
+const extraHistory = load('history', {});extraHistory.onLoad();
+assert.equal(extraHistory.data.selectedRecord.noticeItems.map(item => item.label).join(','), 'Car,Bicycle,Bird,House');
+for (const item of extraHistory.data.selectedRecord.noticeItems) assert(fs.existsSync('miniprogram' + item.image));
+storage.set('paoxia.language', JSON.stringify('zh'));
+const extraChinese = load('history', {});extraChinese.onLoad();
+assert.equal(extraChinese.data.selectedRecord.noticeItems.map(item => item.label).join(','), '汽车,自行车,鸟,房子');
+const exclusiveNotices = load('recap', { showToast() {} });exclusiveNotices.onLoad({});
+exclusiveNotices.chooseNotice(pick('car'));exclusiveNotices.chooseNotice(pick('nothing'));
+assert.equal(Object.keys(exclusiveNotices.data.selectedNotices).join(','), 'nothing');
+exclusiveNotices.chooseNotice(pick('bird'));
+assert.equal(Object.keys(exclusiveNotices.data.selectedNotices).join(','), 'bird');
+console.log('PASS: four new notices persist, localize and preserve Nothing exclusivity.');
+
+const weatherLayout = fs.readFileSync('miniprogram/pages/recap/recap.wxml', 'utf8');
+assert(!weatherLayout.includes('class="weather-trigger'));
+assert(weatherLayout.indexOf('class="section weather-section"') < weatherLayout.indexOf('class="section mood-section"'));
+assert(weatherLayout.includes('wx:for="{{weatherOptions}}"'));
+console.log('PASS: weather choices appear before mood and the form stays on one screen.');
+
+const fixedForm = load('recap', { nextTick(fn) { fn(); }, createSelectorQuery() {
+  return { in() { return this; }, select() { return this; }, boundingClientRect() { return this; },
+    exec(fn) { fn([{ top: 100, height: 800 * fixedForm.data.formScale }, { bottom: 700 }]); } };
+} });
+fixedForm.fitForm();
+assert(Math.abs(fixedForm.data.formScale - 0.71) < 0.001);
+fixedForm.fitForm();
+assert(Math.abs(fixedForm.data.formScale - 0.71) < 0.001);
+assert(fs.readFileSync('miniprogram/pages/recap/recap.wxml', 'utf8').includes('class="recap-heading-inline"'));
+console.log('PASS: recap fits available screen height without repeated shrinking.');
+
+// Free color mixing accepts all RGB channels and works after selecting a preset/eraser.
+const mixer = load('recap', {});
+mixer.toggleColorPicker();assert.equal(mixer.data.colorPickerOpen, true);
+mixer.selectColor({ currentTarget: { dataset: { color: '#3d91d0' } } });
+assert.equal(mixer.data.colorBlue, 208);
+mixer.data.penTool = 'eraser';
+const mix = (channel, value) => mixer.changeColorChannel({ currentTarget: { dataset: { channel } }, detail: { value } });
+mix('colorRed', 255);mix('colorGreen', 127);mix('colorBlue', 0);
+assert.equal(mixer.data.penColor, '#ff7f00');assert.equal(mixer.data.penTool, 'pen');
+mix('colorBlue', 999);assert.equal(mixer.data.penColor, '#ff7fff');
+mix('penColor', 0);mix('colorRed', 'invalid');assert.equal(mixer.data.penColor, '#ff7fff');
+mixer.toggleColorPicker();assert.equal(mixer.data.colorPickerOpen, false);
+assert.equal(mixer.data.penColor, '#ff7fff');
+console.log('PASS: custom RGB palette mixes arbitrary colors and keeps selection when closed.');

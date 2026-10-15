@@ -16,6 +16,7 @@ Page({
   onShow() { showShareMenu(); },
   data: {
     safeTop: 96,
+    formScale: 1,
     language: 'en',
     copy: copyFor('en', 'recap'),
     editing: false,
@@ -36,6 +37,8 @@ Page({
     selectedNotices: {},
     distance: '',
     penColor: '#262622',
+    colorPickerOpen: false,
+    colorRed: 38, colorGreen: 38, colorBlue: 34,
     penColors: [
       { value: '#262622', label: 'Black' },
       { value: '#3d91d0', label: 'Blue' },
@@ -103,6 +106,7 @@ Page({
       const { weather, mood, selectedNotices, distance, note } = draft;
       const selected = initialData.weatherOptions.find(option => option.value === weather);
       prepare({ weather, mood, selectedNotices, distance, note, noteDrawing: draft.noteDrawing || [],
+        noteEditor: draft.noteEditor === true, noteMode: draft.noteMode === 'draw' ? 'draw' : 'text',
         weatherLabel: selected ? selected.label : copy.notSelected,
         weatherGlyph: selected ? selected.glyph : '＋' });
     }
@@ -111,12 +115,32 @@ Page({
     this.persistDraft();
   },
 
+  onReady() { this.fitForm(); },
+  onResize() { this.fitForm(); },
+  fitForm() {
+    if (this.data.noteEditor || typeof wx.createSelectorQuery !== 'function') return;
+    const measure = () => {
+      if (this.data.noteEditor) return;
+      wx.createSelectorQuery().in(this).select('.recap-inner').boundingClientRect()
+        .select('.recap').boundingClientRect().exec(rects => {
+          const inner = rects && rects[0];
+          const screen = rects && rects[1];
+          if (!inner || !screen || !inner.height || this.data.noteEditor) return;
+          const naturalHeight = inner.height / (this.data.formScale || 1);
+          const available = screen.bottom - inner.top - 32;
+          const formScale = Math.min(1, Math.max(0.1, available / naturalHeight));
+          if (Math.abs(formScale - this.data.formScale) > 0.002) this.setData({ formScale });
+        });
+    };
+    if (typeof wx.nextTick === 'function') wx.nextTick(measure); else measure();
+  },
+
   persistDraft() {
     if (this.editId) return false;
     if (!this.draftId || this.saved || this.discarded) return false;
-    const { durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing } = this.data;
+    const { durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing, noteEditor, noteMode } = this.data;
     try {
-      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing, run: this.run });
+      saveDraft({ id: this.draftId, durationSeconds, weather, mood, selectedNotices, distance, note, noteDrawing, noteEditor, noteMode, run: this.run });
       return true;
     } catch (error) {
       wx.showToast({ title: this.data.copy.draftError, icon: 'none' });
@@ -144,7 +168,6 @@ Page({
   },
 
   chooseWeather(event) {
-    if (this.editId) return;
     const weather = event.currentTarget.dataset.value;
     const selected = this.data.weatherOptions.find(option => option.value === weather);
     if (!selected) return;
@@ -183,13 +206,32 @@ Page({
     this.updateForm({ note: event.detail.value });
   },
 
-  openNote() { this.setData({ noteEditor: true, weatherOpen: false }); },
-  closeNote() { this.setData({ noteEditor: false }); this.persistDraft(); },
-  noteMode(event) { this.setData({ noteMode: event.currentTarget.dataset.mode }); },
+  openNote() {
+    if (this.navigating || this.saved || this.discarded) return;
+    if (this.editId && !this.editRecord) return;
+    if (!this.editId && !this.persistDraft()) return;
+    this.setData({ noteEditor: true, weatherOpen: false });
+    this.persistDraft();
+  },
+  closeNote() { this.setData({ noteEditor: false }, () => this.fitForm()); this.persistDraft(); },
+  noteMode(event) { this.setData({ noteMode: event.currentTarget.dataset.mode }); this.persistDraft(); },
   selectPen(event) { this.setData({ penTool: event.currentTarget.dataset.tool }); },
   selectColor(event) {
     const color = event.currentTarget.dataset.color;
-    if (this.data.penColors.some(item => item.value === color)) this.setData({ penColor: color, penTool: 'pen' });
+    if (this.data.penColors.some(item => item.value === color)) this.setData({ penColor: color, penTool: 'pen', colorRed: parseInt(color.slice(1, 3), 16), colorGreen: parseInt(color.slice(3, 5), 16), colorBlue: parseInt(color.slice(5, 7), 16) });
+  },
+  toggleColorPicker() { this.setData({ colorPickerOpen: !this.data.colorPickerOpen }); },
+  changeColorChannel(event) {
+    const channel = event.currentTarget.dataset.channel;
+    if (['colorRed', 'colorGreen', 'colorBlue'].indexOf(channel) === -1) return;
+    const value = Number(event.detail.value);
+    if (!Number.isFinite(value)) return;
+    const update = {};
+    update[channel] = Math.max(0, Math.min(255, Math.round(value)));
+    const channels = Object.assign({}, this.data, update);
+    update.penColor = '#' + ['colorRed', 'colorGreen', 'colorBlue'].map(key => channels[key].toString(16).padStart(2, '0')).join('');
+    update.penTool = 'pen';
+    this.setData(update);
   },
   updateDrawing(event) { this.updateForm({ noteDrawing: event.detail.strokes }); },
   undoDrawing() { this.updateForm({ noteDrawing: this.data.noteDrawing.slice(0, -1) }); },
@@ -307,6 +349,7 @@ Page({
     try {
       if (!this.saved) {
         updateRecord(this.editId, {
+          weather: this.data.weather,
           distance: this.data.distance ? `${this.data.distance} km` : '— km',
           mood: moodLabels[this.data.mood] || 'Not set',
           moodType: this.data.mood || 'unsure',

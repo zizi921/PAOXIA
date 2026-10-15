@@ -17,3 +17,7 @@ Prompt set: draw the same round-headed runner with three hair strokes, white top
 # Typography
 
 Inter Latin subset, sourced from Google Fonts on 2026-09-27 under the SIL Open Font License. The license is included as `Inter-OFL.txt`, and the font is embedded in `styles/inter.wxss` as a data URL for the English interface.
+
+## Additional notice icons
+
+`notice-outline-car.svg`, `notice-outline-bicycle.svg`, `notice-outline-bird.svg`, and `notice-outline-house.svg` are original vector icons authored for PAOXIA, with transparent backgrounds and rounded black strokes matching the existing notice set.
