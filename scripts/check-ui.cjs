@@ -28,7 +28,7 @@ function directoryBytes(directory) {
     return sum + (entry.isDirectory() ? directoryBytes(target) : fs.statSync(target).size);
   }, 0);
 }
-assert(directoryBytes('miniprogram') < 2 * 1024 * 1024);
+assert(directoryBytes('miniprogram') < 1500000, 'Main package source must remain below 1.5 MB');
 const pages = appConfig.pages;
 assert.equal(appConfig.requiredBackgroundModes, undefined);
 assert.equal(appConfig.permission, undefined);

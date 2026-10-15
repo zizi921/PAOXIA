@@ -45,3 +45,7 @@ The flower icon was edited with OpenAI image generation to use coral-red petals,
 ## Month summary poses
 
 `month-runner-01.png` through `month-runner-12.png` are twelve new poses generated with OpenAI image generation using the user-provided mascot reference. Assigned in calendar order: holding a heart, walking with a flower, sitting on a rock, one-arm stretch, looking into the distance, tending a sprout, hands behind head, seated wave, knee hug, reading, holding a cup, overhead heart. Extracted as transparent 240px palette PNGs, used exclusively for Month summaries.
+
+## Package size optimization
+
+Unused original outline notices (except the cloud and legacy wind), the old resting runner, and their unused supporting assets are retained under repository-root `artwork/archive/`, outside the shipped mini program. The active sharing, home, and running illustrations use palette PNG compression at their original dimensions. The local package-source budget is 1,500,000 bytes.
