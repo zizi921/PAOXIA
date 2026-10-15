@@ -177,7 +177,7 @@ assert.equal(history.data.yearRows.length,1);
 assert.equal(history.data.yearRows[0].times,1);
 assert.equal(history.data.yearRows[0].totalSeconds,8);
 assert.equal(history.data.monthRows.length,1);
-assert.equal(history.data.monthSummary.total,'8 sec.');
+assert.equal(history.data.monthSummary.total,'8 sec');
 history.switchMode({currentTarget:{dataset:{mode:'year'}}});
 assert.equal(history.data.periodLabels.year,'2028');
 history.stepPeriod({currentTarget:{dataset:{direction:-1}}});
@@ -237,8 +237,8 @@ for (const value of ['tree','people','cloud','cat','streetlight','dog','flower',
 // A new page/module context reads persistent storage without app globals.
 const newSession = load('history', {});newSession.onLoad();
 assert.equal(newSession.data.records.length,3);
-assert.equal(newSession.data.yearSummary.times,'2 times out.');
-assert.equal(newSession.data.monthSummary.total,'16 sec.');
+assert.equal(newSession.data.yearSummary.times,'2 times');
+assert.equal(newSession.data.monthSummary.total,'16 sec');
 assert.equal(newSession.data.selectedRecord.distance,'— km');
 assert.equal(new Set(newSession.data.records.map(record=>record.id)).size,3);
 newSession.openDay({currentTarget:{dataset:{date:'2028-09-26',id:savedRecords()[1].id}}});
@@ -629,7 +629,7 @@ assert.equal(editHistory.data.selectedRecord.id, 'older');assert.equal(editHisto
 assert.equal(editHistory.data.selectedRecord.distance, '3.5 km');assert.equal(editHistory.data.selectedRecord.mood, 'Good');
 assert.equal(editHistory.data.selectedRecord.noticeItems.length, 3);
 assert.equal(editHistory.data.monthRows.find(item => item.id === 'older').note, 'Updated note');
-assert.equal(editHistory.data.yearSummary.total, '2 min.');
+assert.equal(editHistory.data.yearSummary.total, '2 min');
 assert.deepEqual(savedRecords()[0], originalRecords[0]);
 for (const field of ['id', 'date', 'durationSeconds', 'startedAt']) assert.equal(savedRecords()[1][field], originalRecords[1][field]);
 assert.equal(savedRecords()[1].weather, 'sunny');
@@ -663,7 +663,7 @@ const beforeDeleteBack = backCount;deleteEditor.deleteRun();
 assert.equal(savedRecords().length, 2);assert.equal(backCount, beforeDeleteBack);
 confirmDelete = true;deleteEditor.deleteRun();
 assert.equal(savedRecords().length, 1);assert.equal(savedRecords()[0].id, 'newer');assert.equal(backCount, beforeDeleteBack + 1);
-assert.equal(editHistory.data.selectedRecord.id, 'newer');assert.equal(editHistory.data.yearSummary.times, '1 times out.');
+assert.equal(editHistory.data.selectedRecord.id, 'newer');assert.equal(editHistory.data.yearSummary.times, '1 times');
 const failedDelete = load('recap', { ...deleteRuntime,
   setStorageSync: () => { throw new Error('full'); }
 });
@@ -935,7 +935,7 @@ console.log('PASS: stale day measurements cannot restore an overflowing scale.')
 
 fittedDay.data.dayScale = 1;
 fittedDay.fitDayDetail();
-pendingFits[2]([{ height: 600 }, { top: 100, height: 500 }, { bottom: 900 }]);
+pendingFits[pendingFits.length - 1]([{ height: 600 }, { top: 100, height: 500 }, { bottom: 900 }]);
 assert(fittedDay.data.dayScale * 812 <= 588);
 console.log('PASS: overflowing note-card bottom is included in fit measurement.');
 
@@ -1048,3 +1048,40 @@ for (const distance of ['', '— km', '0 km', '-1 km', 'abc', 'Infinity']) asser
 assert.equal(formatPace(0, '5 km'), '—');
 assert.equal(formatPace(-1, '5 km'), '—');
 console.log('PASS: pace uses exact duration and distance, rounds seconds and handles unavailable values.');
+
+// Width compensation preserves the history column when day content needs fitting.
+assert(fs.readFileSync('miniprogram/pages/history/history.wxml', 'utf8').includes('width: {{100 / dayScale}}%'));
+const widthFit = load('history', {});
+widthFit.data.mode = 'day'; widthFit.data.selectedRecord = { id: 'width-fit' };
+widthFit.setData = (update, cb) => { Object.assign(widthFit.data, update); if (cb) cb(); };
+widthFit.createSelectorQuery = () => {
+  const q = { select() { return q; }, boundingClientRect() { return q; }, exec(cb) {
+    const s = widthFit.data.dayScale;
+    cb([{ height: 600 }, { top: 0, height: 300 + 600 * s }]);
+  } }; return q;
+};
+widthFit.fitDayDetail();
+assert(300 + 600 * widthFit.data.dayScale < 590);
+assert(Math.abs((650 / widthFit.data.dayScale) * widthFit.data.dayScale - 650) < 0.01);
+console.log('PASS: day fitting preserves horizontal width and remeasures drawing layout.');
+
+// Repeated cloud notifications do not resend drawings or reset fitted details.
+leanHistory.applyDay('2026-09-29', 'ink-two');
+leanHistory.data.dayScale = 0.8;
+let repeatedDayWrites = 0;
+const previousDaySetData = leanHistory.setData;
+leanHistory.setData = function(update, cb) { repeatedDayWrites++; previousDaySetData.call(this, update, cb); };
+leanHistory.applyDay('2026-09-29', 'ink-two');
+assert.equal(repeatedDayWrites, 0);
+assert.equal(leanHistory.data.dayScale, 0.8);
+let clears = 0;
+const cachedBoard = { ...drawingDefinition.methods, width: 300, height: 225,
+  ctx: { clearRect() { clears++; } }, properties: { strokes: ink }, paint() {} };
+cachedBoard.redraw();
+cachedBoard.properties.strokes = JSON.parse(JSON.stringify(ink));
+cachedBoard.redraw();
+assert.equal(clears, 1);
+cachedBoard.properties.strokes = [];
+cachedBoard.redraw();
+assert.equal(clears, 2);
+console.log('PASS: unchanged history drawings skip bridge updates and canvas repaint; clearing still redraws.');

@@ -32,7 +32,7 @@
     <block wx:elif="{{mode === 'month'}}">
       <view class="summary month-summary">
         <view><text class="handwritten summary-line">{{monthSummary.times}}</text><text class="handwritten summary-line">{{monthSummary.total}}</text><text wx:if="{{monthRows.length}}" class="handwritten summary-line">{{monthSummary.distance}}</text></view>
-        <image class="summary-runner month-rest-runner" src="/assets/history-runner-02.png" mode="aspectFit" aria-hidden="true" />
+        <image class="summary-runner month-rest-runner" src="{{monthRunnerImage}}" mode="aspectFit" aria-hidden="true" />
       </view>
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="record-row" role="button" aria-label="{{copy.viewRecord}} {{item.day}}" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" data-id="{{item.id}}" bindtap="openDay" hover-class="row-pressed">
@@ -48,7 +48,7 @@
     </block>
 
     <block wx:elif="{{mode === 'year'}}">
-      <view class="summary year-summary"><image class="year-runner" src="/assets/logo-runner.png" mode="aspectFit" aria-hidden="true" /><view><text class="handwritten summary-line">{{yearSummary.times}}</text><text class="handwritten summary-line">{{yearSummary.total}}</text><text wx:if="{{yearRows.length}}" class="handwritten summary-line">{{yearSummary.distance}}</text></view></view>
+      <view class="summary year-summary"><image class="year-runner" src="{{yearRunnerImage}}" mode="aspectFit" aria-hidden="true" /><view><text class="handwritten summary-line">{{yearSummary.times}}</text><text class="handwritten summary-line">{{yearSummary.total}}</text><text wx:if="{{yearRows.length}}" class="handwritten summary-line">{{yearSummary.distance}}</text></view></view>
       <scroll-view class="year-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="year-row" role="button" aria-label="{{copy.viewMonth}} {{item.month}}" wx:for="{{yearRows}}" wx:key="value" data-month="{{item.value}}" bindtap="openMonth" hover-class="row-pressed"><text class="handwritten year-month">{{item.month}}</text><view class="year-copy"><text class="handwritten year-times">{{item.timesText}}</text><text class="handwritten year-total">{{item.total}}</text></view><view class="bar-chart level-{{item.level}}"><view class="chart-bar"></view><view class="chart-bar"></view><view class="chart-bar"></view><view class="chart-bar"></view><view class="chart-bar"></view></view><text class="handwritten row-chevron">›</text></view>
         <view wx:if="{{!yearRows.length}}" class="history-empty"><text class="handwritten empty-title">{{copy.noYear}}</text><text class="handwritten empty-copy">{{copy.noYearCopy}}</text></view>
@@ -56,7 +56,7 @@
     </block>
 
     <view wx:elif="{{selectedRecord}}" class="day-detail">
-      <view class="day-detail-inner" style="transform: scale({{dayScale}}); transform-origin: top center;">
+      <view class="day-detail-inner" style="width: {{100 / dayScale}}%; transform: scale({{dayScale}}); transform-origin: top left;">
       <view class="day-feature">
         <view class="day-summary-copy">
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.dayKicker}}</text><text class="handwritten day-metric day-weekday-value">{{selectedRecord.weekdayLong}}</text></view>

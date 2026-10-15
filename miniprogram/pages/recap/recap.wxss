@@ -148,7 +148,8 @@
 .note-editor-title { font-size: 44rpx; font-weight: 600; }
 .note-done, .note-tab, .note-tool { margin: 0; padding: 0 22rpx; min-height: 44px; line-height: 88rpx; background: transparent; color: #262622; font-size: 30rpx; border-radius: 0; }
 .note-done::after, .note-tab::after, .note-tool::after { border: 0; }
-.note-done { color: #7a7b75; text-decoration: underline; }
+.note-done { color: #7a7b75; font-size: 32rpx; font-weight: 600; text-decoration: underline; text-underline-offset: 6rpx; }
+.note-tab { font-size: 32rpx; }
 .note-tabs { display: flex; margin: 28rpx 0; border-bottom: 2rpx solid #b5b5ae; }
 .note-active { font-weight: 700; text-decoration: underline; text-underline-offset: 8rpx; }
 .note-text-panel { position: relative; }

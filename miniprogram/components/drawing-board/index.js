@@ -20,6 +20,7 @@ Component({
         const ratio = wx.getSystemInfoSync().pixelRatio || 1;
         this.canvas.width = item.width * ratio;
         this.canvas.height = this.height * ratio;
+        this.renderedSignature = null;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.scale(ratio, ratio);
         this.redraw();
@@ -56,8 +57,12 @@ Component({
     },
     redraw() {
       if (!this.ctx) return;
+      const strokes = this.properties.strokes || [];
+      const signature = JSON.stringify([this.width, this.height, strokes]);
+      if (this.renderedSignature === signature) return;
       this.ctx.clearRect(0, 0, this.width, this.height);
-      (this.properties.strokes || []).forEach(stroke => this.paint(stroke));
+      strokes.forEach(stroke => this.paint(stroke));
+      this.renderedSignature = signature;
     },
     start(event) {
       if (!this.properties.editable || !this.ctx) return;
@@ -68,6 +73,7 @@ Component({
       }
       const point = this.point(event);
       if (!point) return;
+      this.renderedSignature = null;
       this.active = { erase: this.properties.tool === 'eraser', color: this.properties.color || '#262622', points: [point] };
       this.paint(this.active);
     },

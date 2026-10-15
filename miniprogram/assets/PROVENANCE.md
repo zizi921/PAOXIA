@@ -35,3 +35,13 @@ The dog icon was subsequently edited with OpenAI image generation to use white f
 `history-runner-16.png` through `history-runner-20.png` were generated in a second batch with the same reference and processing: shoulder stretch, seated forward stretch, side lunge, skipping, and reclining rest.
 
 `history-runner-21.png` through `history-runner-25.png` were generated with the same reference and processing: airplane arms, relaxed squat, hand-on-chest wave, seated knee hug, and tiptoe overhead stretch.
+
+The flower icon was edited with OpenAI image generation to use coral-red petals, preserving the green leaves and black outline.
+
+## Year summary poses
+
+`year-runner-01.png` through `year-runner-05.png` were generated with OpenAI image generation from the user-provided mascot reference: relaxed sitting, palms-together greeting, back stretch, kneeling rest, and butterfly stretch. Extracted as transparent 320px palette PNGs. These five are used only in Year summaries alongside the existing running pose; the Day collection remains 25 poses.
+
+## Month summary poses
+
+`month-runner-01.png` through `month-runner-12.png` are twelve new poses generated with OpenAI image generation using the user-provided mascot reference. Assigned in calendar order: holding a heart, walking with a flower, sitting on a rock, one-arm stretch, looking into the distance, tending a sprout, hands behind head, seated wave, knee hug, reading, holding a cup, overhead heart. Extracted as transparent 240px palette PNGs, used exclusively for Month summaries.

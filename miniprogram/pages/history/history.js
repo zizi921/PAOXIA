@@ -37,6 +37,7 @@ const HISTORY_RUNNER_POSES = Array.from({ length: 25 }, (_, index) => {
   const number = String(index + 1).padStart(2, '0');
   return { image: `/assets/history-runner-${number}.png`, className: `pose-${number}` };
 });
+const YEAR_RUNNER_POSES = ['/assets/logo-runner.png', ...Array.from({ length: 5 }, (_, i) => `/assets/year-runner-0${i + 1}.png`)];
 const FILTER_START_YEAR = 2020;
 const FILTER_END_YEAR = 2035;
 
@@ -186,7 +187,9 @@ Page({
     monthRows: [],
     yearRows: [],
     yearSummary: { times: '', total: '' },
+    yearRunnerImage: '/assets/logo-runner.png',
     monthSummary: { times: '', total: '', distance: '' },
+    monthRunnerImage: '/assets/month-runner-01.png',
     selectedRecord: null,
     filterOpen: false,
     filterMode: 'month',
@@ -285,6 +288,7 @@ Page({
   fitDayDetail() {
     if (this.data.mode !== 'day' || !this.data.selectedRecord || !this.createSelectorQuery) return;
     const revision = this.dayFitRevision = (this.dayFitRevision || 0) + 1;
+    let passes = 0;
     const measure = () => {
       const query = this.createSelectorQuery();
       query.select('.day-detail').boundingClientRect();
@@ -300,7 +304,16 @@ Page({
         // Include overflowing children; use rendered bounds, then undo our transform.
         const renderedHeight = Math.max(content.height, card ? card.bottom - content.top + 12 * scale : 0);
         const naturalHeight = renderedHeight / scale;
-        this.setData({ dayScale: Math.min(1, Math.max(0, available.height - 12) / naturalHeight) });
+        // Compensate width in WXML so fitting never narrows the detail column.
+        // Re-measure because the wider layout can change text and drawing height.
+        const candidate = Math.max(0.01, Math.min(1, Math.max(0, available.height - 12) / naturalHeight));
+        const nextScale = passes ? Math.min(scale, candidate) : candidate;
+        passes += 1;
+        this.setData({ dayScale: nextScale }, () => {
+          if (revision !== this.dayFitRevision || passes >= 8 || Math.abs(nextScale - scale) < 0.001) return;
+          if (wx.nextTick) wx.nextTick(measure);
+          else measure();
+        });
       });
     };
     if (wx.nextTick) wx.nextTick(measure);
@@ -446,9 +459,10 @@ Page({
     this.setData({
       periodLabels,
       yearRows: presentYearRows(rawRows, this.data.language),
+      yearRunnerImage: YEAR_RUNNER_POSES[Math.abs(Number(year) - FILTER_START_YEAR) % YEAR_RUNNER_POSES.length],
       yearSummary: this.data.language === 'zh'
         ? { distance, times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyYearHint }
-        : { distance, times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyYearHint }
+        : { distance, times: times ? `${times} times` : this.data.copy.noRuns, total: times ? totalText(seconds, 'en') : this.data.copy.emptyYearHint }
     });
   },
 
@@ -470,9 +484,10 @@ Page({
       monthValue: value,
       periodLabels,
       monthRows: records,
+      monthRunnerImage: `/assets/month-runner-${value.slice(5, 7)}.png`,
       monthSummary: this.data.language === 'zh'
         ? { distance, times: times ? `${times}次跑步` : this.data.copy.noRuns, total: times ? totalText(seconds, 'zh') : this.data.copy.emptyMonthHint }
-        : { distance, times: times ? `${times} times out.` : this.data.copy.noRuns, total: times ? `${totalText(seconds, 'en')}.` : this.data.copy.emptyMonthHint }
+        : { distance, times: times ? `${times} times` : this.data.copy.noRuns, total: times ? totalText(seconds, 'en') : this.data.copy.emptyMonthHint }
     });
   },
 
@@ -482,6 +497,12 @@ Page({
     const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
     const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)), this.data.language, this.data.copy);
     if (selectedRecord) selectedRecord.noteDrawing = this.drawings && this.drawings.get(selectedRecord.id) || [];
+    // Cloud status updates often return the same record. Keep its canvas and fitted
+    // layout intact rather than sending the full drawing across the bridge again.
+    const unchanged = this.data.dayValue === value && this.data.dayWeekday === weekday
+      && this.data.periodLabels.day === label
+      && JSON.stringify(this.data.selectedRecord) === JSON.stringify(selectedRecord);
+    if (unchanged) return;
     this.setData({ dayValue: value, dayWeekday: weekday, selectedRecord, periodLabels, dayScale: 1 }, () => this.fitDayDetail());
   },
 
