@@ -114,3 +114,8 @@
 .history .history-tools .clear-button { color: #74746c; }
 
 .day-detail-inner > view { flex-shrink: 0; }
+
+.record-feeling-notices { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; align-items: center; margin-left: 20rpx; column-gap: 12rpx; }
+.history .record-top-line .record-feeling-notices .mood-inline { flex-shrink: 0; margin-left: 0; }
+.record-feeling-notices .record-notices { min-height: 0; margin: 0; gap: 4rpx; }
+.record-notices .notice-mark { width: 32rpx; height: 32rpx; margin-right: 0; }

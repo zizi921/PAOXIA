@@ -1,5 +1,5 @@
 const { safeTop } = require('../../utils/layout');
-const { formatDuration } = require('../../utils/time');
+const { formatDuration, formatPace } = require('../../utils/time');
 const { readRecords, clearRecords } = require('../../utils/records');
 const { readLanguage, copyFor } = require('../../utils/i18n');
 const { shareAppMessage, showShareMenu } = require('../../utils/share');
@@ -129,6 +129,7 @@ function decorateRecord(record, language, copy) {
     weekdayLong: language === 'zh' ? WEEKDAY_NAMES_ZH[date.getDay()] : WEEKDAY_NAMES[date.getDay()],
     duration: formatDuration(record.durationSeconds, language),
     distance: record.distance || '— km',
+    pace: formatPace(record.durationSeconds, record.distance),
     mood: record.mood === 'Not set' || !record.mood ? copy.notSet : copy[record.moodType] || record.mood,
     moodType: record.moodType || 'unsure',
     moodImage: `/assets/mood-outline-${['good', 'calm', 'tired', 'unsure'].includes(record.moodType) ? record.moodType : 'unsure'}.png`,

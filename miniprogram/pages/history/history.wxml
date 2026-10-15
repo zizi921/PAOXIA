@@ -37,9 +37,9 @@
       <scroll-view class="record-list scroll-list" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="record-row" role="button" aria-label="{{copy.viewRecord}} {{item.day}}" wx:for="{{monthRows}}" wx:key="id" data-date="{{item.date}}" data-id="{{item.id}}" bindtap="openDay" hover-class="row-pressed">
           <view class="record-main">
-            <view class="record-top-line"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><view class="mood-inline"><image class="mini-face" src="{{item.moodImage}}" mode="aspectFit" aria-hidden="true" /><text class="handwritten mood-name">{{item.mood}}</text></view></view>
+            <view class="record-top-line"><view class="record-date-line"><text class="handwritten record-day">{{item.day}}</text><text class="handwritten record-weekday">{{item.weekday}}</text></view><view class="record-feeling-notices"><view class="mood-inline"><image class="mini-face" src="{{item.moodImage}}" mode="aspectFit" aria-hidden="true" /><text class="handwritten mood-name">{{item.mood}}</text></view><view class="mark-row record-notices"><block wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label"><image wx:if="{{mark.image}}" class="notice-mark" src="{{mark.image}}" mode="aspectFit" aria-label="{{mark.label}}" /><text wx:else class="mark {{mark.className}}">{{mark.glyph}}</text></block></view></view></view>
             <text class="handwritten record-duration">{{item.duration}}</text>
-            <view class="record-bottom-line"><text class="handwritten record-distance">{{item.distance}}</text><view class="mark-row"><block wx:for="{{item.noticeItems}}" wx:for-item="mark" wx:key="label"><image wx:if="{{mark.image}}" class="notice-mark" src="{{mark.image}}" mode="aspectFit" aria-label="{{mark.label}}" /><text wx:else class="mark {{mark.className}}">{{mark.glyph}}</text></block></view></view>
+            <view class="record-bottom-line"><text class="handwritten record-distance">{{item.distance}}</text></view>
           </view>
           <text class="handwritten row-chevron">›</text>
         </view>
@@ -62,6 +62,7 @@
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.dayKicker}}</text><text class="handwritten day-metric day-weekday-value">{{selectedRecord.weekdayLong}}</text></view>
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.timeKicker}}</text><text class="handwritten day-metric">{{selectedRecord.duration}}</text></view>
           <view class="day-stat"><text class="handwritten day-kicker">{{copy.distanceKicker}}</text><text class="handwritten day-metric day-distance">{{selectedRecord.distance}}</text></view>
+          <view class="day-stat"><text class="handwritten day-kicker">{{copy.paceKicker}}</text><text class="handwritten day-metric">{{selectedRecord.pace}}</text></view>
         </view>
         <view class="day-summary-illustration" aria-hidden="true"><text class="day-cloud {{selectedRecord.weatherClass}}">{{selectedRecord.weatherGlyph}}</text><image class="day-runner {{selectedRecord.runnerPoseClass}}" src="{{selectedRecord.runnerImage}}" mode="aspectFit" /></view>
       </view>

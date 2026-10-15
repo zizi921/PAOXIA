@@ -1,5 +1,5 @@
 <view wx:if="{{!noteEditor}}" class="recap lang-{{language}}" style="--safe-top: {{safeTop}}px;">
-  <view class="recap-inner" style="transform: scale({{formScale}});">
+  <view class="recap-inner" style="transform: scale({{formScale}}); visibility: {{formReady ? 'visible' : 'hidden'}};">
     <view class="recap-heading-row">
       <view class="recap-heading-inline">
         <text class="handwritten recap-title">{{editing ? copy.edit : copy.so}}</text>

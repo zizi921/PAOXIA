@@ -24,4 +24,14 @@ function formatDuration(totalSeconds, language = 'en') {
   return `${safeSeconds} sec`;
 }
 
-module.exports = { formatElapsed, formatDuration };
+function formatPace(totalSeconds, distance) {
+  const seconds = Number(totalSeconds);
+  const match = String(distance == null ? '' : distance).trim().match(/^(\d+(?:\.\d+)?|\.\d+)\s*(?:km)?$/);
+  const km = match ? Number(match[1]) : 0;
+  if (!Number.isFinite(seconds) || seconds <= 0 || !Number.isFinite(km) || km <= 0) return '—';
+  const paceSeconds = Math.round(seconds / km);
+  if (!Number.isFinite(paceSeconds) || paceSeconds <= 0) return '—';
+  return `${Math.floor(paceSeconds / 60)}:${twoDigits(paceSeconds % 60)} /km`;
+}
+
+module.exports = { formatElapsed, formatDuration, formatPace };

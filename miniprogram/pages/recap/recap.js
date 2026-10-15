@@ -17,6 +17,7 @@ Page({
   data: {
     safeTop: 96,
     formScale: 1,
+    formReady: false,
     language: 'en',
     copy: copyFor('en', 'recap'),
     editing: false,
@@ -118,18 +119,28 @@ Page({
   onReady() { this.fitForm(); },
   onResize() { this.fitForm(); },
   fitForm() {
-    if (this.data.noteEditor || typeof wx.createSelectorQuery !== 'function') return;
+    if (this.data.noteEditor) return;
+    if (typeof wx.createSelectorQuery !== 'function') {
+      this.setData({ formReady: true });
+      return;
+    }
     const measure = () => {
       if (this.data.noteEditor) return;
       wx.createSelectorQuery().in(this).select('.recap-inner').boundingClientRect()
         .select('.recap').boundingClientRect().exec(rects => {
           const inner = rects && rects[0];
           const screen = rects && rects[1];
-          if (!inner || !screen || !inner.height || this.data.noteEditor) return;
+          if (this.data.noteEditor) return;
+          if (!inner || !screen || !inner.height) {
+            this.setData({ formReady: true });
+            return;
+          }
           const naturalHeight = inner.height / (this.data.formScale || 1);
           const available = screen.bottom - inner.top - 32;
           const formScale = Math.min(1, Math.max(0.1, available / naturalHeight));
-          if (Math.abs(formScale - this.data.formScale) > 0.002) this.setData({ formScale });
+          if (!this.data.formReady || Math.abs(formScale - this.data.formScale) > 0.002) {
+            this.setData({ formScale, formReady: true });
+          }
         });
     };
     if (typeof wx.nextTick === 'function') wx.nextTick(measure); else measure();
@@ -213,7 +224,7 @@ Page({
     this.setData({ noteEditor: true, weatherOpen: false });
     this.persistDraft();
   },
-  closeNote() { this.setData({ noteEditor: false }, () => this.fitForm()); this.persistDraft(); },
+  closeNote() { this.setData({ noteEditor: false, formReady: false }, () => this.fitForm()); this.persistDraft(); },
   noteMode(event) { this.setData({ noteMode: event.currentTarget.dataset.mode }); this.persistDraft(); },
   selectPen(event) { this.setData({ penTool: event.currentTarget.dataset.tool }); },
   selectColor(event) {

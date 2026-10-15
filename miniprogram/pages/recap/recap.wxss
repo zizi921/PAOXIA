@@ -231,7 +231,8 @@
 .note-editor-header { margin-bottom: 24rpx; }
 .note-editor-header .note-done { padding: 0; min-width: 88rpx; }
 .note-editor-title { display: block; }
-.note-textarea { height: 420rpx; max-height: 42vh; }
+/* Match the canvas: 3:4 content height plus the same 2rpx borders. */
+.note-textarea { height: calc(75vw - 65rpx); max-height: none; }
 
 /* Weather is a full choice row above mood, with the same icon/label rhythm. */
 .recap .weather-section { margin-top: 24rpx; }

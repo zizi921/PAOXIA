@@ -1030,3 +1030,21 @@ mix('penColor', 0);mix('colorRed', 'invalid');assert.equal(mixer.data.penColor, 
 mixer.toggleColorPicker();assert.equal(mixer.data.colorPickerOpen, false);
 assert.equal(mixer.data.penColor, '#ff7fff');
 console.log('PASS: custom RGB palette mixes arbitrary colors and keeps selection when closed.');
+
+// Initial layout is measured while hidden, then scale and visibility update together.
+assert.equal(load('recap', {}).data.formReady, false);
+assert.equal(fixedForm.data.formReady, true);
+const noMeasurement = load('recap', {});noMeasurement.fitForm();
+assert.equal(noMeasurement.data.formReady, true);
+assert(fs.readFileSync('miniprogram/pages/recap/recap.wxml', 'utf8').includes("visibility: {{formReady ? 'visible' : 'hidden'}}"));
+console.log('PASS: recap reveals only after its first fit, with a measurement fallback.');
+
+const { formatPace } = require('../miniprogram/utils/time');
+assert.equal(formatPace(1800, '5 km'), '6:00 /km');
+assert.equal(formatPace(330, '1'), '5:30 /km');
+assert.equal(formatPace(359.8, '1 km'), '6:00 /km');
+assert.equal(formatPace(90, '0.25 km'), '6:00 /km');
+for (const distance of ['', '— km', '0 km', '-1 km', 'abc', 'Infinity']) assert.equal(formatPace(60, distance), '—');
+assert.equal(formatPace(0, '5 km'), '—');
+assert.equal(formatPace(-1, '5 km'), '—');
+console.log('PASS: pace uses exact duration and distance, rounds seconds and handles unavailable values.');
