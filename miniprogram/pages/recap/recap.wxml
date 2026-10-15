@@ -44,51 +44,51 @@
       <text class="handwritten section-title">{{copy.whatNotice}}</text>
       <view class="notice-grid">
         <button class="choice notice-choice {{selectedNotices.tree ? 'selected notice-red' : ''}}" data-value="tree" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.tree}}">
-          <image class="pictogram" src="/assets/notice-outline-tree.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-tree.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.tree}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.people ? 'selected notice-red' : ''}}" data-value="people" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.people}}">
-          <image class="pictogram people-pictogram" src="/assets/notice-outline-people-bold.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-people.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten people-label">{{copy.people}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.cloud ? 'selected notice-red' : ''}}" data-value="cloud" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.cloud}}">
-          <image class="pictogram" src="/assets/notice-outline-cloud.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-cloud.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.cloud}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.cat ? 'selected notice-red' : ''}}" data-value="cat" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.cat}}">
-          <image class="pictogram" src="/assets/notice-outline-cat.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-cat.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.cat}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.streetlight ? 'selected notice-red' : ''}}" data-value="streetlight" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.streetlight}}">
-          <image class="pictogram" src="/assets/notice-outline-streetlight.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-streetlight.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.streetlight}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.dog ? 'selected notice-red' : ''}}" data-value="dog" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.dog}}">
-          <image class="pictogram" src="/assets/notice-outline-dog.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-dog.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.dog}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.flower ? 'selected notice-red' : ''}}" data-value="flower" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.flower}}">
-          <image class="pictogram" src="/assets/notice-outline-flower.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-flower.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.flower}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.car ? 'selected notice-red' : ''}}" data-value="car" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.car}}">
-          <image class="pictogram" src="/assets/notice-outline-car.svg" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-car.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.car}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.bicycle ? 'selected notice-red' : ''}}" data-value="bicycle" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.bicycle}}">
-          <image class="pictogram" src="/assets/notice-outline-bicycle.svg" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-bicycle.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.bicycle}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.bird ? 'selected notice-red' : ''}}" data-value="bird" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.bird}}">
-          <image class="pictogram" src="/assets/notice-outline-bird.svg" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-bird.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.bird}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.house ? 'selected notice-red' : ''}}" data-value="house" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.house}}">
-          <image class="pictogram" src="/assets/notice-outline-house.svg" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-house.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.house}}</text>
         </button>
         <button class="choice notice-choice {{selectedNotices.nothing ? 'selected notice-red' : ''}}" data-value="nothing" bindtap="chooseNotice" hover-class="choice-pressed" aria-label="{{copy.nothingLabel}}">
-          <image class="pictogram" src="/assets/notice-outline-nothing.png" mode="aspectFit" aria-hidden="true" />
+          <image class="pictogram" src="/assets/notice-color-nothing.png" mode="aspectFit" aria-hidden="true" />
           <text class="choice-label handwritten">{{copy.nothingLabel}}</text>
         </button>
       </view>
