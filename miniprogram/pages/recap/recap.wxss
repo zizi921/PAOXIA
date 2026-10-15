@@ -14,7 +14,7 @@
 .weather-caption { margin-top: 10rpx; color: #5f5f58; font-size: 25rpx; line-height: 1; }
 .weather-menu { position: absolute; z-index: 20; top: 118rpx; right: -8rpx; box-sizing: border-box; display: flex; width: 430rpx; padding: 13rpx 10rpx 10rpx; border: 3rpx solid #4d4d47; border-radius: 34rpx 28rpx 32rpx 26rpx; background: #ffffff; }
 .weather-option { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; height: 118rpx; margin: 0; padding: 6rpx 0; border: 0; border-radius: 48%; background: transparent; color: #262622; line-height: 1; }
-.weather-option.selected::before { content: ''; position: absolute; top: 1rpx; right: 5rpx; bottom: 1rpx; left: 5rpx; border: 4rpx solid #75927b; border-radius: 48% 53% 46% 55%; transform: rotate(-5deg); opacity: .72; }
+.weather-option.selected::before { content: ''; position: absolute; top: 1rpx; right: 5rpx; bottom: 1rpx; left: 5rpx; border: 4rpx solid #db6954; border-radius: 48% 53% 46% 55%; transform: rotate(-5deg); opacity: .72; }
 .weather-option-glyph { position: relative; z-index: 1; font-family: serif; font-size: 53rpx; line-height: .8; }.weather-option-glyph.sunny { color: #f5a614; }.weather-option-glyph.cloudy, .weather-option-glyph.rainy { color: #4f8fc9; }.weather-option-glyph.windy { color: #5f9272; transform: rotate(-8deg); }
 .weather-option-label { position: relative; z-index: 1; margin-top: 10rpx; font-size: 25rpx; }
 .section { margin-top: 30rpx; }
@@ -29,7 +29,7 @@
 .notice-choice { flex: 0 0 25%; width: 25%; min-height: 154rpx; }
 .notice-choice .pictogram { margin: -4rpx 0; transform: scale(.9); }
 .notice-choice .choice-label { font-size: 29rpx; }
-.choice.selected::before { content: ''; position: absolute; top: 0; right: 7rpx; bottom: 0; left: 7rpx; border: 5rpx solid #75927b; border-radius: 49% 53% 46% 55%; transform: rotate(-5deg); opacity: .78; }
+.choice.selected::before { content: ''; position: absolute; top: 0; right: 7rpx; bottom: 0; left: 7rpx; border: 5rpx solid #db6954; border-radius: 49% 53% 46% 55%; transform: rotate(-5deg); opacity: .78; }
 .notice-choice.selected::before { top: 0; right: 12rpx; bottom: 0; left: 12rpx; border-color: #db6954; transform: rotate(7deg); }
 .choice-label { position: relative; z-index: 2; margin-top: 5rpx; font-size: 35rpx; line-height: .95; white-space: nowrap; }
 .two-line { display: flex; flex-direction: column; align-items: center; margin-top: 0; line-height: .72; text-align: center; white-space: normal; }
@@ -65,11 +65,11 @@
 .distance-row { margin-top: 16rpx; }
 .field-label, .unit { font-size: 38rpx; line-height: 1; white-space: nowrap; }
 .field-label { font-size: 44rpx; }
-.optional { font-size: 31rpx; opacity: .72; }
+.optional { font-size: 31rpx; color: #7a7b75; opacity: 1; }
 .distance-input { box-sizing: border-box; flex: 1; min-width: 90rpx; height: 62rpx; margin: 0 16rpx; padding: 0 12rpx; border: 3rpx solid #595a53; border-radius: 5rpx 2rpx 4rpx 3rpx; background: #ffffff; font-size: 38rpx; text-align: center; }
 .note-input { box-sizing: border-box; width: 100%; height: 236rpx; margin-top: 24rpx; padding: 0 26rpx 7rpx; border: 3rpx solid #595a53; border-radius: 8rpx 5rpx 7rpx 4rpx; background: #ffffff; color: #262622; font-size: 43rpx; }
 .note-placeholder { color: #77756d; font-family: inherit; font-size: 33rpx; font-weight: 500; }
-.recap .save-button { min-height: 108rpx; margin-top: 36rpx; background: #ffffff; color: #000; border-color: #000; font-size: 62rpx; }
+.recap .save-button { min-height: 108rpx; margin-top: 36rpx; background: #ffffff; color: #262622; border-color: #262622; font-size: 62rpx; }
 @media (max-height: 960px) {
   .recap { padding-top: max(var(--safe-top, 80px), 76px); }
   .recap-heading-row { min-height: 102rpx; }
@@ -121,7 +121,7 @@
 
 .recap .weather-choice .choice-label,
 .recap .mood-choice .choice-label,
-.recap .notice-choice .choice-label { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 600; color: #65665f; line-height: 1.05; }
+.recap .notice-choice .choice-label { font-family: 'Inter', sans-serif; font-size: 25rpx; font-weight: 600; color: #7a7b75; line-height: 1.05; }
 
 .recap .notice-section { margin-top: -14rpx; }
 @media (max-height: 960px) { .recap .notice-section { margin-top: 10rpx; } }
@@ -148,7 +148,7 @@
 .note-editor-title { font-size: 44rpx; font-weight: 600; }
 .note-done, .note-tab, .note-tool { margin: 0; padding: 0 22rpx; min-height: 44px; line-height: 88rpx; background: transparent; color: #262622; font-size: 30rpx; border-radius: 0; }
 .note-done::after, .note-tab::after, .note-tool::after { border: 0; }
-.note-done { text-decoration: underline; }
+.note-done { color: #7a7b75; text-decoration: underline; }
 .note-tabs { display: flex; margin: 28rpx 0; border-bottom: 2rpx solid #b5b5ae; }
 .note-active { font-weight: 700; text-decoration: underline; text-underline-offset: 8rpx; }
 .note-text-panel { position: relative; }
@@ -196,8 +196,8 @@
 
 .recap.lang-zh .note-entry-text { font-size: 31rpx; }
 
-.recap.lang-zh .recap-secondary-actions .continue-button,
-.recap.lang-zh .recap-secondary-actions .discard-button { color: #74746c; }
+.recap .recap-secondary-actions .continue-button,
+.recap .recap-secondary-actions .discard-button { color: #7a7b75; }
 
 .recap.lang-zh .notice-choice .people-label { font-weight: 600; }
 
