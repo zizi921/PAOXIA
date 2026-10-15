@@ -119,3 +119,6 @@
 .history .record-top-line .record-feeling-notices .mood-inline { flex-shrink: 0; margin-left: 0; }
 .record-feeling-notices .record-notices { min-height: 0; margin: 0; gap: 4rpx; }
 .record-notices .notice-mark { width: 32rpx; height: 32rpx; margin-right: 0; }
+
+.sync-status { position: absolute; bottom: max(8px, env(safe-area-inset-bottom)); left: 24rpx; right: 24rpx; padding: 0; min-height: 28rpx; line-height: 28rpx; font-size: 22rpx; font-weight: 400; color: #65665f; background: transparent; text-align: center; }
+.sync-status::after { border: 0; }

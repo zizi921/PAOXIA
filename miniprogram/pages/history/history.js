@@ -1,3 +1,4 @@
+const cloudSync = require('../../utils/sync');
 const { safeTop } = require('../../utils/layout');
 const { formatDuration, formatPace } = require('../../utils/time');
 const { readRecords, clearRecords } = require('../../utils/records');
@@ -229,7 +230,19 @@ Page({
     this.skipInitialShow = true;
   },
 
+  retrySync() { cloudSync.sync(); },
+  watchSync() {
+    if (this.stopSyncWatch) this.stopSyncWatch();
+    this.stopSyncWatch = cloudSync.subscribe(status => {
+      this.setData({ syncStatus: status });
+      if (status === 'synced' || status === 'conflict' || status === 'pending') this.refreshCloudRecords();
+    });
+    cloudSync.sync();
+  },
+  onHide() { if (this.stopSyncWatch) this.stopSyncWatch(); },
+  onUnload() { if (this.stopSyncWatch) this.stopSyncWatch(); },
   onShow() {
+    this.watchSync();
     showShareMenu();
     // onLoad already populated this page; refresh only when returning to it.
     if (this.skipInitialShow) {
@@ -248,6 +261,23 @@ Page({
     if (this.data.mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
   },
 
+  refreshCloudRecords() {
+    const wasEmpty = !this.data.records.length;
+    try { this.setData({ records: this.prepareRecords(readRecords()) }); }
+    catch (error) { wx.showToast({ title: this.data.copy.readError, icon: 'none' }); return; }
+    if (wasEmpty && this.data.records.length) {
+      const latest = this.data.records[0];
+      this.setData({ mode: 'day', dayValue: latest.date, monthValue: latest.date.slice(0, 7) });
+      this.applyYear(latest.date.slice(0, 4));
+      this.applyMonth(this.data.monthValue);
+      this.applyDay(latest.date, latest.id);
+    } else {
+      this.applyYear(this.data.periodLabels.year);
+      this.applyMonth(this.data.monthValue);
+      if (this.data.mode === 'day') this.applyDay(this.data.dayValue, this.data.selectedRecord && this.data.selectedRecord.id);
+    }
+    this.fitDayDetail();
+  },
   onReady() { this.fitDayDetail(); },
   onResize() { this.fitDayDetail(); },
 

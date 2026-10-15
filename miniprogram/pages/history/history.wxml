@@ -91,4 +91,5 @@
       </picker-view>
     </view>
   </view>
+  <button class="sync-status" bindtap="retrySync" aria-live="polite">{{copy.sync[syncStatus || 'pending']}}</button>
 </view>

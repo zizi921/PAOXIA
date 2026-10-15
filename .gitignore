@@ -11,3 +11,6 @@ project.private.config.json
 # Generated previews and discarded concept iterations
 output/ui-preview/
 output/imagegen/
+
+# Cloud function dependencies
+node_modules/

@@ -1,0 +1,5 @@
+{
+  "envId": "cloud1-d0gdhw9khd6812077",
+  "functionRoot": "cloudfunctions",
+  "functions": [{"name":"paoxiaSync","handler":"index.main","runtime":"Nodejs20.19","timeout":30,"memorySize":256,"installDependency":true,"ignore":["node_modules/**"]}]
+}

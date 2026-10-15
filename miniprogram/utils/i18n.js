@@ -3,6 +3,7 @@ const STORAGE_KEY = 'paoxia.language';
 const COPY = {
   en: {
     home: {
+      sync: { pending: 'Saved here · tap to sync', syncing: 'Syncing with WeChat…', synced: 'Synced with WeChat', error: 'Not synced · tap to retry', conflict: 'Both edits saved · tap to sync' },
       go: 'START', continueRun: 'Continue run', continueDraft: 'Continue draft', history: 'Days Out.',
       goAria: 'Start running', continueRunAria: 'Continue this run', continueDraftAria: 'Continue your draft', historyAria: 'View running history',
       loadError: 'Could not load your run or draft.'
@@ -27,19 +28,21 @@ const COPY = {
       deleteError: 'Could not delete this run. Try again.', deleteNavError: 'Run deleted. Could not open history.', saveChangesError: 'Could not save changes. Try again.', saveError: 'Could not save this run. Try again.', cleanupError: 'Run saved. Draft cleanup failed.', savedNavError: 'Run saved. Tap Save to open history.'
     },
     history: {
+      sync: { pending: 'Saved here · tap to sync', syncing: 'Syncing with WeChat…', synced: 'Synced with WeChat', error: 'Not synced · tap to retry', conflict: 'Both edits saved · tap to sync' },
       title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', yearFilter: 'Filter year', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
-      noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Your saved runs stay on this device.',
+      noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Synced runs follow your WeChat account.',
       noMonth: 'No days out this month.', noMonthCopy: 'Pick another month or go again.', noYear: 'No days out this year.', noYearCopy: 'Try another year or start a new run.',
       dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', paceKicker: 'PACE', felt: 'FELT', spotted: 'SEEN', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
       noDay: 'No day out here yet.', noDayCopy: 'Choose another date or go again.', goAgain: 'One More Time',
       notSet: 'Not set', good: 'Good', calm: 'Calm', tired: 'Tired', unsure: 'Not sure',
       tree: 'Tree', wind: 'Wind', people: 'People', cloud: 'Cloud', cat: 'Cat', dog: 'Dog', flower: 'Flower', sun: 'Sun', moon: 'Moon', streetlight: 'Streetlight', car: 'Car', bicycle: 'Bicycle', bird: 'Bird', house: 'House', didntNotice: 'Nothing',
-      clearAll: 'Clear', clearTitle: 'Clear all runs?', clearContent: 'All saved runs, notes and drawings on this device will be permanently deleted. Drafts and settings will stay.', clearConfirm: 'Clear all', clearCancel: 'Cancel', clearError: 'Could not clear runs. Try again.',
+      clearAll: 'Clear', clearTitle: 'Clear all runs?', clearContent: 'All runs shown here, including notes and drawings, will be deleted from this WeChat account after syncing. Drafts and settings will stay.', clearConfirm: 'Clear all', clearCancel: 'Cancel', clearError: 'Could not clear runs. Try again.',
       emptyYearHint: 'Try another year.', emptyMonthHint: 'Pick another month.', readError: 'Could not read saved runs.', editError: 'Could not open edit. Try again.'
     }
   },
   zh: {
     home: {
+      sync: { pending: '已存本机 · 点此同步', syncing: '正在同步微信记录…', synced: '已同步至微信账号', error: '尚未同步 · 点此重试', conflict: '两份修改均已保留 · 点此同步' },
       go: '出发', continueRun: '继续跑步', continueDraft: '继续填写', history: '跑跑记记',
       goAria: '开始跑步计时', continueRunAria: '继续本次跑步', continueDraftAria: '继续填写跑后记录', historyAria: '查看跑步记录',
       loadError: '无法读取跑步或草稿'
@@ -64,14 +67,15 @@ const COPY = {
       deleteError: '无法删除这条记录，请重试', deleteNavError: '记录已删除，但无法打开跑步记录', saveChangesError: '无法保存修改，请重试', saveError: '无法保存这次记录，请重试', cleanupError: '记录已保存，但草稿清理失败', savedNavError: '记录已保存，请再次点击保存进入跑步记录'
     },
     history: {
+      sync: { pending: '已存本机 · 点此同步', syncing: '正在同步微信记录…', synced: '已同步至微信账号', error: '尚未同步 · 点此重试', conflict: '两份修改均已保留 · 点此同步' },
       title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', yearFilter: '筛选年份', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
-      noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '记录会保存在这台设备上。',
+      noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '同步后的记录，换手机也能找回。',
       noMonth: '这个月还没有跑步记录', noMonthCopy: '换一个月份，或再跑一次。', noYear: '这一年还没有跑步记录', noYearCopy: '换一个年份，或开始一次跑步。',
       dayKicker: '日期', timeKicker: '跑步时长', distanceKicker: '距离', paceKicker: '配速', felt: '感受', spotted: '沿途看到', nothing: '这次没有特别记录', noNote: '这次没有备注',
       noDay: '这一天还没有跑步记录', noDayCopy: '选择其他日期，或再跑一次。', goAgain: '再跑一次',
       notSet: '未填写', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
       tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', dog: '狗', flower: '花', sun: '太阳', moon: '月亮', streetlight: '路灯', car: '汽车', bicycle: '自行车', bird: '鸟', house: '房子', didntNotice: '没特别留意',
-      clearAll: '清空', clearTitle: '清空所有跑步记录？', clearContent: '将永久删除这台设备上的全部已完成记录、备注和画图，无法恢复。草稿和设置会保留。', clearConfirm: '全部清空', clearCancel: '取消', clearError: '清空失败，请重试',
+      clearAll: '清空', clearTitle: '清空所有跑步记录？', clearContent: '将删除当前显示的全部记录、备注和画图，同步后也会从微信账号中删除。草稿和设置会保留。', clearConfirm: '全部清空', clearCancel: '取消', clearError: '清空失败，请重试',
       emptyYearHint: '换一个年份看看', emptyMonthHint: '换一个月份看看', readError: '无法读取本机记录', editError: '无法打开编辑页面，请重试'
     }
   }

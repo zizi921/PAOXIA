@@ -9,10 +9,10 @@ class TestDate extends Date {
 const storage = new Map();
 const storageWx = {
   getStorageSync: key => storage.has(key) ? JSON.parse(storage.get(key)) : '',
-  setStorageSync: (key, value) => storage.set(key, JSON.stringify(value)),
+  setStorageSync: (key, value) => { if (key === 'paoxia.completedRuns') storage.delete('paoxia.syncState'); storage.set(key, JSON.stringify(value)); },
   removeStorageSync: key => storage.delete(key)
 };
-function savedRecords() { return storageWx.getStorageSync('paoxia.completedRuns') || []; }
+function savedRecords() { const state = storageWx.getStorageSync('paoxia.syncState'); return state ? state.records : storageWx.getStorageSync('paoxia.completedRuns') || []; }
 const appConfig = JSON.parse(fs.readFileSync('miniprogram/app.json'));
 const appWxss = fs.readFileSync('miniprogram/app.wxss','utf8');
 assert(appWxss.includes('@import "styles/inter.wxss"'));
@@ -51,7 +51,7 @@ function load(route, wx, globals = {}) {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/share') ? shareModule.exports : request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/sync') ? { subscribe: () => () => {}, sync: () => Promise.resolve() } : request.endsWith('/share') ? shareModule.exports : request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -441,7 +441,7 @@ const afterDiscard = load('recap', draftRuntime);afterDiscard.onLoad({ durationS
 assert.equal(afterDiscard.data.note, '');
 afterDiscard.updateNote(input('retain on failure'));
 const saveFailure = load('recap', { ...draftRuntime, setStorageSync: (key, value) => {
-  if (key === 'paoxia.completedRuns') throw new Error('full');
+  if (key === 'paoxia.syncState') throw new Error('full');
   storageWx.setStorageSync(key, value);
 }});
 saveFailure.onLoad({});saveFailure.save();
@@ -857,7 +857,7 @@ assert(leanHistory.data.monthRows.every(record => record.noteDrawing === undefin
 assert.equal(JSON.stringify(leanHistory.data.selectedRecord.noteDrawing), JSON.stringify(ink));
 leanHistory.applyDay('2026-09-29', 'ink-two');
 assert.equal(JSON.stringify(leanHistory.data.selectedRecord.noteDrawing), JSON.stringify(ink));
-assert.equal(storageWx.getStorageSync('paoxia.completedRuns')[0].noteDrawing.length, 1);
+assert.equal(savedRecords()[0].noteDrawing.length, 1);
 console.log('PASS: drawing payload limited to visible history detail; stored artwork retained.');
 
 // Complete day details fit above the action even after a drawing gains height.
@@ -896,7 +896,7 @@ for (const language of ['en', 'zh']) {
   const clearPage = load('history', {
     showModal: options => { modal = options; },
     showToast: options => { toast = options; },
-    removeStorageSync: key => { if (failDelete) throw new Error('storage failure'); storageWx.removeStorageSync(key); }
+    setStorageSync: (key, value) => { if (failDelete && key === 'paoxia.syncState') throw new Error('storage failure'); storageWx.setStorageSync(key, value); }
   });
   clearPage.onLoad();
   clearPage.clearAllRecords();

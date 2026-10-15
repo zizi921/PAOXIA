@@ -1,3 +1,4 @@
+const cloudSync = require('../../utils/sync');
 const { safeTop } = require('../../utils/layout');
 const { readActiveRun } = require('../../utils/active-run');
 const { readDraft } = require('../../utils/recap-draft');
@@ -8,7 +9,19 @@ Page({
   onShareTimeline: shareTimeline,
   data: { safeTop: 96, hasActiveRun: false, hasDraft: false, language: 'en', copy: copyFor('en', 'home') },
   onLoad() { this.setData({ safeTop: safeTop() }); },
+  retrySync() { cloudSync.sync(); },
+  watchSync() {
+    if (this.stopSyncWatch) this.stopSyncWatch();
+    this.stopSyncWatch = cloudSync.subscribe(status => {
+      this.setData({ syncStatus: status });
+      if (status === 'synced' || status === 'conflict' || status === 'pending') this.refreshCloudRecords();
+    });
+    cloudSync.sync();
+  },
+  onHide() { if (this.stopSyncWatch) this.stopSyncWatch(); },
+  onUnload() { if (this.stopSyncWatch) this.stopSyncWatch(); },
   onShow() {
+    this.watchSync();
     this.navigating = false;
     showShareMenu(true);
     try {
@@ -17,6 +30,10 @@ Page({
     } catch (error) {
       wx.showToast({ title: this.data.copy.loadError, icon: 'none' });
     }
+  },
+  refreshCloudRecords() {
+    try { this.setData({ hasActiveRun: !!readActiveRun(), hasDraft: !!readDraft() }); }
+    catch (error) { wx.showToast({ title: this.data.copy.loadError, icon: 'none' }); }
   },
   chooseLanguage(event) {
     if (this.navigating) return;
