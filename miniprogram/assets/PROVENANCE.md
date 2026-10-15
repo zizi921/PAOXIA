@@ -27,3 +27,11 @@ Inter Latin subset, sourced from Google Fonts on 2026-09-27 under the SIL Open F
 `notice-color-*.png` (12 icons) were generated with OpenAI image generation from the user-provided existing notice grid and approved in this conversation on 2026-10-15. The approved sheet was extracted into individual 128px assets with transparent exterior padding. Labels remain native localized UI text. These assets are shared by recap and history; the original outline assets remain available.
 
 The dog icon was subsequently edited with OpenAI image generation to use white fur, retaining its black outline and transparent exterior.
+
+## Additional history poses
+
+`history-runner-11.png` through `history-runner-15.png` were generated with OpenAI image generation on 2026-10-15 using a contact sheet of the existing ten mascots as the visual reference. Poses: side stretch, quadriceps stretch, cross-legged rest, hands-behind-back walk, and hands-on-knees rest. Extracted into transparent 320px square assets for the existing history illustration slot.
+
+`history-runner-16.png` through `history-runner-20.png` were generated in a second batch with the same reference and processing: shoulder stretch, seated forward stretch, side lunge, skipping, and reclining rest.
+
+`history-runner-21.png` through `history-runner-25.png` were generated with the same reference and processing: airplane arms, relaxed squat, hand-on-chest wave, seated knee hug, and tiptoe overhead stretch.

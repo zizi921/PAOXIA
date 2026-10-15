@@ -33,7 +33,7 @@ const WEATHER_META = {
   rainy: { glyph: '☂', className: 'rainy' },
   windy: { glyph: '≋', className: 'windy' }
 };
-const HISTORY_RUNNER_POSES = Array.from({ length: 10 }, (_, index) => {
+const HISTORY_RUNNER_POSES = Array.from({ length: 25 }, (_, index) => {
   const number = String(index + 1).padStart(2, '0');
   return { image: `/assets/history-runner-${number}.png`, className: `pose-${number}` };
 });
