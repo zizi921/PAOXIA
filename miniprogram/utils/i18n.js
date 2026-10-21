@@ -4,7 +4,7 @@ const COPY = {
   en: {
     home: {
       sync: { pending: 'Saved here · tap to sync', syncing: 'Syncing with WeChat…', synced: 'Synced with WeChat', error: 'Not synced · tap to retry', conflict: 'Both edits saved · tap to sync' },
-      go: 'START', continueRun: 'Continue run', continueDraft: 'Continue draft', history: 'Days Out.',
+      go: 'START', continueRun: 'Continue run', continueDraft: 'Continue draft', history: 'Days Out',
       goAria: 'Start running', continueRunAria: 'Continue this run', continueDraftAria: 'Continue your draft', historyAria: 'View running history',
       loadError: 'Could not load your run or draft.'
     },
@@ -32,7 +32,7 @@ const COPY = {
     history: {
       routeTitle: 'RUN OUTLINE', routePartial: 'Some parts of this route were not recorded',
       sync: { pending: 'Saved here · tap to sync', syncing: 'Syncing with WeChat…', synced: 'Synced with WeChat', error: 'Not synced · tap to retry', conflict: 'Both edits saved · tap to sync' },
-      title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', yearFilter: 'Filter year', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
+      title: 'Days Out', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', yearFilter: 'Filter year', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
       noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Synced runs follow your WeChat account.',
       noMonth: 'No days out this month.', noMonthCopy: 'Pick another month or go again.', noYear: 'No days out this year.', noYearCopy: 'Try another year or start a new run.',
       dayKicker: 'DAY', timeKicker: 'TIME OUT', distanceKicker: 'DISTANCE', paceKicker: 'PACE', felt: 'FELT', spotted: 'SEEN', nothing: 'Nothing noted this time.', noNote: 'No note this time.',
@@ -46,13 +46,13 @@ const COPY = {
   zh: {
     home: {
       sync: { pending: '已存本机 · 点此同步', syncing: '正在同步微信记录…', synced: '已同步至微信账号', error: '尚未同步 · 点此重试', conflict: '两份修改均已保留 · 点此同步' },
-      go: '出发', continueRun: '继续跑步', continueDraft: '继续填写', history: '跑跑记记',
+      go: '跑一下', continueRun: '继续跑步', continueDraft: '继续填写', history: '记一记',
       goAria: '开始跑步计时', continueRunAria: '继续本次跑步', continueDraftAria: '继续填写跑后记录', historyAria: '查看跑步记录',
       loadError: '无法读取跑步或草稿'
     },
     run: {
       gpsLocating: '正在定位…', gpsReady: 'GPS 距离', gpsWeak: '定位信号较弱', gpsUnavailable: '定位不可用 · 打开设置', gpsPaused: '距离已暂停', gpsPartial: '距离可能不完整，请在跑后核对',
-      moving: '跑一下', breath: '歇会儿', pause: '暂停', resume: '继续', done: '完成',
+      moving: '在路上', breath: '歇会儿', pause: '暂停', resume: '继续', done: '完成',
       timeAria: '当前跑步时长', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
     },
@@ -64,7 +64,7 @@ const COPY = {
       howWasIt: '还好吗你？', good: '不错', calm: '平静', tired: '累了', unsure: '说不准',
       whatNotice: '路上有什么小发现？', tree: '树', wind: '风', people: '人', cloud: '云', cat: '猫', streetlight: '路灯', car: '汽车', bicycle: '自行车', bird: '鸟', house: '房子', dog: '狗', flower: '花', nothingLabel: '没特别留意', didnt: '没特别', notice: '留意',
       distance: '跑了多远', optional: '（可选）', distanceInputAria: '填写跑步距离，单位公里', notePlaceholder: '写两句，画两笔…',
-      save: '记下啦', saveChanges: '保存修改', continueRun: '接着跑', cancel: '取消', discardDraft: '算了', deleteRun: '删除这次记录',
+      save: '记下来', saveChanges: '保存修改', continueRun: '接着跑', cancel: '取消', discardDraft: '算了', deleteRun: '删除这次记录',
       discardTitle: '放弃草稿？', discardContent: '本次时长和填写内容将被删除，且不会保存为跑步记录。', discardConfirm: '放弃', keep: '保留',
       deleteTitle: '删除这次记录？', deleteContent: '这条跑步记录及其内容将被永久删除。', deleteConfirm: '删除',
       loadRecordError: '无法读取这条记录，请重新打开', loadDraftError: '无法读取草稿，请重新打开页面', draftError: '无法保存草稿，请重试',
@@ -74,7 +74,7 @@ const COPY = {
     history: {
       routeTitle: '跑过的形状', routePartial: '部分路段未记录',
       sync: { pending: '已存本机 · 点此同步', syncing: '正在同步微信记录…', synced: '已同步至微信账号', error: '尚未同步 · 点此重试', conflict: '两份修改均已保留 · 点此同步' },
-      title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', yearFilter: '筛选年份', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
+      title: '记一记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', yearFilter: '筛选年份', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
       noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '同步后的记录，换手机也能找回。',
       noMonth: '这个月还没有跑步记录', noMonthCopy: '换一个月份，或再跑一次。', noYear: '这一年还没有跑步记录', noYearCopy: '换一个年份，或开始一次跑步。',
       dayKicker: '日期', timeKicker: '跑步时长', distanceKicker: '距离', paceKicker: '配速', felt: '感受', spotted: '沿途看到', nothing: '这次没有特别记录', noNote: '这次没有备注',
