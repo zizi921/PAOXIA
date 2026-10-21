@@ -96,11 +96,9 @@
 
     <view class="form-row distance-row">
       <text class="handwritten field-label">{{copy.distance}} <text class="optional">{{copy.optional}}</text></text>
-      <input class="distance-input handwritten" type="digit" maxlength="5" value="{{distance}}" placeholder="0.00" bindinput="updateDistance" aria-label="{{copy.distanceInputAria}}" />
+      <input class="distance-input handwritten" always-embed="{{true}}" type="digit" maxlength="5" value="{{distance}}" placeholder="0.00" bindinput="updateDistance" aria-label="{{copy.distanceInputAria}}" />
       <text class="handwritten unit">km</text>
     </view>
-
-    <text wx:if="{{distanceIncomplete}}" class="distance-warning">{{copy.distanceCheck}}</text>
 
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="openNote">{{editing ? copy.saveChanges : copy.save}}</button>
     <view class="recap-secondary-actions">

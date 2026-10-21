@@ -20,8 +20,7 @@
 .section { margin-top: 30rpx; }
 .section-title { display: block; font-size: 44rpx; line-height: 52rpx; }
 .mood-grid, .notice-grid { display: flex; flex-wrap: wrap; width: calc(100% + 80rpx); margin-left: -40rpx; margin-right: -40rpx; }
-.mood-grid { margin-top: 40rpx; }
-.notice-grid { margin-top: 38rpx; }
+.mood-grid, .notice-grid { margin-top: 38rpx; }
 .choice { position: relative; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; margin: 0; padding: 10rpx 2rpx 8rpx; border: 0; border-radius: 50%; background: transparent; color: #262622; line-height: 1; overflow: visible; }
 .choice::after { border: 0; }
 .choice-pressed { opacity: .62; transform: scale(.97); }
@@ -76,7 +75,7 @@
   .recap-title { font-size: 78rpx; }
   .section { margin-top: 20rpx; }
   .mood-section { margin-top: 60rpx; }
-  .mood-grid { margin-top: 30rpx; }
+  .mood-grid { margin-top: 28rpx; }
   .mood-choice { min-height: 114rpx; }
   .notice-section { margin-top: 62rpx; }
   .notice-grid { margin-top: 28rpx; }
@@ -303,5 +302,3 @@
 .recap .mood-section,
 .recap .notice-section,
 .recap .distance-row { position: relative; left: -10rpx; }
-
-.distance-warning { display: block; margin-top: 8rpx; color: #7a7b75; font-size: 22rpx; text-align: center; }

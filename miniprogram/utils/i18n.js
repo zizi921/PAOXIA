@@ -52,7 +52,7 @@ const COPY = {
     },
     run: {
       gpsLocating: '正在定位…', gpsReady: 'GPS 距离', gpsWeak: '定位信号较弱', gpsUnavailable: '定位不可用 · 打开设置', gpsPaused: '距离已暂停', gpsPartial: '距离可能不完整，请在跑后核对',
-      moving: '跑下', breath: '歇会儿', pause: '暂停', resume: '继续', done: '完成',
+      moving: '跑一下', breath: '歇会儿', pause: '暂停', resume: '继续', done: '完成',
       timeAria: '当前跑步时长', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
     },
