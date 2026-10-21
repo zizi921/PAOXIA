@@ -692,7 +692,7 @@ storageWx.setStorageSync('paoxia.completedRuns', [{ id: 'zh-run', date: '2026-09
 const zhHome = load('home', {});zhHome.onLoad();zhHome.onShow();
 assert.equal(zhHome.data.language, 'zh');assert.equal(zhHome.data.copy.go, '出发');assert.equal(zhHome.data.copy.history, '跑跑记记');
 const zhRun = load('run', {}, { Date: clock, setInterval: () => 1, clearInterval: () => {} });zhRun.onLoad({ startedAt: String(now) });
-assert.equal(zhRun.data.copy.moving, '跑下');assert.equal(zhRun.data.copy.pause, '暂停');
+assert.equal(zhRun.data.copy.moving, '跑一下');assert.equal(zhRun.data.copy.pause, '暂停');
 const zhRecap = load('recap', {});zhRecap.onLoad({ recordId: 'zh-run' });
 assert.equal(zhRecap.data.durationText, '2分钟');assert.equal(zhRecap.data.copy.so, '跑完啦');assert.equal(zhRecap.data.copy.howWasIt, '还好吗你？');assert.equal(zhRecap.data.weatherLabel, '下雨');
 const zhHistory = load('history', {});zhHistory.onLoad({ recordId: 'zh-run' });
