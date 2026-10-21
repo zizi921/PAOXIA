@@ -1,2 +1,2 @@
 :host { display: block; }
-.outline { display: block; width: 220rpx; height: 220rpx; margin: 0 auto; }
+.outline { display: block; width: 180rpx; height: 180rpx; margin: 0 auto; }

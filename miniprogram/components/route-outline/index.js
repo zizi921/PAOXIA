@@ -27,7 +27,7 @@ Component({
       const ctx = this.ctx;
       ctx.clearRect(0, 0, this.width, this.height);
       if (!shape || !Array.isArray(shape.segments)) return;
-      ctx.strokeStyle = '#262622'; ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#edf4fa'; ctx.lineWidth = 6;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       shape.segments.forEach(segment => {
         if (!Array.isArray(segment) || segment.length < 2) return;

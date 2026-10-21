@@ -126,5 +126,9 @@
 
 .day-cloud.day-cloud-outline { width: 76rpx; height: 76rpx; }
 
-.day-route { padding: 14rpx 20rpx 0; }
+.day-experience { display: flex; align-items: flex-start; }
+.day-experience-copy { flex: 1; min-width: 0; }
+.day-route { flex: 0 0 180rpx; width: 180rpx; padding: 28rpx 20rpx 0 0; }
+.has-route .day-notices { gap: 20rpx 30rpx; padding-left: 20rpx; }
+.has-route .day-blank-copy { margin-left: 0; }
 .route-caption { display: block; text-align: center; color: #7a7b75; font-size: 22rpx; }
