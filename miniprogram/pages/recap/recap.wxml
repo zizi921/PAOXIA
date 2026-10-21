@@ -100,6 +100,8 @@
       <text class="handwritten unit">km</text>
     </view>
 
+    <text wx:if="{{distanceIncomplete}}" class="distance-warning">{{copy.distanceCheck}}</text>
+
     <button class="pill handwritten save-button" hover-class="pressed" bindtap="openNote">{{editing ? copy.saveChanges : copy.save}}</button>
     <view class="recap-secondary-actions">
     <button wx:if="{{canContinue}}" class="continue-button handwritten" hover-class="pressed" bindtap="continueRun">{{copy.continueRun}}</button>

@@ -1,5 +1,10 @@
 {
-  "pages": ["pages/home/home", "pages/run/run", "pages/recap/recap", "pages/history/history"],
+  "pages": [
+    "pages/home/home",
+    "pages/run/run",
+    "pages/recap/recap",
+    "pages/history/history"
+  ],
   "window": {
     "navigationStyle": "custom",
     "navigationBarTextStyle": "black",
@@ -7,5 +12,17 @@
     "backgroundTextStyle": "dark"
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "requiredBackgroundModes": [
+    "location"
+  ],
+  "requiredPrivateInfos": [
+    "startLocationUpdateBackground",
+    "onLocationChange"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于跑步期间前后台测距和生成路线轮廓，只同步公里数与不含经纬度的形状。"
+    }
+  }
 }

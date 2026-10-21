@@ -203,10 +203,13 @@ Page({
   // Keep vector payloads in the logic layer; only the visible detail needs them.
   prepareRecords(records) {
     this.drawings = new Map();
+    this.routes = new Map();
     return records.map(record => {
       const noteDrawing = record.noteDrawing;
       const summary = Object.assign({}, record);
       delete summary.noteDrawing;
+      delete summary.routeShape;
+      if (record.routeShape) this.routes.set(record.id, record.routeShape);
       if (noteDrawing && noteDrawing.length) this.drawings.set(record.id, noteDrawing);
       return summary;
     });
@@ -497,6 +500,7 @@ Page({
     const exactRecord = this.data.records.find(record => record.date === value && (!recordId || record.id === recordId));
     const selectedRecord = decorateRecord(exactRecord || (recordId && this.data.records.find(record => record.date === value)), this.data.language, this.data.copy);
     if (selectedRecord) selectedRecord.noteDrawing = this.drawings && this.drawings.get(selectedRecord.id) || [];
+    if (selectedRecord) selectedRecord.routeShape = this.routes && this.routes.get(selectedRecord.id) || null;
     // Cloud status updates often return the same record. Keep its canvas and fitted
     // layout intact rather than sending the full drawing across the bridge again.
     const unchanged = this.data.dayValue === value && this.data.dayWeekday === weekday

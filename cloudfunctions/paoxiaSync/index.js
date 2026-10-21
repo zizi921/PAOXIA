@@ -14,7 +14,7 @@ function cleanRecord(value) {
       !Array.isArray(value.notices) || value.notices.length > 12 ||
       value.notices.some(n => typeof n !== 'string' || n.length > 30)) throw new Error('INVALID_RECORD');
   const result = {};
-  for (const key of ['id', 'date', 'startedAt', 'finishedAt', 'durationSeconds', 'distance', 'weather', 'mood', 'moodType', 'notices', 'note', 'noteDrawing']) {
+  for (const key of ['id', 'date', 'startedAt', 'finishedAt', 'durationSeconds', 'distance', 'weather', 'mood', 'moodType', 'notices', 'note', 'noteDrawing', 'routeShape']) {
     if (value[key] !== undefined) result[key] = value[key];
   }
   for (const key of ['weather', 'mood', 'moodType']) {
@@ -22,6 +22,20 @@ function cleanRecord(value) {
   }
   for (const key of ['startedAt', 'finishedAt']) {
     if (result[key] !== undefined && (!Number.isFinite(result[key]) || result[key] < 0)) throw new Error('INVALID_RECORD');
+  }
+  if (result.routeShape !== undefined) {
+    const shape = result.routeShape;
+    if (!shape || shape.version !== 1 || typeof shape.partial !== 'boolean' ||
+        !Array.isArray(shape.segments) || shape.segments.length > 32) throw new Error('INVALID_ROUTE');
+    let routeCount = 0;
+    for (const segment of shape.segments) {
+      if (!Array.isArray(segment) || segment.length < 2) throw new Error('INVALID_ROUTE');
+      routeCount += segment.length;
+      if (segment.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n) || n < 0 || n > 1))) throw new Error('INVALID_ROUTE');
+    }
+    if (routeCount > 512) throw new Error('INVALID_ROUTE');
+    // Explicitly reconstruct; no client geographic metadata can enter cloud storage.
+    result.routeShape = { version: 1, partial: shape.partial, segments: shape.segments.map(s => s.map(p => p.slice())) };
   }
   const strokes = result.noteDrawing || [];
   if (!Array.isArray(strokes) || strokes.length > 120) throw new Error('INVALID_DRAWING');
@@ -46,7 +60,7 @@ exports.main = async event => {
   if (!OPENID || callerApp !== APPID) return { ok: false, error: 'UNAUTHENTICATED' };
   const owner = hash(`${APPID}:${OPENID}`);
   const action = event && event.action;
-  if (action === 'identity') return { ok: true, owner };
+  if (action === 'identity') return { ok: true, owner, routeShapeVersion: 1 };
   if (action === 'list') {
     const after = event.after || '';
     if (typeof after !== 'string' || (after && !/^[a-f0-9]{64}$/.test(after))) return { ok: false, error: 'INVALID_CURSOR' };

@@ -125,3 +125,6 @@
 .empty-copy.empty-sync-copy { font-size: 24rpx; white-space: nowrap; }
 
 .day-cloud.day-cloud-outline { width: 76rpx; height: 76rpx; }
+
+.day-route { padding: 14rpx 20rpx 0; }
+.route-caption { display: block; text-align: center; color: #7a7b75; font-size: 22rpx; }

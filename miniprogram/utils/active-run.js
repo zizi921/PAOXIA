@@ -11,7 +11,10 @@ function readActiveRun() {
   return {
     startedAt: run.startedAt,
     pausedAt: run.pausedAt,
-    totalPausedMs: run.totalPausedMs
+    totalPausedMs: run.totalPausedMs,
+    distanceMeters: Number.isFinite(run.distanceMeters) && run.distanceMeters >= 0 ? run.distanceMeters : 0,
+    routeTrace: run.routeTrace || null,
+    distanceIncomplete: !!run.distanceIncomplete
   };
 }
 
@@ -19,7 +22,10 @@ function saveActiveRun(run) {
   wx.setStorageSync(STORAGE_KEY, {
     startedAt: run.startedAt,
     pausedAt: run.pausedAt,
-    totalPausedMs: run.totalPausedMs
+    totalPausedMs: run.totalPausedMs,
+    distanceMeters: Number.isFinite(run.distanceMeters) && run.distanceMeters >= 0 ? run.distanceMeters : 0,
+    routeTrace: run.routeTrace || null,
+    distanceIncomplete: !!run.distanceIncomplete
   });
 }
 

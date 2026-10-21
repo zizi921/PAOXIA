@@ -1,3 +1,4 @@
+const { normalizeRoute } = require('../../utils/route-shape');
 const { safeTop } = require('../../utils/layout');
 const { formatDuration } = require('../../utils/time');
 const { readRecords, saveRecord, updateRecord, deleteRecord } = require('../../utils/records');
@@ -98,7 +99,7 @@ Page({
       return;
     }
     this.run = draft && draft.run || null;
-    prepare({ canContinue: !!this.run });
+    prepare({ canContinue: !!this.run, distanceIncomplete: !!(this.run && this.run.distanceIncomplete) });
     this.draftId = draft ? draft.id : `draft-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const durationSeconds = draft ? draft.durationSeconds : Number(options && options.durationSeconds) || 0;
     prepare({ weather: '', weatherLabel: copy.notSelected, weatherGlyph: '＋',
@@ -397,7 +398,8 @@ Page({
       moodType: this.data.mood || 'unsure',
       notices: Object.keys(this.data.selectedNotices),
       note: this.data.note, noteDrawing: this.data.noteDrawing,
-      weather: this.data.weather
+      weather: this.data.weather,
+      routeShape: normalizeRoute(this.run && this.run.routeTrace, this.run && this.run.distanceIncomplete)
     };
     try {
       if (!this.saved) {

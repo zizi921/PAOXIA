@@ -9,11 +9,13 @@ const COPY = {
       loadError: 'Could not load your run or draft.'
     },
     run: {
+      gpsLocating: 'Finding GPS…', gpsReady: 'GPS distance', gpsWeak: 'Weak GPS signal', gpsUnavailable: 'GPS unavailable · settings', gpsPaused: 'Distance paused', gpsPartial: 'Distance may be incomplete · check after your run',
       moving: 'Moving', breath: 'Take a breath.', pause: 'Pause', resume: 'Resume', done: 'Done',
       timeAria: 'Current run time', pauseAria: 'Pause run timer', resumeAria: 'Resume run timer', doneAria: 'Finish run and fill in recap',
       restoreError: 'Could not save or restore this run.', stateError: 'Could not save run state.', finishError: 'Could not finish this run.'
     },
     recap: {
+      distanceCheck: 'GPS distance may be incomplete. Please check it.',
       customColor: 'Mix a color', closePalette: 'Close palette', colorPreview: 'Selected color', redChannel: 'Red', greenChannel: 'Green', blueChannel: 'Blue', noteBack: 'Back', noteTitle: 'Note', noteDone: 'Done', noteText: 'Text', noteDraw: 'Draw', yourDrawing: 'Your drawing', editNote: 'Edit note or drawing', pen: 'Pen', eraser: 'Eraser', undo: 'Undo last stroke', selected: ', selected', colorsLabel: 'Pen colors', colors: ['Black', 'Blue', 'Green', 'Yellow', 'Red', 'Purple'], drawingHint: 'Write or draw with your finger.', drawingFull: 'Drawing full. Undo to continue.',
       edit: 'Edit', so: 'So?', weather: 'Weather', notSelected: 'Not selected', weatherMenuAria: 'Weather options',
       weatherOptions: { sunny: 'Sunny', cloudy: 'Cloudy', rainy: 'Rainy', windy: 'Windy' },
@@ -28,6 +30,7 @@ const COPY = {
       deleteError: 'Could not delete this run. Try again.', deleteNavError: 'Run deleted. Could not open history.', saveChangesError: 'Could not save changes. Try again.', saveError: 'Could not save this run. Try again.', cleanupError: 'Run saved. Draft cleanup failed.', savedNavError: 'Run saved. Tap Save to open history.'
     },
     history: {
+      routeTitle: 'RUN OUTLINE', routePartial: 'Some parts of this route were not recorded',
       sync: { pending: 'Saved here · tap to sync', syncing: 'Syncing with WeChat…', synced: 'Synced with WeChat', error: 'Not synced · tap to retry', conflict: 'Both edits saved · tap to sync' },
       title: 'Days Out.', edit: 'Edit', year: 'Year', month: 'Month', day: 'Day', previous: 'Previous period', next: 'Next period', yearFilter: 'Filter year', monthFilter: 'Filter month', dayFilter: 'Filter date', cancelFilter: 'Cancel', confirmFilter: 'Confirm', viewRecord: 'View run on', viewMonth: 'View runs in',
       noRuns: 'No days out yet.', noRunsCopy: 'Go again, then save your first run.', localCopy: 'Synced runs follow your WeChat account.',
@@ -48,11 +51,13 @@ const COPY = {
       loadError: '无法读取跑步或草稿'
     },
     run: {
+      gpsLocating: '正在定位…', gpsReady: 'GPS 距离', gpsWeak: '定位信号较弱', gpsUnavailable: '定位不可用 · 打开设置', gpsPaused: '距离已暂停', gpsPartial: '距离可能不完整，请在跑后核对',
       moving: '跑下', breath: '歇会儿', pause: '暂停', resume: '继续', done: '完成',
       timeAria: '当前跑步时长', pauseAria: '暂停跑步计时', resumeAria: '继续跑步计时', doneAria: '结束跑步并填写跑后记录',
       restoreError: '无法保存或恢复本次跑步', stateError: '无法保存跑步状态', finishError: '无法结束本次跑步'
     },
     recap: {
+      distanceCheck: 'GPS 距离可能不完整，请核对或手动填写',
       customColor: '自由调色', closePalette: '收起调色盘', colorPreview: '当前颜色', redChannel: '红', greenChannel: '绿', blueChannel: '蓝', noteBack: '返回', noteTitle: '留下一点什么', noteDone: '完成', noteText: '文字', noteDraw: '画画', yourDrawing: '你的涂鸦', editNote: '编辑文字或涂鸦', pen: '钢笔', eraser: '橡皮擦', undo: '撤销上一笔', selected: '，已选中', colorsLabel: '画笔颜色', colors: ['黑色', '蓝色', '绿色', '黄色', '红色', '紫色'], drawingHint: '用手指写写画画。', drawingFull: '画板已满，请撤销后继续',
       edit: '编辑', so: '跑完啦', weather: '天气', notSelected: '未选择', weatherMenuAria: '天气选项',
       weatherOptions: { sunny: '晴天', cloudy: '多云', rainy: '下雨', windy: '有风' },
@@ -67,6 +72,7 @@ const COPY = {
       deleteError: '无法删除这条记录，请重试', deleteNavError: '记录已删除，但无法打开跑步记录', saveChangesError: '无法保存修改，请重试', saveError: '无法保存这次记录，请重试', cleanupError: '记录已保存，但草稿清理失败', savedNavError: '记录已保存，请再次点击保存进入跑步记录'
     },
     history: {
+      routeTitle: '跑过的形状', routePartial: '部分路段未记录',
       sync: { pending: '已存本机 · 点此同步', syncing: '正在同步微信记录…', synced: '已同步至微信账号', error: '尚未同步 · 点此重试', conflict: '两份修改均已保留 · 点此同步' },
       title: '跑跑记记', edit: '编辑', year: '年', month: '月', day: '日', previous: '上一个时间段', next: '下一个时间段', yearFilter: '筛选年份', monthFilter: '筛选月份', dayFilter: '筛选日期', cancelFilter: '取消', confirmFilter: '确定', viewRecord: '查看跑步记录', viewMonth: '查看月份记录',
       noRuns: '还没有跑步记录', noRunsCopy: '再跑一次，保存你的第一条记录。', localCopy: '同步后的记录，换手机也能找回。',

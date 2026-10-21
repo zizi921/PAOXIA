@@ -303,3 +303,5 @@
 .recap .mood-section,
 .recap .notice-section,
 .recap .distance-row { position: relative; left: -10rpx; }
+
+.distance-warning { display: block; margin-top: 8rpx; color: #7a7b75; font-size: 22rpx; text-align: center; }

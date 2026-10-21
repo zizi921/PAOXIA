@@ -25,6 +25,7 @@ async function perform() {
     for (let count = 0; count < 200; count++) {
       const pending = records.readState().pending[0];
       if (!pending) break;
+      if (pending.record && pending.record.routeShape && identity.routeShapeVersion !== 1) throw new Error('Route sync requires updated cloud function');
       const result = await call({ action: 'write', ...pending });
       if (result.owner && result.owner !== owner) throw new Error('Account changed');
       if (result.ok) records.acknowledge(owner, pending.operation, result.value);

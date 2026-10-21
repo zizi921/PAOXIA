@@ -20,3 +20,18 @@
 .run.lang-zh .headline,
 .run.lang-zh .run-actions .pill,
 .run.lang-zh .return-link { font-weight: 600; }
+
+.run-distance { display: flex; flex-direction: column; align-items: center; margin-top: 18rpx; }
+.distance-value { font-size: 40rpx; color: #262622; font-variant-numeric: tabular-nums; }
+.gps-status { font-size: 22rpx; line-height: 1.4; color: #7a7b75; text-align: center; }
+.gps-settings { padding: 8rpx 12rpx; margin: 0; background: transparent; border: 0; text-decoration: underline; }
+.gps-settings::after { border: 0; }
+.run-art { min-height: 160rpx; }
+@media (max-height: 700px) {
+  .run { padding-top: max(100px, var(--safe-top, 96px)); }
+  .headline { font-size: 76rpx; }
+  .timer { margin-top: 20rpx; font-size: 98rpx; }
+  .run-art { min-height: 100rpx; padding: 8rpx 0; }
+  .run-runner { max-height: 20vh; }
+  .run-actions { top: 0; }
+}

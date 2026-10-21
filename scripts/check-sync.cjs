@@ -24,7 +24,7 @@ vm.runInNewContext(fs.readFileSync('cloudfunctions/paoxiaSync/index.js','utf8'),
     database:()=>({collection:()=>collection,command:{gt:value=>({gt:value})},serverDate:()=>Date.now()})
   }
 });
-const run = id => ({id,date:'2026-10-15',startedAt:1000,finishedAt:601000,durationSeconds:600,distance:'2 km',weather:'sunny',mood:'Good',moodType:'good',notices:['tree'],note:'hello',noteDrawing:[{color:'#123456',points:[[0,0],[1,1]]}]});
+const run = id => ({id,date:'2026-10-15',startedAt:1000,finishedAt:601000,durationSeconds:600,distance:'2 km',weather:'sunny',mood:'Good',moodType:'good',notices:['tree'],note:'hello',noteDrawing:[{color:'#123456',points:[[0,0],[1,1]]}],routeShape:{version:1,partial:false,segments:[[[0.1,0.5],[0.9,0.5]]]}});
 function phone(user='alice', storage=new Map()) {
   const wx = {
     getStorageSync:k=>storage.has(k)?clone(storage.get(k)):'',
@@ -33,6 +33,7 @@ function phone(user='alice', storage=new Map()) {
       if (wx.offline) throw new Error('offline');
       identity={OPENID:user,APPID:'wx9c65c2f6a3a548d3'};
       const result=await backend.exports.main(clone(data));
+      if (wx.legacyServer && data.action === 'identity') delete result.routeShapeVersion;
       if (wx.loseResponse && data.action==='write') { wx.loseResponse=false; throw new Error('response lost'); }
       return {result};
     }}
@@ -46,9 +47,18 @@ function phone(user='alice', storage=new Map()) {
   return {wx,storage,r:records.exports,sync:sync.exports.sync,status:()=>status};
 }
 (async()=>{
+  const legacy=phone('legacy-route'); legacy.wx.legacyServer=true;
+  legacy.r.saveRecord(run('route-old-server')); await legacy.sync();
+  assert.equal(legacy.status(),'error'); assert.equal(legacy.r.readState().pending.length,1);
+  assert.equal(documents.size,0, 'Old server cannot silently discard a route');
+  const safe=backend.exports.cleanRecord({...run('metadata'), routeShape:{...run('x').routeShape, latitude:31, longitude:121}});
+  assert(!('latitude' in safe.routeShape)); assert(!('longitude' in safe.routeShape));
+  for (const segments of [[[[31,121],[0,0]]], [[[0,0],[NaN,0]]], [Array.from({length:513},()=>[0.5,0.5])]]) {
+    assert.throws(()=>backend.exports.cleanRecord({...run('bad'),routeShape:{version:1,partial:false,segments}}));
+  }
   const a=phone(),b=phone();
   a.r.saveRecord(run('one')); await a.sync(); assert.equal(a.status(),'synced');
-  await b.sync(); assert.equal(b.r.readRecords().length,1);assert.equal(b.r.readRecords()[0].noteDrawing[0].color,'#123456');assert.equal(b.r.readRecords()[0].finishedAt,601000);
+  await b.sync(); assert.deepEqual(clone(b.r.readRecords()[0].routeShape),run('one').routeShape); assert.equal(b.r.readRecords().length,1);assert.equal(b.r.readRecords()[0].noteDrawing[0].color,'#123456');assert.equal(b.r.readRecords()[0].finishedAt,601000);
   b.r.updateRecord('one',{...run('one'),note:'phone B'}); await b.sync(); await a.sync(); assert.equal(a.r.readRecords()[0].note,'phone B');
   a.wx.offline=true; a.r.saveRecord(run('offline')); await a.sync(); assert.equal(a.status(),'error');assert.equal(a.r.readState().pending.length,1);
   const restarted=phone('alice',a.storage); restarted.wx.loseResponse=true;await restarted.sync();assert.equal(restarted.status(),'error');

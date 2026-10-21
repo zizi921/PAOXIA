@@ -2,6 +2,7 @@
   "navigationStyle": "custom",
   "disableScroll": true,
   "usingComponents": {
-    "drawing-board": "/components/drawing-board/index"
+    "drawing-board": "/components/drawing-board/index",
+    "route-outline": "/components/route-outline/index"
   }
 }

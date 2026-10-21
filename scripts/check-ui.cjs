@@ -30,9 +30,9 @@ function directoryBytes(directory) {
 }
 assert(directoryBytes('miniprogram') < 1500000, 'Main package source must remain below 1.5 MB');
 const pages = appConfig.pages;
-assert.equal(appConfig.requiredBackgroundModes, undefined);
-assert.equal(appConfig.permission, undefined);
-assert.equal(appConfig.requiredPrivateInfos, undefined);
+assert.deepEqual(appConfig.requiredBackgroundModes, ['location']);
+assert(appConfig.permission['scope.userLocation'].desc);
+assert.deepEqual(appConfig.requiredPrivateInfos, ['startLocationUpdateBackground', 'onLocationChange']);
 for (const route of pages) for (const ext of ['js','json','wxml','wxss']) assert(fs.existsSync(`miniprogram/${route}.${ext}`));
 function load(route, wx, globals = {}) {
   let page;
@@ -47,11 +47,13 @@ function load(route, wx, globals = {}) {
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/i18n.js', 'utf8'), { module: i18nModule, wx: runtimeWx });
   const shareModule = { exports: {} };
   vm.runInNewContext(fs.readFileSync('miniprogram/utils/share.js', 'utf8'), { module: shareModule, wx: runtimeWx });
+  const locationModule = { exports: {} };
+  vm.runInNewContext(fs.readFileSync('miniprogram/utils/run-location.js', 'utf8'), { module: locationModule, wx: runtimeWx, Date: globals.Date || TestDate });
   const context = {
     Page: x => page=x,
     wx: runtimeWx,
     Date: TestDate,
-    require: request => request.endsWith('/sync') ? { subscribe: () => () => {}, sync: () => Promise.resolve() } : request.endsWith('/share') ? shareModule.exports : request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
+    require: request => request.endsWith('/route-shape') ? require('../miniprogram/utils/route-shape') : request.endsWith('/run-location') ? locationModule.exports : request.endsWith('/sync') ? { subscribe: () => () => {}, sync: () => Promise.resolve() } : request.endsWith('/share') ? shareModule.exports : request.endsWith('/recap-draft') ? draftModule.exports : request.endsWith('/i18n') ? i18nModule.exports : request.endsWith('/time') ? time : request.endsWith('/records') ? recordsModule.exports : request.endsWith('/active-run') ? activeRunModule.exports : { safeTop: () => 108 },
     ...globals
   };
   vm.runInNewContext(fs.readFileSync(`miniprogram/pages/${route}/${route}.js`, 'utf8'), context);
@@ -129,8 +131,8 @@ assert.equal(storageWx.getStorageSync('paoxia.recapDraft').distance, '');
 home.onShow();assert.equal(home.data.hasActiveRun,false);
 
 const runWxml = fs.readFileSync('miniprogram/pages/run/run.wxml','utf8');
-assert(!runWxml.includes('location-status'));
-assert(!runWxml.includes('distanceText'));
+assert(runWxml.includes('gps-status'));
+assert(runWxml.includes('distanceText'));
 
 const recap=load('recap',{redirectTo:x=>{navigation=x.url;x.complete();}});
 recap.onLoad({durationSeconds:'8'});assert.equal(recap.data.safeTop,108);assert.equal(recap.data.durationText,'8 sec');
@@ -1085,3 +1087,19 @@ cachedBoard.properties.strokes = [];
 cachedBoard.redraw();
 assert.equal(clears, 2);
 console.log('PASS: unchanged history drawings skip bridge updates and canvas repaint; clearing still redraws.');
+
+// Route survives draft completion and editing; list payloads stay small.
+storage.clear();
+const routeTrace = { segments: [[[0, 0], [100, 0], [100, 100]]], partial: false };
+storageWx.setStorageSync('paoxia.recapDraft', {
+  id: 'shape-draft', durationSeconds: 60, weather: '', mood: '', selectedNotices: {}, distance: '0.2', note: '',
+  run: { startedAt: 1000, finishedAt: 61000, pausedAt: 0, totalPausedMs: 0, routeTrace }
+});
+const routeRecap = load('recap', { redirectTo: x => x.complete() });
+routeRecap.onLoad({}); routeRecap.save();
+assert.equal(savedRecords()[0].routeShape.segments.length, 1);
+const routeHistory = load('history', {}); routeHistory.onLoad();
+assert.equal(routeHistory.data.records[0].routeShape, undefined);
+routeHistory.applyDay(savedRecords()[0].date, savedRecords()[0].id);
+assert.equal(routeHistory.data.selectedRecord.routeShape.segments.length, 1);
+console.log('PASS: route outline persists from draft to completed record and loads only in day detail.');

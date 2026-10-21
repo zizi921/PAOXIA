@@ -1,0 +1,40 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { createRouteTrace, normalizeRoute } = require('../miniprogram/utils/route-shape');
+const location = (x, y) => ({ latitude: -y / 111194.9266, longitude: x / 111194.9266 });
+const circle = createRouteTrace();
+for (let i = 0; i <= 120; i++) circle.add(location(Math.cos(i * Math.PI / 60) * 100, Math.sin(i * Math.PI / 60) * 100), i === 0);
+const shape = normalizeRoute(circle.snapshot(), false);
+const points = shape.segments[0];
+assert.deepEqual(points[0], points.at(-1));
+const span = axis => Math.max(...points.map(p => p[axis])) - Math.min(...points.map(p => p[axis]));
+assert(Math.abs(span(0) - span(1)) < 0.002, 'Circle keeps its aspect ratio');
+assert(!JSON.stringify(shape).includes('latitude'));
+const straight = createRouteTrace();
+straight.add(location(0, 0), true); straight.add(location(100, 0), false);
+assert.deepEqual(normalizeRoute(straight.snapshot()).segments[0], [[0.08, 0.5], [0.92, 0.5]]);
+straight.add(location(200, 100), true); straight.add(location(300, 100), false);
+assert.equal(normalizeRoute(straight.snapshot(), true).segments.length, 2);
+assert.equal(normalizeRoute(straight.snapshot(), true).partial, true);
+const restored = createRouteTrace(straight.snapshot());
+restored.add(location(500, 200), true); restored.add(location(600, 200), false);
+assert.equal(normalizeRoute(restored.snapshot()).segments.length, 3);
+const long = createRouteTrace();
+for (let i = 0; i < 20000; i++) long.add(location(i, Math.sin(i / 20) * 80), i === 0);
+assert(long.snapshot().segments.flat().length <= 512);
+assert.equal(normalizeRoute(long.snapshot()).segments.length, 1);
+for (let i = 0; i < 40; i++) { long.add(location(i, 0), true); long.add(location(i, 10), false); }
+assert.equal(long.snapshot().segments.length, 32); assert.equal(long.snapshot().partial, true);
+assert.equal(normalizeRoute(createRouteTrace().snapshot()), undefined);
+
+let component;
+vm.runInNewContext(fs.readFileSync('miniprogram/components/route-outline/index.js', 'utf8'), { Component: x => { component = x; } });
+let moves = 0, lines = 0, clears = 0;
+const canvas = { ctx: { clearRect() { clears++; }, beginPath() {}, moveTo() { moves++; }, lineTo() { lines++; }, stroke() {} },
+  width: 110, height: 110, properties: { shape: normalizeRoute(straight.snapshot()) } };
+component.methods.draw.call(canvas);
+assert.equal(moves, 2, 'Each piece has its own moveTo, never a connecting line'); assert.equal(lines, 2);
+component.methods.draw.call(canvas); assert.equal(clears, 1, 'Identical shapes do not repaint');
+canvas.properties.shape = null; component.methods.draw.call(canvas); assert.equal(clears, 2);
+console.log('PASS: circular/straight/irregular outlines, gaps, restoration, point limits, no geographic metadata and canvas repaint bounds.');
