@@ -64,6 +64,54 @@ async function main() {
     return module.exports;
   }
   const modules = Object.fromEntries(['route-shape', 'run-location', 'active-run', 'recap-draft', 'i18n', 'time'].map(n => [n, moduleAt(n)]));
+  // Slow first consent must not consume the GPS acquisition timeout.
+  const consentApi = fakeWx();
+  const consentStatuses = [];
+  let consent;
+  consentApi.requirePrivacyAuthorize = opts => { consent = opts; };
+  consentApi.startLocationUpdateBackground = function(opts) {
+    this.starts++;
+    this.listener(point(0)); // native first fix can precede start success
+    opts.success();
+  };
+  const consentTracker = modules['run-location'].createRunLocation({
+    onDistance() {}, onStatus: status => consentStatuses.push(status)
+  }, consentApi);
+  const pendingConsent = consentTracker.start(); await flush();
+  now += 300000; consentTracker.checkSignal();
+  assert.deepEqual(consentStatuses, ['locating']);
+  assert.equal(consentApi.starts, 0);
+  consent.success(); await pendingConsent;
+  assert.equal(consentStatuses.at(-1), 'ready');
+  consentTracker.checkSignal();
+  assert(!consentStatuses.includes('interrupted'));
+  await consentTracker.stop();
+
+  const retryApi = fakeWx(); const retryStatuses = [];
+  retryApi.startLocationUpdateBackground = function(opts) {
+    this.starts++;
+    if (this.starts === 1) opts.fail({ errMsg: 'GPS temporarily unavailable' });
+    else opts.success();
+  };
+  const retryTracker = modules['run-location'].createRunLocation({
+    onDistance() {}, onStatus: status => retryStatuses.push(status)
+  }, retryApi);
+  await retryTracker.start();
+  assert.equal(retryStatuses.at(-1), 'locating');
+  now += 1000; retryTracker.checkSignal(); await flush();
+  assert.equal(retryApi.starts, 2);
+  retryApi.listener(point(0)); assert.equal(retryStatuses.at(-1), 'ready');
+  retryApi.error({ errMsg: 'location timeout' });
+  assert.equal(retryStatuses.at(-1), 'interrupted');
+  now += 1000; retryTracker.checkSignal(); await flush();
+  assert.equal(retryApi.starts, 3);
+  retryApi.listener(point(100)); // re-anchor, never count travel across missing fixes
+  retryApi.error({ errMsg: 'location timeout' });
+  await retryTracker.stop();
+  now += 60000; retryTracker.checkSignal(); await flush();
+  assert.equal(retryApi.starts, 3);
+  assert.equal(retryApi.listener, null);
+
   function page() {
     let result;
     vm.runInNewContext(fs.readFileSync('miniprogram/pages/run/run.js', 'utf8'), {

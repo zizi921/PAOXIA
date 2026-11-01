@@ -44,22 +44,46 @@ function createRunLocation({ onDistance, onStatus, onPoint }, api = wx) {
   let queue = Promise.resolve();
   let lastSignal = 0;
   let stale = false;
+  let starting = false;
+  let hasFix = false;
+  let retryAt = 0;
+  let failures = 0;
+  let privacyReady = false;
+  const blocked = err => /auth.*(?:deny|denied|reject)|permission|privacy|scope|not authorized|no authorization|not supported|API missing|接口.*权限|拒绝|未授权/i.test(String(err && (err.errMsg || err.message) || ''));
   const invoke = name => new Promise((resolve, reject) => {
-    if (!api[name]) { reject(new Error('Location unavailable')); return; }
+    if (!api[name]) { reject(new Error('Location API missing')); return; }
     api[name]({ ...(name === 'startLocationUpdateBackground' ? { type: 'wgs84' } : {}), success: resolve, fail: reject });
   });
   const receive = event => {
     if (!wanted || !listening) return;
     const result = filter.add(event, Date.now());
-    if (result.status === 'ready' || result.status === 'gap') { lastSignal = Date.now(); stale = false; }
+    if (result.status === 'ready' || result.status === 'gap') {
+      lastSignal = Date.now(); stale = false; hasFix = true; retryAt = 0; failures = 0;
+    }
     if (result.point && onPoint) onPoint(result.point, result.newSegment);
     onStatus(result.status);
     if (result.meters) onDistance(result.meters);
   };
-  const error = () => {
-    if (!wanted) return;
+  function fail(err, stage) {
     filter.reset();
-    onStatus('unavailable');
+    // Never include location callbacks/coordinates in diagnostics.
+    console.warn('[PAOXIA GPS]', stage, String(err && (err.errMsg || err.message) || 'location error'));
+    if (stage === 'privacy' || blocked(err)) {
+      wanted = false;
+      retryAt = 0;
+      detach();
+      privacyReady = false;
+      queue = queue.then(() => api.stopLocationUpdate ? invoke('stopLocationUpdate').catch(() => {}) : undefined);
+      onStatus('unavailable');
+      return;
+    }
+    if (hasFix) onStatus('interrupted');
+    else onStatus('locating');
+    retryAt = Date.now() + Math.min(15000, 1000 * Math.pow(2, Math.min(failures++, 4)));
+  }
+  const error = err => {
+    if (!wanted || !listening) return;
+    fail(err, 'update');
   };
   function detach() {
     if (listening) {
@@ -69,42 +93,78 @@ function createRunLocation({ onDistance, onStatus, onPoint }, api = wx) {
     listening = false;
     filter.reset();
   }
+  function launch(restart = false) {
+    if (starting || !wanted) return queue;
+    starting = true;
+    retryAt = 0;
+    const current = revision;
+    queue = queue.then(async () => {
+      let stage = 'privacy';
+      try {
+        if (!wanted || current !== revision) return;
+        if (!api.onLocationChange || !api.offLocationChange || !api.stopLocationUpdate) throw new Error('Location API missing');
+        if (!privacyReady && api.requirePrivacyAuthorize) await invoke('requirePrivacyAuthorize');
+        if (!wanted || current !== revision) return;
+        privacyReady = true;
+        stage = 'start';
+        if (restart) {
+          detach();
+          await invoke('stopLocationUpdate');
+          if (!wanted || current !== revision) return;
+        }
+        // Subscribe before starting: the first fix can arrive before the success callback.
+        listening = true;
+        api.onLocationChange(receive);
+        if (api.onLocationChangeError) api.onLocationChangeError(error);
+        lastSignal = Date.now();
+        stale = false;
+        await invoke('startLocationUpdateBackground');
+        if (!wanted || current !== revision) return;
+        // Authorization dialogs may remain open for minutes. Start the signal timeout afterwards.
+        lastSignal = Date.now();
+      } catch (err) {
+        if (wanted && current === revision) {
+          detach();
+          fail(err, stage);
+        }
+      } finally {
+        if (current === revision) starting = false;
+      }
+    });
+    return queue;
+  }
   return {
     start() {
       if (wanted) return queue;
       wanted = true;
-      const current = ++revision;
-      lastSignal = Date.now();
+      ++revision;
+      starting = false;
       stale = false;
+      hasFix = false;
+      failures = 0;
+      retryAt = 0;
       onStatus('locating');
-      queue = queue.then(async () => {
-        if (!wanted || current !== revision) return;
-        try {
-          if (!api.onLocationChange || !api.offLocationChange || !api.stopLocationUpdate) throw new Error('Location unavailable');
-          if (api.requirePrivacyAuthorize) await invoke('requirePrivacyAuthorize');
-          if (!wanted || current !== revision) return;
-          await invoke('startLocationUpdateBackground');
-          if (!wanted || current !== revision) return; // queued stop cleans up a late authorization
-          api.onLocationChange(receive);
-          if (api.onLocationChangeError) api.onLocationChangeError(error);
-          listening = true;
-        } catch (err) {
-          if (wanted && current === revision) { wanted = false; detach(); onStatus('unavailable'); }
-        }
-      });
-      return queue;
+      return launch();
     },
     checkSignal() {
-      if (wanted && !stale && Date.now() - lastSignal > 30000) {
+      if (!wanted || starting) return;
+      if (retryAt) {
+        if (Date.now() >= retryAt) launch(true);
+        return;
+      }
+      if (listening && !stale && Date.now() - lastSignal > 30000) {
         stale = true;
         filter.reset();
         onStatus('interrupted');
+        retryAt = Date.now() + 1000;
       }
     },
     stop() {
-      if (!wanted && !listening) return queue;
+      if (!wanted && !listening && !starting) return queue;
       wanted = false;
       revision += 1;
+      starting = false;
+      retryAt = 0;
       detach(); // ignore callbacks immediately, even while authorization is pending
       queue = queue.then(() => api.stopLocationUpdate ? invoke('stopLocationUpdate').catch(() => {}) : undefined);
       return queue;
